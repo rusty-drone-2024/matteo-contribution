@@ -15,7 +15,7 @@ impl MediaClient {
         if rq.url().is_empty() || rq.url() == "/" {
             self.fetch_homepage_data();
         } else {
-            if (rq.url().starts_with("/?link=")) {
+            if rq.url().starts_with("/?link=") {
                 let internal_url = &rq.url()[7..];
 
                 if let Some(node_id) = self.dns.get(internal_url) {

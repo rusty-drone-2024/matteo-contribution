@@ -5,7 +5,7 @@ use crate::local_server::FrontendWebServer;
 use crate::low_level::network_handler::{
     run_network_handler, ClientNetworkRequest, ClientNetworkResponse,
 };
-use common_structs::leaf::{Leaf, LeafCommand, LeafPacketSentEvent};
+use common_structs::leaf::{LeafCommand, LeafPacketSentEvent};
 use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};
 use std::collections::HashMap;
@@ -42,7 +42,6 @@ impl MediaClient {
         start_network_handler(network_request_listener, network_response_sender);
 
         Self {
-            initialized: false,
             network_request,
             network_response,
             webserver_requests,

@@ -24,7 +24,7 @@ impl MediaClient {
                     let _ = request.respond(Response::from_data(file.file));
                 }
             }
-            ClientNetworkResponse::GotMedia(request_id, link, media) => {}
+            ClientNetworkResponse::GotMedia(_request_id, _link, _media) => {}
         }
     }
 

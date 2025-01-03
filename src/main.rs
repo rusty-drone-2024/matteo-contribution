@@ -2,18 +2,15 @@ mod local_server;
 mod low_level;
 mod media_client;
 
-use common_structs::leaf::Leaf;
-use crossbeam_channel::{unbounded, Receiver, Sender};
+use crossbeam_channel::unbounded;
 use media_client::MediaClient;
-use std::thread;
 use wg_2024::network::NodeId;
-use wg_2024::packet::{Packet, PacketType};
 
 fn main() {
     let (controller_send, _) = unbounded();
     let (_, controller_rcv) = unbounded();
-    let (packet_leaf_in, packet_rcv) = unbounded();
-    let (packet_send, packet_leaf_out) = unbounded();
+    let (_packet_leaf_in, packet_rcv) = unbounded();
+    let (packet_send, _packet_leaf_out) = unbounded();
 
     let mut client = MediaClient::new(
         7,

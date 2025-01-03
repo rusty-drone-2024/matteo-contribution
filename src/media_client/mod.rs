@@ -2,15 +2,17 @@ mod request_handler;
 mod response_handler;
 
 use crate::local_server::FrontendWebServer;
+use crate::low_level::network_handler::{
+    run_network_handler, ClientNetworkRequest, ClientNetworkResponse,
+};
 use common_structs::leaf::{Leaf, LeafCommand, LeafPacketSentEvent};
+use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};
 use std::collections::HashMap;
 use std::thread;
 use tiny_http::Request;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
-use common_structs::message::Link;
-use crate::low_level::network_handler::{run_network_handler, ClientNetworkRequest, ClientNetworkResponse};
 
 pub struct MediaClient {
     webserver_requests: Receiver<Request>,
@@ -20,7 +22,6 @@ pub struct MediaClient {
     network_request: Sender<ClientNetworkRequest>,
     network_response: Receiver<ClientNetworkResponse>,
 }
-
 
 impl MediaClient {
     pub fn new(
@@ -39,7 +40,7 @@ impl MediaClient {
 
         start_webserver(web_requests_channel);
         start_network_handler(network_request_listener, network_response_sender);
-        
+
         Self {
             initialized: false,
             network_request,
@@ -52,7 +53,7 @@ impl MediaClient {
     }
 
     pub fn run(&mut self) {
-        loop{
+        loop {
             select! {
                 recv(self.webserver_requests) -> msg => {
                     println!("WEB REQUEST {:?}", msg);
@@ -62,7 +63,7 @@ impl MediaClient {
                     println!("NET RESPONSE {:?}", msg);
                     self.handle_response(msg.unwrap());
                 }
-            }   
+            }
         }
     }
 }
@@ -75,7 +76,10 @@ fn start_webserver(requests_channel: Sender<Request>) {
     });
 }
 
-fn start_network_handler(receiver: Receiver<ClientNetworkRequest>, sender: Sender<ClientNetworkResponse>) {
+fn start_network_handler(
+    receiver: Receiver<ClientNetworkRequest>,
+    sender: Sender<ClientNetworkResponse>,
+) {
     thread::spawn(move || {
         run_network_handler(receiver, sender);
     });

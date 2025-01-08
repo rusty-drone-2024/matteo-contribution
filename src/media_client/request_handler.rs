@@ -14,22 +14,21 @@ impl MediaClient {
 
         if rq.url().is_empty() || rq.url() == "/" {
             self.fetch_homepage_data();
-        } else {
-            if rq.url().starts_with("/?link=") {
-                let internal_url = &rq.url()[7..];
+        } else if rq.url().starts_with("/?link=") {
+            let internal_url = &rq.url()[7..];
 
-                if let Some(node_id) = self.dns.get(internal_url) {
-                    let link = internal_url.to_string();
-                    self.fetch_page_data(*node_id, link);
-                } else {
-                    let _ = rq.respond(Response::empty(404));
-                    return;
-                }
+            if let Some(node_id) = self.dns.get(internal_url) {
+                let link = internal_url.to_string();
+                self.fetch_page_data(*node_id, link);
             } else {
                 let _ = rq.respond(Response::empty(404));
                 return;
             }
+        } else {
+            let _ = rq.respond(Response::empty(404));
+            return;
         }
+        
 
         self.open_requests.insert(self.counter, rq);
         self.counter += 1;

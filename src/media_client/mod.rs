@@ -5,7 +5,7 @@ use crate::local_server::FrontendWebServer;
 use crate::low_level::network_handler::{
     run_network_handler, ClientNetworkRequest, ClientNetworkResponse,
 };
-use common_structs::leaf::{LeafCommand, LeafPacketSentEvent};
+use common_structs::leaf::{LeafCommand, LeafEvent};
 use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};
 use std::collections::HashMap;
@@ -26,7 +26,7 @@ pub struct MediaClient {
 impl MediaClient {
     pub fn new(
         _id: NodeId,
-        _controller_send: Sender<LeafPacketSentEvent>,
+        _controller_send: Sender<LeafEvent>,
         _controller_recv: Receiver<LeafCommand>,
         _packet_recv: Receiver<Packet>,
         _packet_send: HashMap<NodeId, Sender<Packet>>,

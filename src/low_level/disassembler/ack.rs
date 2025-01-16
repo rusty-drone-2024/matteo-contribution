@@ -21,6 +21,7 @@ impl Disassembler {
     }
 
     #[allow(dead_code)]
+    //TODO Make it also remove the entry
     pub fn is_packet_acked(&self, session_id: SessionId) -> bool {
         let packet = &self.packets_to_send[&session_id];
 

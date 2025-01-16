@@ -8,7 +8,6 @@ impl NetworkHandler {
     pub(crate) fn handle_client_request(&mut self, client_request: ClientNetworkRequest) {
         match client_request {
             ClientNetworkRequest::ListAll(id) => {
-                dbg!(id);
                 self.disassembler
                     .add_message_to_send(id, Message::RespFilesList(vec![12, 13]));
                 for fragment_index in 0..self.disassembler.get_fragment_size(id).unwrap() {

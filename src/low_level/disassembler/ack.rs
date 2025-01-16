@@ -21,7 +21,7 @@ impl Disassembler {
     }
 
     #[allow(dead_code)]
-    pub fn is_packet_acked(&mut self, session_id: SessionId) -> bool {
+    pub fn is_packet_acked(&self, session_id: SessionId) -> bool {
         let packet = &self.packets_to_send[&session_id];
 
         packet.ack_received.len() >= packet.pieces.len()

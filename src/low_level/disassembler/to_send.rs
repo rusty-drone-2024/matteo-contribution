@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use super::{DisassembledPacket, Disassembler};
 use common_structs::message::Message;
 use common_structs::types::{FragmentIndex, SessionId};
@@ -16,7 +17,7 @@ impl Disassembler {
             routing_header,
             session_id,
             pieces: message.into_fragments(),
-            ack_received: Default::default(),
+            ack_received: HashSet::default(),
         };
 
         self.packets_to_send
@@ -26,7 +27,7 @@ impl Disassembler {
 
     #[allow(dead_code)]
     pub fn get_packet_for_fragment(
-        &mut self,
+        &self,
         session_id: SessionId,
         fragment_id: FragmentIndex,
     ) -> Option<Packet> {

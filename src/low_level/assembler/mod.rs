@@ -1,15 +1,32 @@
+#![allow(dead_code)]
+mod fragment_adder;
+mod merger;
+mod test;
+
 use std::collections::HashMap;
-use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;
 
-#[allow(dead_code)]
+#[derive(Default)]
 pub struct Assembler {
-    expecting_session_ids: HashMap<u64, DisassembledPacked>,
+    messages_to_assemble: HashMap<u64, MessageToAssemble>,
 }
 
-#[allow(dead_code)]
-struct DisassembledPacked {
-    routing_header: SourceRoutingHeader,
-    session_id: u64,
+impl Assembler {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+struct MessageToAssemble {
+    pieces_number: u64,
     pieces: HashMap<u64, Fragment>,
+}
+
+impl MessageToAssemble {
+    fn new(pieces_number: u64) -> Self {
+        Self {
+            pieces_number,
+            pieces: HashMap::default(),
+        }
+    }
 }

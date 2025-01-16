@@ -1,4 +1,4 @@
-use crate::low_level::network_handler::ClientNetworkResponse;
+use crate::low_level::ClientNetworkResponse;
 use crate::media_client::MediaClient;
 use common_structs::message::Link;
 use std::collections::HashMap;

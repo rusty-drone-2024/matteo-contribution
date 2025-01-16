@@ -1,4 +1,4 @@
-use crate::low_level::network_handler::ClientNetworkRequest;
+use crate::low_level::ClientNetworkRequest;
 use crate::media_client::MediaClient;
 use common_structs::message::Link;
 use tiny_http::{Method, Request, Response};

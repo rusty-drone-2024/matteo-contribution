@@ -1,14 +1,9 @@
 use crate::local_server::FrontendWebServer;
-use crossbeam_channel::Sender;
-use tiny_http::{Request, Server};
+use tiny_http::Server;
 
 impl FrontendWebServer {
-    pub fn new(requests_channel: Sender<Request>) -> Self {
-        Self { requests_channel }
-    }
-
     pub fn loop_forever(&self) {
-        let server = Server::http("localhost:7878").unwrap();
+        let server = self.init_server();
 
         loop {
             match server.recv() {
@@ -21,5 +16,13 @@ impl FrontendWebServer {
                 }
             };
         }
+    }
+
+    fn init_server(&self) -> Server {
+        let port = 7700 + self.node_id as u32;
+        let addr = &format!("localhost:{}", port);
+        let server = Server::http(addr).unwrap();
+        open::that(addr).unwrap();
+        server
     }
 }

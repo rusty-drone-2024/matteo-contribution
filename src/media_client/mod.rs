@@ -2,9 +2,8 @@ mod request_handler;
 mod response_handler;
 
 use crate::local_server::FrontendWebServer;
-use crate::low_level::network_handler::{
-    run_network_handler, ClientNetworkRequest, ClientNetworkResponse,
-};
+use crate::low_level::network_handler::NetworkHandler;
+use crate:: low_level::{ClientNetworkResponse, ClientNetworkRequest};
 use common_structs::leaf::{LeafCommand, LeafEvent};
 use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};

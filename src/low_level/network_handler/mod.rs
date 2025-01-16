@@ -1,8 +1,7 @@
-mod high_level_struct;
+use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
 
 use common_structs::message::FileWithData;
 use crossbeam_channel::{Receiver, Sender};
-pub use high_level_struct::*;
 use std::collections::HashMap;
 
 pub fn run_network_handler(

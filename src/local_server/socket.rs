@@ -22,7 +22,7 @@ impl FrontendWebServer {
         let port = 7700 + self.node_id as u32;
         let addr = &format!("localhost:{}", port);
         let server = Server::http(addr).unwrap();
-        open::that(addr).unwrap();
+        println!("OPEN page {} for media client", addr);
         server
     }
 }

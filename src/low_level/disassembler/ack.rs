@@ -21,18 +21,18 @@ impl Disassembler {
 
     pub fn is_message_acked(&self, session_id: SessionId) -> bool {
         let packet = self.packets_to_send.get(&session_id);
-        
-        if let Some(packet) = packet{
-            return packet.ack_received.len() >= packet.pieces.len()
+
+        if let Some(packet) = packet {
+            return packet.ack_received.len() >= packet.pieces.len();
         }
         false
     }
 
     pub fn remove_acked_message(&mut self, session_id: SessionId) -> bool {
-        if !self.is_message_acked(session_id){
+        if !self.is_message_acked(session_id) {
             return false;
         }
-        
+
         self.packets_to_send.remove(&session_id).is_some()
     }
 }

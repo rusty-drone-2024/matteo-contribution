@@ -17,8 +17,8 @@ impl FrontendWebServer {
             };
         }
     }
-    
-    fn init_server(&self) -> Server{
+
+    fn init_server(&self) -> Server {
         let port = 7700 + self.node_id as u32;
         let addr = &format!("localhost:{}", port);
         let server = Server::http(addr).unwrap();

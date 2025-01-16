@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-use common_structs::message::FileWithData;
-use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
 use crate::low_level::network_handler::NetworkHandler;
+use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
+use common_structs::message::FileWithData;
+use std::collections::HashMap;
 
-impl NetworkHandler{
-    pub(super) fn handle_client_request(&self, client_request: ClientNetworkRequest){
+impl NetworkHandler {
+    pub(super) fn handle_client_request(&self, client_request: ClientNetworkRequest) {
         match client_request {
             ClientNetworkRequest::ListAll(id) => {
                 let list = vec![

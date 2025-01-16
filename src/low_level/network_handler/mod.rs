@@ -1,19 +1,22 @@
 mod handle_client;
 
-use crossbeam_channel::{select, Receiver, Sender};
 use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
+use crossbeam_channel::{select, Receiver, Sender};
 
-pub struct NetworkHandler{
+pub struct NetworkHandler {
     client_receiver: Receiver<ClientNetworkRequest>,
     client_sender: Sender<ClientNetworkResponse>,
 }
 
-impl NetworkHandler{
+impl NetworkHandler {
     pub fn new(
         client_receiver: Receiver<ClientNetworkRequest>,
         client_sender: Sender<ClientNetworkResponse>,
-    ) -> Self{
-        Self{client_receiver, client_sender}
+    ) -> Self {
+        Self {
+            client_receiver,
+            client_sender,
+        }
     }
 
     pub fn run(&mut self) {
@@ -25,7 +28,6 @@ impl NetworkHandler{
                     }
                 },
             }
-        }   
+        }
     }
 }
-

@@ -2,7 +2,6 @@ use super::Disassembler;
 use common_structs::types::{FragmentIndex, SessionId};
 
 impl Disassembler {
-    #[allow(dead_code)]
     pub fn ack_fragment(
         &mut self,
         session_id: SessionId,
@@ -20,11 +19,20 @@ impl Disassembler {
         Ok(packet.ack_received.insert(fragment_id))
     }
 
-    #[allow(dead_code)]
-    //TODO Make it also remove the entry
-    pub fn is_packet_acked(&self, session_id: SessionId) -> bool {
-        let packet = &self.packets_to_send[&session_id];
+    pub fn is_message_acked(&self, session_id: SessionId) -> bool {
+        let packet = self.packets_to_send.get(&session_id);
+        
+        if let Some(packet) = packet{
+            return packet.ack_received.len() >= packet.pieces.len()
+        }
+        false
+    }
 
-        packet.ack_received.len() >= packet.pieces.len()
+    pub fn remove_acked_message(&mut self, session_id: SessionId) -> bool {
+        if !self.is_message_acked(session_id){
+            return false;
+        }
+        
+        self.packets_to_send.remove(&session_id).is_some()
     }
 }

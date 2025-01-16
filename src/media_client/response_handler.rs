@@ -13,10 +13,10 @@ impl MediaClient {
                 if let Some(request) = self.open_requests.remove(&request_id) {
                     let _ = request.respond(Response::from_data(html));
 
-                    list.into_iter().for_each(|(link, node_id)| {
+                    for (link, node_id) in list {
                         println!("INSERTING {}", link);
                         self.dns.insert(link, node_id);
-                    });
+                    }
                 }
             }
             ClientNetworkResponse::GotFile(request_id, file) => {

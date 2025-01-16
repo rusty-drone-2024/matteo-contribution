@@ -8,7 +8,7 @@ impl Disassembler {
         fragment_id: FragmentIndex,
     ) -> Result<bool, String> {
         let packet = self
-            .packets_to_send
+            .messages_to_send
             .get_mut(&session_id)
             .ok_or("No session id")?;
 
@@ -20,7 +20,7 @@ impl Disassembler {
     }
 
     pub fn is_message_acked(&self, session_id: SessionId) -> bool {
-        let packet = self.packets_to_send.get(&session_id);
+        let packet = self.messages_to_send.get(&session_id);
 
         if let Some(packet) = packet {
             return packet.ack_received.len() >= packet.pieces.len();
@@ -33,6 +33,6 @@ impl Disassembler {
             return false;
         }
 
-        self.packets_to_send.remove(&session_id).is_some()
+        self.messages_to_send.remove(&session_id).is_some()
     }
 }

@@ -9,8 +9,8 @@ impl MediaClient {
     pub(super) fn handle_response(&mut self, response: ClientNetworkResponse) {
         match response {
             ClientNetworkResponse::ListOfAll(request_id, list) => {
-                let html = self.create_homepage(&list);
                 if let Some(request) = self.open_requests.remove(&request_id) {
+                    let html = self.create_homepage(&list);
                     let _ = request.respond(Response::from_data(html));
 
                     for (link, node_id) in list {

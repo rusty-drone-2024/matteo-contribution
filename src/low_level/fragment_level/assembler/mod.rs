@@ -6,14 +6,15 @@ mod test;
 use std::collections::HashMap;
 use wg_2024::packet::Fragment;
 
-#[derive(Default)]
 pub struct Assembler {
     messages_to_assemble: HashMap<u64, MessageToAssemble>,
 }
 
 impl Assembler {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            messages_to_assemble: HashMap::new(),
+        }
     }
 }
 

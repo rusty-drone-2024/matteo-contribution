@@ -1,4 +1,4 @@
-use crate::low_level::assembler::Assembler;
+use super::Assembler;
 use common_structs::message::Message;
 use common_structs::types::SessionId;
 

@@ -1,5 +1,5 @@
 #![cfg(test)]
-use crate::low_level::disassembler::Disassembler;
+use super::Disassembler;
 use common_structs::message::Message;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Packet;

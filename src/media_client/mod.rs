@@ -24,7 +24,7 @@ pub struct MediaClient {
 
 impl MediaClient {
     pub fn new(
-        _id: NodeId,
+        id: NodeId,
         _controller_send: Sender<LeafEvent>,
         _controller_recv: Receiver<LeafCommand>,
         _packet_recv: Receiver<Packet>,
@@ -37,7 +37,7 @@ impl MediaClient {
         let (network_request, network_request_listener) = unbounded();
         let (network_response_sender, network_response) = unbounded();
 
-        start_webserver(web_requests_channel);
+        start_webserver(id, web_requests_channel);
         start_network_handler(network_request_listener, network_response_sender);
 
         Self {
@@ -66,8 +66,8 @@ impl MediaClient {
     }
 }
 
-fn start_webserver(requests_channel: Sender<Request>) {
-    let server = FrontendWebServer::new(requests_channel);
+fn start_webserver(node_id: NodeId, requests_channel: Sender<Request>) {
+    let server = FrontendWebServer::new(node_id, requests_channel);
 
     thread::spawn(move || {
         server.loop_forever();
@@ -79,6 +79,6 @@ fn start_network_handler(
     sender: Sender<ClientNetworkResponse>,
 ) {
     thread::spawn(move || {
-        run_network_handler(receiver, sender);
+        NetworkHandler::new(receiver, sender).run();
     });
 }

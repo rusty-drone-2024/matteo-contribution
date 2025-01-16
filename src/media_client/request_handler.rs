@@ -34,6 +34,7 @@ impl MediaClient {
     }
 
     fn fetch_homepage_data(&self) {
+        dbg!(self.counter);
         let _ = self
             .network_request
             .send(ClientNetworkRequest::ListAll(self.counter));

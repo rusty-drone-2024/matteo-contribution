@@ -12,7 +12,7 @@ impl Disassembler {
             ack_received: HashSet::default(),
         };
 
-        self.packets_to_send
+        self.messages_to_send
             .insert(session_id, disassembled)
             .is_some()
     }
@@ -23,7 +23,7 @@ impl Disassembler {
         session_id: SessionId,
         fragment_id: FragmentIndex,
     ) -> Option<Packet> {
-        let disassembled = self.packets_to_send.get(&session_id)?;
+        let disassembled = self.messages_to_send.get(&session_id)?;
         let fragment = disassembled.pieces.get(fragment_id as usize)?;
 
         Some(Packet::new_fragment(
@@ -34,7 +34,7 @@ impl Disassembler {
     }
 
     pub fn get_fragment_size(&self, session_id: SessionId) -> Option<u64> {
-        let disassembled = self.packets_to_send.get(&session_id)?;
+        let disassembled = self.messages_to_send.get(&session_id)?;
         Some(disassembled.pieces.len() as u64)
     }
 }

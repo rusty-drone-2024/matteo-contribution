@@ -2,9 +2,9 @@ mod request_handler;
 mod response_handler;
 
 use crate::local_server::FrontendWebServer;
-use crate::low_level::network_handler::NetworkHandler;
+use crate::low_level::network_level::NetworkHandler;
 use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
-use common_structs::leaf::{LeafCommand, LeafEvent};
+use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};
 use std::collections::HashMap;
@@ -22,13 +22,13 @@ pub struct MediaClient {
     network_response: Receiver<ClientNetworkResponse>,
 }
 
-impl MediaClient {
-    pub fn new(
+impl Leaf for MediaClient {
+    fn new(
         id: NodeId,
         _controller_send: Sender<LeafEvent>,
         _controller_recv: Receiver<LeafCommand>,
-        _packet_recv: Receiver<Packet>,
-        _packet_send: HashMap<NodeId, Sender<Packet>>,
+        packet_recv: Receiver<Packet>,
+        packet_send: HashMap<NodeId, Sender<Packet>>,
     ) -> Self
     where
         Self: Sized,
@@ -38,7 +38,12 @@ impl MediaClient {
         let (network_response_sender, network_response) = unbounded();
 
         start_webserver(id, web_requests_channel);
-        start_network_handler(network_request_listener, network_response_sender);
+        start_network_handler(
+            network_request_listener,
+            network_response_sender,
+            packet_recv,
+            packet_send,
+        );
 
         Self {
             network_request,
@@ -50,7 +55,7 @@ impl MediaClient {
         }
     }
 
-    pub fn run(&mut self) {
+    fn run(&mut self) {
         loop {
             select! {
                 recv(self.webserver_requests) -> msg => {
@@ -77,8 +82,10 @@ fn start_webserver(node_id: NodeId, requests_channel: Sender<Request>) {
 fn start_network_handler(
     receiver: Receiver<ClientNetworkRequest>,
     sender: Sender<ClientNetworkResponse>,
+    packet_receiver: Receiver<Packet>,
+    packet_senders: HashMap<NodeId, Sender<Packet>>,
 ) {
     thread::spawn(move || {
-        NetworkHandler::new(receiver, sender).run();
+        NetworkHandler::new(receiver, sender, packet_receiver, packet_senders).run();
     });
 }

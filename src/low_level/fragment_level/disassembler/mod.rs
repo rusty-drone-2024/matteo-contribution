@@ -7,14 +7,15 @@ use common_structs::types::FragmentIndex;
 use std::collections::{HashMap, HashSet};
 use wg_2024::packet::Fragment;
 
-#[derive(Default)]
 pub struct Disassembler {
-    packets_to_send: HashMap<u64, DisassembledPacket>,
+    messages_to_send: HashMap<u64, DisassembledPacket>,
 }
 
 impl Disassembler {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            messages_to_send: HashMap::new(),
+        }
     }
 }
 

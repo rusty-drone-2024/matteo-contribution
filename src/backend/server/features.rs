@@ -14,7 +14,11 @@ impl TextServer {
     pub(super) fn get_file(&self, link: Link) -> Option<FileWithData> {
         //TODO self.id instead of 20
         let file = format!(
-            "<!DOCTYPE html><html><body><h1>{} - {}</h1></body></html>",
+            "<!DOCTYPE html><html><body><h1>{} - {}</h1><p>\
+            sdadsadsadsasadasdsdasdsadsadsadasdasdsadsadasdsdasdsa<br>\
+            asdsadsadddddddddddddddddddddddddddsdsadsadsadsadasdsad<br>\
+            asdsdasdsaaaadsdasdsadsadsadsadasdsadsadsadsadsadsadsad<br>\
+            <p></body></html>",
             20, link
         );
 

@@ -23,18 +23,22 @@ impl NetworkBacked {
             routing_header,
             pack_type,
         } = packet;
+        
+        // TODO check routing,....
+        
         self.decide_response_and_chain(session_id, routing_header, pack_type);
     }
 
     fn decide_response_and_chain(
         &mut self,
         session_id: SessionId,
-        routing_header: SourceRoutingHeader,
+        routing: SourceRoutingHeader,
         pack_type: PacketType,
     ) {
         match pack_type {
             MsgFragment(fragment) => {
-                self.merger_and_chain(session_id, routing_header, fragment);
+                self.handle_send_packet(Packet::new_ack(routing.get_reversed(), session_id, fragment.fragment_index));
+                self.merger_and_chain(session_id, routing, fragment);
             }
             PacketType::Ack(ack) => {
                 self.disassembler.ack(session_id, ack.fragment_index);
@@ -44,10 +48,9 @@ impl NetworkBacked {
                     .disassembler
                     .nack_require_resend(session_id, nack.fragment_index);
 
-                if let Some(_fragment) = fragment_to_resend {
-                    todo!()
-                    /*let response = Packet::new_fragment(.., session_id, fragment);
-                    self.handle_send_packet(response);*/
+                if let Some((routing, fragment)) = fragment_to_resend {
+                    let response = Packet::new_fragment(routing, session_id, fragment);
+                    self.handle_send_packet(response);
                 }
             }
             PacketType::FloodRequest(flood) => {

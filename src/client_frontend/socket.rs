@@ -1,4 +1,4 @@
-use crate::local_server::FrontendWebServer;
+use crate::client_frontend::FrontendWebServer;
 use crate::utils::set_panics_message;
 use tiny_http::Server;
 

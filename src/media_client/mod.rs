@@ -2,7 +2,7 @@ mod request_handler;
 mod response_handler;
 
 use crate::backend::{ClientNetworkRequest, ClientNetworkResponse, TextMediaClientBackend};
-use crate::local_server::FrontendWebServer;
+use crate::client_frontend::FrontendWebServer;
 use crate::utils::set_panics_message;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::Link;

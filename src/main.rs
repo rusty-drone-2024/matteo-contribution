@@ -1,5 +1,5 @@
 mod backend;
-mod local_server;
+mod client_frontend;
 mod media_client;
 mod utils;
 

@@ -1,9 +1,9 @@
 mod request_handler;
 mod response_handler;
 
+use crate::backend::{ClientNetworkRequest, ClientNetworkResponse, TextMediaClientBackend};
 use crate::local_server::FrontendWebServer;
-use crate::low_level::network_level::NetworkHandler;
-use crate::low_level::{ClientNetworkRequest, ClientNetworkResponse};
+use crate::utils::set_panics_message;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::Link;
 use crossbeam_channel::{select, unbounded, Receiver, Sender};
@@ -56,14 +56,13 @@ impl Leaf for MediaClient {
     }
 
     fn run(&mut self) {
+        set_panics_message("Failed client middleware");
         loop {
             select! {
                 recv(self.webserver_requests) -> msg => {
-                    println!("WEB REQUEST {:?}", msg);
                     self.handle_request(msg.unwrap());
                 },
                 recv(self.network_response) -> msg => {
-                    println!("NET RESPONSE {:?}", msg);
                     self.handle_response(msg.unwrap());
                 }
             }
@@ -86,6 +85,12 @@ fn start_network_handler(
     packet_senders: HashMap<NodeId, Sender<Packet>>,
 ) {
     thread::spawn(move || {
-        NetworkHandler::new(receiver, sender, packet_receiver, packet_senders).run();
+        TextMediaClientBackend::new(
+            packet_receiver,
+            packet_senders.into_iter().next().unwrap().1,
+            receiver,
+            sender,
+        )
+        .run();
     });
 }

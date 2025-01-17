@@ -1,10 +1,11 @@
+mod backend;
 mod local_server;
-mod low_level;
 mod media_client;
+mod utils;
 
+use crate::backend::TextServer;
 use common_structs::leaf::Leaf;
 use crossbeam_channel::unbounded;
-use low_level::test_responder::EchoServer;
 use media_client::MediaClient;
 use std::thread;
 use wg_2024::network::NodeId;
@@ -23,7 +24,7 @@ fn main() {
         vec![(20 as NodeId, packet_send)].into_iter().collect(),
     );
 
-    let mut echo_server = EchoServer::new(packet_leaf_out, packet_leaf_in);
+    let mut echo_server = TextServer::new(packet_leaf_out, packet_leaf_in);
 
     thread::spawn(move || {
         echo_server.run();

@@ -1,4 +1,4 @@
-use crate::low_level::ClientNetworkResponse;
+use crate::backend::ClientNetworkResponse;
 use crate::media_client::MediaClient;
 use common_structs::message::Link;
 use std::collections::HashMap;
@@ -7,6 +7,8 @@ use wg_2024::network::NodeId;
 
 impl MediaClient {
     pub(super) fn handle_response(&mut self, response: ClientNetworkResponse) {
+        println!("NET RESPONSE {:?} {:?}", response, self.open_requests);
+
         match response {
             ClientNetworkResponse::ListOfAll(request_id, list) => {
                 if let Some(request) = self.open_requests.remove(&request_id) {
@@ -14,7 +16,6 @@ impl MediaClient {
                     let _ = request.respond(Response::from_data(html));
 
                     for (link, node_id) in list {
-                        println!("INSERTING {}", link);
                         self.dns.insert(link, node_id);
                     }
                 }

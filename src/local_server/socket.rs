@@ -1,8 +1,10 @@
 use crate::local_server::FrontendWebServer;
+use crate::utils::set_panics_message;
 use tiny_http::Server;
 
 impl FrontendWebServer {
     pub fn loop_forever(&self) {
+        set_panics_message("Failed webserver");
         let server = self.init_server();
 
         loop {
@@ -12,7 +14,6 @@ impl FrontendWebServer {
                 }
                 Err(e) => {
                     println!("error: {}", e);
-                    break;
                 }
             };
         }

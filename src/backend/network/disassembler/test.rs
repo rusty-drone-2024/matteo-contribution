@@ -1,8 +1,6 @@
 #![cfg(test)]
 use super::Disassembler;
 use common_structs::message::Message;
-use wg_2024::network::SourceRoutingHeader;
-use wg_2024::packet::Packet;
 
 #[test]
 fn missing_session() {
@@ -19,17 +17,10 @@ fn check_fragment_packets() {
             .as_bytes()
             .to_owned(),
     );
-    let fragments = msg.clone().into_fragments();
-    disassembler.add_message_to_send(11, msg);
+    let expected = msg.clone().into_fragments();
+    let fragments = disassembler.split(11, msg);
 
-    for (i, f) in fragments.into_iter().enumerate() {
-        let routing = SourceRoutingHeader::empty_route();
-        let expected = Some(Packet::new_fragment(routing.clone(), 11, f));
-        assert_eq!(
-            expected,
-            disassembler.get_packet_for_fragment(routing.clone(), 11, i as u64)
-        );
-    }
+    assert_eq!(expected, fragments);
 }
 
 #[test]
@@ -49,5 +40,5 @@ fn check_fragment_acks() {
         assert_eq!(Ok(true), disassembler.ack_fragment(11, i as u64));
     }
     assert!(disassembler.is_message_acked(11));
-    assert!(disassembler.remove_acked_message(11));
+    assert!(disassembler.remove_message_if_acked(11));
 }

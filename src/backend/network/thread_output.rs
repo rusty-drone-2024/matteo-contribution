@@ -1,9 +1,9 @@
-use crate::backend::network::{NetworkBacked, PacketMessage};
+use crate::backend::network::{NetworkBackend, PacketMessage};
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;
 
-impl NetworkBacked {
+impl NetworkBackend {
     pub(super) fn merger_and_chain(
         &mut self,
         session_id: SessionId,

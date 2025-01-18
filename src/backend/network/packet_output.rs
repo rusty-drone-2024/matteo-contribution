@@ -1,7 +1,7 @@
-use crate::backend::network::{NetworkBacked, PacketMessage};
+use crate::backend::network::{NetworkBackend, PacketMessage};
 use wg_2024::packet::Packet;
 
-impl NetworkBacked {
+impl NetworkBackend {
     pub(super) fn handle_send_msg(&mut self, msg: PacketMessage) {
         let PacketMessage(session, routing, message) = msg;
         let fragments = self.disassembler.split(session, routing.clone(), message);

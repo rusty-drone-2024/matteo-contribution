@@ -12,17 +12,16 @@ mod thread_output;
 
 pub use crate::backend::assembler::Assembler;
 pub use crate::backend::disassembler::Disassembler;
-use crate::utils::set_panics_message;
 
 pub struct PacketMessage(pub SessionId, pub SourceRoutingHeader, pub Message);
 
 pub struct NetworkCommunication {
-    pub backend: Option<NetworkBacked>,
+    pub backend: Option<NetworkBackend>,
     pub rcv: Receiver<PacketMessage>,
     pub send: Sender<PacketMessage>,
 }
 
-pub struct NetworkBacked {
+pub struct NetworkBackend {
     assembler: Assembler,
     disassembler: Disassembler,
     thread_in: Receiver<PacketMessage>,
@@ -31,7 +30,7 @@ pub struct NetworkBacked {
     packet_out: Sender<Packet>,
 }
 
-impl NetworkBacked {
+impl NetworkBackend {
     pub fn new(
         thread_in: Receiver<PacketMessage>,
         thread_out: Sender<PacketMessage>,
@@ -49,8 +48,6 @@ impl NetworkBacked {
     }
 
     pub fn run(&mut self) {
-        set_panics_message("Failed network");
-
         loop {
             self.read_input_and_chain();
         }

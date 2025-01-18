@@ -91,14 +91,8 @@ fn start_network_handler(
 ) {
     // TODO TO REMOVE
     let unsafe_data = packet_senders.into_iter().next().unwrap().1;
-    
+
     thread::spawn(move || {
-        TextMediaClientBackend::new(
-            packet_receiver,
-            unsafe_data,
-            receiver,
-            sender,
-        )
-        .run();
+        TextMediaClientBackend::new(packet_receiver, unsafe_data, receiver, sender).run();
     });
 }

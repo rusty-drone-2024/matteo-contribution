@@ -89,10 +89,13 @@ fn start_network_handler(
     packet_receiver: Receiver<Packet>,
     packet_senders: HashMap<NodeId, Sender<Packet>>,
 ) {
+    // TODO TO REMOVE
+    let unsafe_data = packet_senders.into_iter().next().unwrap().1;
+    
     thread::spawn(move || {
         TextMediaClientBackend::new(
             packet_receiver,
-            packet_senders.into_iter().next().unwrap().1,
+            unsafe_data,
             receiver,
             sender,
         )

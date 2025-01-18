@@ -1,10 +1,10 @@
+mod assembler;
+mod disassembler;
+pub mod network;
+
 use common_structs::message::{FileWithData, Link, Media};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
-
-mod fragment_level;
-pub mod network_level;
-pub mod test_responder;
 
 #[derive(Debug, Clone)]
 pub enum ClientNetworkRequest {

@@ -1,7 +1,7 @@
 mod features;
 mod message_handler;
 
-use crate::backend::network::{NetworkBacked, NetworkCommunication, PacketMessage};
+use crate::backend::network::{NetworkBackend, NetworkCommunication, PacketMessage};
 use common_structs::message::Link;
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::thread;
@@ -21,7 +21,7 @@ impl TextServer {
         let (network_send, thread_in) = unbounded();
         let (thread_out, network_rcv) = unbounded();
 
-        let network_backend = Some(NetworkBacked::new(
+        let network_backend = Some(NetworkBackend::new(
             thread_in,
             thread_out,
             packet_recv,

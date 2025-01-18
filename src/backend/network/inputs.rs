@@ -1,11 +1,11 @@
-use crate::backend::network::NetworkBacked;
+use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use crossbeam_channel::select;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::PacketType::MsgFragment;
 use wg_2024::packet::{FloodRequest, Packet, PacketType};
 
-impl NetworkBacked {
+impl NetworkBackend {
     pub(super) fn read_input_and_chain(&mut self) {
         select! {
             recv(self.packet_in) -> msg => {
@@ -62,7 +62,7 @@ impl NetworkBacked {
                 }
             }
             PacketType::FloodRequest(flood) => {
-                let response = NetworkBacked::packet_response_from_flood_request(flood);
+                let response = NetworkBackend::packet_response_from_flood_request(flood);
                 self.handle_send_packet(response);
             }
             PacketType::FloodResponse(_flood_resp) => {

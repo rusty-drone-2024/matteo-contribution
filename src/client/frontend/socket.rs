@@ -7,13 +7,11 @@ impl FrontendWebServer {
             return println!("FATAL: Cannot initialize web server");
         };
 
-        loop {
-            let Ok(rq) = server.recv() else {
-                return println!("Channel returned in web frontend");
-            };
-
+        while let Ok(rq) = server.recv(){
             let _ = self.requests_channel.send(rq);
         }
+
+        println!("Channel returned in web frontend");
     }
 
     fn init_server(&self) -> Option<Server> {

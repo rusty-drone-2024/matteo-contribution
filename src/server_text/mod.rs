@@ -2,7 +2,6 @@ mod features;
 mod message_handler;
 
 use crate::backend::network::{NetworkBacked, NetworkCommunication, PacketMessage};
-use crate::utils::set_panics_message;
 use common_structs::message::Link;
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::thread;
@@ -40,7 +39,6 @@ impl TextServer {
     }
 
     pub fn run(&mut self) {
-        set_panics_message("Failed servers");
         if let Some(mut net_backend) = self.network.backend.take() {
             thread::spawn(move || net_backend.run());
         }

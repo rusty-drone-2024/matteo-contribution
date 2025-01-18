@@ -7,7 +7,7 @@ impl TextMediaClient {
     pub(crate) fn handle_request(&mut self, rq: Request) {
         println!("REQUESTING {}", rq.url());
         let res_to_forward = self.trasform_to_network_req(rq.url());
-        println!("-- FORWARDING {:?}", res_to_forward);
+        println!("-- FORWARDING {res_to_forward:?}");
 
         if let Some(to_forward) = res_to_forward {
             self.open_requests.insert(self.counter, rq);

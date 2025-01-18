@@ -16,6 +16,12 @@ use crate::utils::set_panics_message;
 
 pub struct PacketMessage(pub SessionId, pub SourceRoutingHeader, pub Message);
 
+pub struct NetworkCommunication {
+    pub backend: Option<NetworkBacked>,
+    pub rcv: Receiver<PacketMessage>,
+    pub send: Sender<PacketMessage>,
+}
+
 pub struct NetworkBacked {
     assembler: Assembler,
     disassembler: Disassembler,

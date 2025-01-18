@@ -21,6 +21,7 @@ impl Disassembler {
     }
 }
 
+#[derive(Clone)]
 struct DisassembledPacket {
     routing: SourceRoutingHeader,
     pieces: Vec<Fragment>,

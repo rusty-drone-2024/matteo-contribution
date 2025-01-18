@@ -10,13 +10,12 @@ impl TextMediaClientBackend {
     pub(crate) fn handle_message_packet(&mut self, packet_msg: PacketMessage) {
         let PacketMessage(session_id, _, message) = packet_msg;
 
-        if let Some(resp) = self.trasform_into_client_response(session_id, message) {
+        if let Some(resp) = Self::trasform_into_client_response(session_id, message) {
             let _ = self.client_sender.send(resp);
         }
     }
 
     fn trasform_into_client_response(
-        &self,
         session_id: SessionId,
         message: Message,
     ) -> Option<ClientNetworkResponse> {

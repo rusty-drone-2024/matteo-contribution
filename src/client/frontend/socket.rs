@@ -13,17 +13,18 @@ impl FrontendWebServer {
                     let _ = self.requests_channel.send(rq);
                 }
                 Err(e) => {
-                    println!("error: {}", e);
+                    println!("error: {e}");
                 }
             };
         }
     }
 
+    //noinspection ALL
     fn init_server(&self) -> Server {
-        let port = 7700 + self.node_id as u32;
-        let addr = &format!("localhost:{}", port);
+        let port = 7700 + i32::from(self.node_id);
+        let addr = &format!("localhost:{port}");
         let server = Server::http(addr).unwrap();
-        println!("OPEN page http://{} for media client", addr);
+        println!("OPEN page http://{addr} for media client");
         server
     }
 }

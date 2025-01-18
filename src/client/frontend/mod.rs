@@ -12,8 +12,8 @@ pub struct FrontendWebServer {
 impl FrontendWebServer {
     pub fn new(node_id: NodeId, requests_channel: Sender<Request>) -> Self {
         Self {
-            node_id,
             requests_channel,
+            node_id,
         }
     }
 }

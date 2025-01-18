@@ -61,10 +61,14 @@ impl Leaf for TextMediaClient {
         loop {
             select! {
                 recv(self.webserver_requests) -> msg => {
-                    self.handle_request(msg.unwrap());
+                    if let Ok(msg) = msg{
+                        self.handle_request(msg);
+                    }
                 },
                 recv(self.network_response) -> msg => {
-                    self.handle_response(msg.unwrap());
+                    if let Ok(msg) = msg{
+                        self.handle_response(msg);
+                    }
                 }
             }
         }

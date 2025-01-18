@@ -50,8 +50,9 @@ impl TextMediaClientBackend {
 
     pub fn run(&mut self) {
         set_panics_message("Failed client");
-        let mut net_backend = self.network_backed.take().unwrap();
-        thread::spawn(move || net_backend.run());
+        if let Some(mut net_backend) = self.network_backed.take() {
+            thread::spawn(move || net_backend.run());
+        }
 
         loop {
             select! {

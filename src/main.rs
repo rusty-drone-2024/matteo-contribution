@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 mod backend;
 mod client;
 mod server_text;

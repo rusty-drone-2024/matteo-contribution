@@ -61,10 +61,14 @@ impl Leaf for TextMediaClient {
         loop {
             select! {
                 recv(self.webserver_requests) -> msg => {
-                    self.handle_request(msg.unwrap());
+                    if let Ok(msg) = msg{
+                        self.handle_request(msg);
+                    }
                 },
                 recv(self.network_response) -> msg => {
-                    self.handle_response(msg.unwrap());
+                    if let Ok(msg) = msg{
+                        self.handle_response(msg);
+                    }
                 }
             }
         }
@@ -85,13 +89,10 @@ fn start_network_handler(
     packet_receiver: Receiver<Packet>,
     packet_senders: HashMap<NodeId, Sender<Packet>>,
 ) {
+    // TODO TO REMOVE
+    let unsafe_data = packet_senders.into_iter().next().unwrap().1;
+
     thread::spawn(move || {
-        TextMediaClientBackend::new(
-            packet_receiver,
-            packet_senders.into_iter().next().unwrap().1,
-            receiver,
-            sender,
-        )
-        .run();
+        TextMediaClientBackend::new(packet_receiver, unsafe_data, receiver, sender).run();
     });
 }

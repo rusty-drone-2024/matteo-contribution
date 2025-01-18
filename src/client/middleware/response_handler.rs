@@ -11,28 +11,32 @@ impl TextMediaClient {
 
         match response {
             ClientNetworkResponse::ListOfAll(request_id, list) => {
-                if let Some(request) = self.open_requests.remove(&request_id) {
-                    let html = self.create_homepage(&list);
-                    let _ = request.respond(Response::from_data(html));
+                let Some(request) = self.open_requests.remove(&request_id) else {
+                    return;
+                };
 
-                    for (link, node_id) in list {
-                        self.dns.insert(link, node_id);
-                    }
+                let html = Self::create_homepage(&list);
+                let _ = request.respond(Response::from_data(html));
+
+                for (link, node_id) in list {
+                    self.dns.insert(link, node_id);
                 }
             }
             ClientNetworkResponse::GotFile(request_id, file) => {
-                if let Some(request) = self.open_requests.remove(&request_id) {
-                    let _ = request.respond(Response::from_data(file.file));
-                }
+                let Some(request) = self.open_requests.remove(&request_id) else {
+                    return;
+                };
+
+                let _ = request.respond(Response::from_data(file.file));
             }
             ClientNetworkResponse::GotMedia(_request_id, _link, _media) => {}
         }
     }
 
-    fn create_homepage(&self, list: &HashMap<Link, NodeId>) -> String {
+    fn create_homepage(list: &HashMap<Link, NodeId>) -> String {
         let mut html = "<!DOCTYPE html><html><body><h1>Link possibles</h1>".to_string();
         for link in list.keys() {
-            html.push_str(&format!("<a href=\".?link={}\">{}</a><br>", link, link));
+            html.push_str(&format!("<a href=\".?link={link}\">{link}</a><br>"));
         }
 
         html.push_str("</body></html>");

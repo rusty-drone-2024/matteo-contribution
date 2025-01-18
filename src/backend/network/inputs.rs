@@ -9,10 +9,14 @@ impl NetworkBacked {
     pub(super) fn read_input_and_chain(&mut self) {
         select! {
             recv(self.packet_in) -> msg => {
-                self.check_packet_and_chain(msg.unwrap());
+                if let Ok(msg) = msg{
+                    self.check_packet_and_chain(msg);
+                }
             },
             recv(self.thread_in) -> msg => {
-                self.handle_send_msg(msg.unwrap());
+                if let Ok(msg) = msg{
+                    self.handle_send_msg(msg);
+                }
             }
         }
     }

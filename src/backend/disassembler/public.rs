@@ -11,13 +11,8 @@ impl Disassembler {
         routing: SourceRoutingHeader,
         message: Message,
     ) -> Vec<Fragment> {
-        let space_was_free = self.add_message_to_send(session_id, routing, message);
-        if !space_was_free {
-            println!("-- -- -- --DISASSEMBLER OVERWRITTEN")
-        }
-
-        let disassembled = self.messages_to_send.get(&session_id).unwrap();
-        disassembled.pieces.clone()
+        let disassembled = self.add_message_to_send(session_id, routing, message);
+        disassembled.pieces
     }
 
     pub fn ack(&mut self, session_id: SessionId, fragment_index: FragmentIndex) {
@@ -34,7 +29,8 @@ impl Disassembler {
         fragment_index: FragmentIndex,
     ) -> Option<(SourceRoutingHeader, Fragment)> {
         let disassembled = self.messages_to_send.get(&session_id)?;
-        let fragment_index = *disassembled.ack_received.get(&fragment_index)? as usize;
+        let fragment_index = *disassembled.ack_received.get(&fragment_index)?;
+        let fragment_index = usize::try_from(fragment_index).ok()?;
 
         let routing = disassembled.routing.clone();
         let fragmet = disassembled.pieces.get(fragment_index).cloned()?;

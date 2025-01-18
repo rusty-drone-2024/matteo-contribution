@@ -1,12 +1,12 @@
 use crate::backend::ClientNetworkResponse;
-use crate::media_client::MediaClient;
+use crate::client::middleware::TextMediaClient;
 use common_structs::message::Link;
 use std::collections::HashMap;
 use tiny_http::Response;
 use wg_2024::network::NodeId;
 
-impl MediaClient {
-    pub(super) fn handle_response(&mut self, response: ClientNetworkResponse) {
+impl TextMediaClient {
+    pub(crate) fn handle_response(&mut self, response: ClientNetworkResponse) {
         println!("NET RESPONSE {:?} {:?}", response, self.open_requests);
 
         match response {

@@ -3,7 +3,7 @@ use common_structs::message::{FileWithData, Link};
 use std::collections::HashMap;
 
 impl TextServer {
-    pub(super) fn get_files_list(&self) -> Vec<Link> {
+    pub(crate) fn get_files_list(&self) -> Vec<Link> {
         vec![
             "https:://www.filebello.com".to_string(),
             "https:://www.filebello2.com".to_string(),
@@ -11,7 +11,7 @@ impl TextServer {
         ]
     }
 
-    pub(super) fn get_file(&self, link: Link) -> Option<FileWithData> {
+    pub(crate) fn get_file(&self, link: Link) -> Option<FileWithData> {
         //TODO self.id instead of 20
         let file = format!(
             "<!DOCTYPE html><html><body><h1>{} - {}</h1><p>\

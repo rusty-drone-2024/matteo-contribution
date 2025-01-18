@@ -1,12 +1,12 @@
 mod backend;
-mod client_frontend;
-mod media_client;
+mod client;
+mod server_text;
 mod utils;
 
-use crate::backend::TextServer;
+use crate::server_text::TextServer;
+use client::middleware::TextMediaClient;
 use common_structs::leaf::Leaf;
 use crossbeam_channel::unbounded;
-use media_client::MediaClient;
 use std::thread;
 use wg_2024::network::NodeId;
 
@@ -16,7 +16,7 @@ fn main() {
     let (packet_leaf_in, packet_rcv) = unbounded();
     let (packet_send, packet_leaf_out) = unbounded();
 
-    let mut client = MediaClient::new(
+    let mut client = TextMediaClient::new(
         7,
         controller_send,
         controller_rcv,

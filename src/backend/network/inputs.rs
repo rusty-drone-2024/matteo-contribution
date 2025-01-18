@@ -23,9 +23,9 @@ impl NetworkBacked {
             routing_header,
             pack_type,
         } = packet;
-        
+
         // TODO check routing,....
-        
+
         self.decide_response_and_chain(session_id, routing_header, pack_type);
     }
 
@@ -37,7 +37,11 @@ impl NetworkBacked {
     ) {
         match pack_type {
             MsgFragment(fragment) => {
-                self.handle_send_packet(Packet::new_ack(routing.get_reversed(), session_id, fragment.fragment_index));
+                self.handle_send_packet(Packet::new_ack(
+                    routing.get_reversed(),
+                    session_id,
+                    fragment.fragment_index,
+                ));
                 self.merger_and_chain(session_id, routing, fragment);
             }
             PacketType::Ack(ack) => {

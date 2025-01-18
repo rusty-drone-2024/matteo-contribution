@@ -1,10 +1,10 @@
 use crate::backend::ClientNetworkRequest;
 use crate::backend::ClientNetworkRequest::{Get, ListAll};
-use crate::media_client::MediaClient;
+use crate::client::middleware::TextMediaClient;
 use tiny_http::Request;
 
-impl MediaClient {
-    pub(super) fn handle_request(&mut self, rq: Request) {
+impl TextMediaClient {
+    pub(crate) fn handle_request(&mut self, rq: Request) {
         println!("REQUESTING {}", rq.url());
         let res_to_forward = self.trasform_to_network_req(rq.url());
         println!("-- FORWARDING {:?}", res_to_forward);

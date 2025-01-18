@@ -6,15 +6,13 @@ use crossbeam_channel::{Receiver, Sender};
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Packet;
 
-mod assembler;
-mod disassembler;
 mod inputs;
 mod packet_output;
 mod thread_output;
 
+pub use crate::backend::assembler::Assembler;
+pub use crate::backend::disassembler::Disassembler;
 use crate::utils::set_panics_message;
-pub use assembler::Assembler;
-pub use disassembler::Disassembler;
 
 pub struct PacketMessage(pub SessionId, pub SourceRoutingHeader, pub Message);
 

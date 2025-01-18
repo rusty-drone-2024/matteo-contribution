@@ -1,13 +1,13 @@
-use crate::backend::client::TextMediaClientBackend;
 use crate::backend::network::PacketMessage;
 use crate::backend::ClientNetworkResponse;
 use crate::backend::ClientNetworkResponse::{GotFile, GotMedia, ListOfAll};
+use crate::client::TextMediaClientBackend;
 use common_structs::message::Message;
 use common_structs::types::SessionId;
 use std::collections::HashMap;
 
 impl TextMediaClientBackend {
-    pub(super) fn handle_message_packet(&mut self, packet_msg: PacketMessage) {
+    pub(crate) fn handle_message_packet(&mut self, packet_msg: PacketMessage) {
         let PacketMessage(session_id, _, message) = packet_msg;
 
         if let Some(resp) = self.trasform_into_client_response(session_id, message) {

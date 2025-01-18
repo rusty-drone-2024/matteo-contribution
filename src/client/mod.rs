@@ -1,4 +1,6 @@
 mod client_handler;
+pub mod frontend;
+pub mod middleware;
 mod network_msg_handler;
 
 use crate::backend::network::{NetworkBacked, PacketMessage};

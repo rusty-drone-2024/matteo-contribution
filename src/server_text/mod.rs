@@ -37,7 +37,7 @@ impl TextServer {
     }
 
     pub fn run(&mut self) {
-        set_panics_message("Failed server");
+        set_panics_message("Failed servers");
         let mut net_backend = self.network_backed.take().unwrap();
         thread::spawn(move || net_backend.run());
 

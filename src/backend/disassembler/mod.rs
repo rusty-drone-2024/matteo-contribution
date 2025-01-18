@@ -1,11 +1,10 @@
 #![allow(dead_code)]
 mod ack;
+mod public;
 mod test;
 mod to_send;
-mod public;
 
-use common_structs::message::Message;
-use common_structs::types::{FragmentIndex, SessionId};
+use common_structs::types::FragmentIndex;
 use std::collections::{HashMap, HashSet};
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;

@@ -1,11 +1,16 @@
+use crate::backend::network::Disassembler;
 use common_structs::message::Message;
 use common_structs::types::{FragmentIndex, SessionId};
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;
-use crate::backend::network::Disassembler;
 
-impl Disassembler{
-    pub fn split(&mut self, session_id: SessionId, routing: SourceRoutingHeader, message: Message) -> Vec<Fragment> {
+impl Disassembler {
+    pub fn split(
+        &mut self,
+        session_id: SessionId,
+        routing: SourceRoutingHeader,
+        message: Message,
+    ) -> Vec<Fragment> {
         let space_was_free = self.add_message_to_send(session_id, routing, message);
         if !space_was_free {
             println!("-- -- -- --DISASSEMBLER OVERWRITTEN")
@@ -33,7 +38,7 @@ impl Disassembler{
 
         let routing = disassembled.routing.clone();
         let fragmet = disassembled.pieces.get(fragment_index).cloned()?;
-        
+
         Some((routing, fragmet))
     }
 }

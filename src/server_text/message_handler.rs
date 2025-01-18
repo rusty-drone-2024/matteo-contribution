@@ -3,7 +3,7 @@ use common_structs::message::Message::*;
 use common_structs::message::{Message, ServerType};
 
 impl TextServer {
-    pub(super) fn handle_message(&self, message: Message) -> Message {
+    pub(crate) fn handle_message(&self, message: Message) -> Message {
         match message.clone() {
             ReqServerType => RespServerType(ServerType::Text),
             ReqFilesList => RespFilesList(self.get_files_list()),

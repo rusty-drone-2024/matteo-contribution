@@ -5,7 +5,7 @@ use common_structs::message::Message;
 use wg_2024::network::SourceRoutingHeader;
 
 impl TextMediaClientBackend {
-    pub(super) fn handle_client_request(&mut self, client_request: ClientNetworkRequest) {
+    pub(crate) fn handle_client_request(&mut self, client_request: ClientNetworkRequest) {
         match client_request {
             ClientNetworkRequest::ListAll(id) => {
                 let routing = SourceRoutingHeader::initialize(vec![10, 20]);

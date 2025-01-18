@@ -1,8 +1,9 @@
 mod request_handler;
 mod response_handler;
 
-use crate::backend::{ClientNetworkRequest, ClientNetworkResponse, TextMediaClientBackend};
-use crate::client_frontend::FrontendWebServer;
+use crate::backend::{ClientNetworkRequest, ClientNetworkResponse};
+use crate::client::frontend::FrontendWebServer;
+use crate::client::TextMediaClientBackend;
 use crate::utils::set_panics_message;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::Link;
@@ -13,7 +14,7 @@ use tiny_http::Request;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 
-pub struct MediaClient {
+pub struct TextMediaClient {
     webserver_requests: Receiver<Request>,
     open_requests: HashMap<u64, Request>,
     counter: u64,
@@ -22,7 +23,7 @@ pub struct MediaClient {
     network_response: Receiver<ClientNetworkResponse>,
 }
 
-impl Leaf for MediaClient {
+impl Leaf for TextMediaClient {
     fn new(
         id: NodeId,
         _controller_send: Sender<LeafEvent>,

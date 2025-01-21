@@ -1,8 +1,7 @@
-use crate::backend::network::PacketMessage;
+use crate::backend::PacketMessage;
 use crate::client::backend::ClientBackend;
 use crate::client::frontend::ClientNetworkResponse::ListOfAll;
 use crate::client::frontend::{ClientNetworkResponse, RequestWrapper};
-use wg_2024::network::SourceRoutingHeader;
 
 impl ClientBackend {
     pub(super) fn handle_frontend_request(&mut self, frontend_request: RequestWrapper) {
@@ -14,8 +13,8 @@ impl ClientBackend {
         self.open_requests.insert(session_id, frontend_request);
 
         let msg = Self::convert_request(client_req);
-        let routing = SourceRoutingHeader::initialize(vec![self.node_id, 20]);
-        let packet_msg = PacketMessage(session_id, routing, msg);
+        //TODO dehardcode
+        let packet_msg = PacketMessage::new(session_id, 20, msg);
         let _ = self.network_send.send(packet_msg);
     }
 
@@ -26,11 +25,13 @@ impl ClientBackend {
     }
 
     pub(super) fn handle_network_response(&mut self, packet_message: PacketMessage) -> Option<()> {
-        let PacketMessage(session_id, _, message) = packet_message;
+        let PacketMessage {
+            session, message, ..
+        } = packet_message;
 
         let resp = Self::convert_response(message)?;
         self.save_to_dns_if_needed(&resp);
-        let frontend_request = self.open_requests.remove(&session_id)?;
+        let frontend_request = self.open_requests.remove(&session)?;
         frontend_request.post_response(resp)
     }
 

@@ -4,16 +4,23 @@ use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;
 
 impl NetworkBackend {
-    pub(super) fn merger_and_chain(
+    pub(super) fn send_to_thread(
         &mut self,
         session_id: SessionId,
-        routing_header: SourceRoutingHeader,
+        routing_header: &SourceRoutingHeader,
         fragment: Fragment,
     ) {
-        if let Some(message) = self.assembler.merge_fragment(session_id, fragment) {
-            let _ = self
-                .thread_out
-                .send(PacketMessage(session_id, routing_header, message));
-        }
+        let Some(message) = self.assembler.merge_fragment(session_id, fragment) else {
+            return; // Packet not ready yet
+        };
+
+        let Some(first) = routing_header.hops.first().copied() else {
+            println!("DRONE PASSED US DATA WITH NO SENSE (EMPTY VEC)");
+            return;
+        };
+
+        let _ = self
+            .thread_out
+            .send(PacketMessage::new(session_id, first, message));
     }
 }

@@ -3,9 +3,9 @@ mod frontend;
 
 use crate::backend::network::NetworkBackend;
 use crate::client::frontend::ClientFrontend;
-use crate::Leaf;
-use backend::ClientBackend;
-use common_structs::leaf::{LeafCommand, LeafEvent};
+
+use crate::client::backend::ClientBackend;
+use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::collections::HashMap;
 use std::thread;
@@ -37,20 +37,16 @@ impl Leaf for TextMediaClient {
         let (network_out_send, network_out_rcv) = unbounded();
         let (frontend_send, frontend_rcv) = unbounded();
 
-        // TODO remove
-        let Some(packet_send) = packet_senders.into_values().next() else {
-            panic!("Cannot get the single sender");
-        };
-
         Self {
             threads_data: Some(ThreadsData {
                 network_backend: NetworkBackend::new(
+                    id,
                     network_in_rcv,
                     network_out_send,
                     packet_recv,
-                    packet_send,
+                    packet_senders,
                 ),
-                backend: ClientBackend::new(id, frontend_rcv, network_out_rcv, network_in_send),
+                backend: ClientBackend::new(frontend_rcv, network_out_rcv, network_in_send),
                 frontend: ClientFrontend::new(id, frontend_send),
             }),
         }

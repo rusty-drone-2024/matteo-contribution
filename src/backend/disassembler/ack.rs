@@ -28,16 +28,7 @@ impl Disassembler {
 
     pub(crate) fn is_message_acked(&self, session_id: SessionId) -> bool {
         if let Some(disassembled) = self.messages_to_send.get(&session_id) {
-            let success = disassembled.ack_received.len() >= disassembled.pieces.len();
-            if success {
-                println!(
-                    "-- -- -- --DISASSEMBLER finished {} [{}/{}]",
-                    session_id,
-                    disassembled.ack_received.len(),
-                    disassembled.pieces.len()
-                );
-            }
-            return success;
+            return disassembled.ack_received.len() >= disassembled.pieces.len();
         }
         false
     }

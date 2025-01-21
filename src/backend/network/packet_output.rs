@@ -47,7 +47,7 @@ impl NetworkBackend {
         let routing = &packet.routing_header;
 
         let Some(node_id) = routing.current_hop() else {
-            println!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
+            eprintln!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
             return;
         };
 

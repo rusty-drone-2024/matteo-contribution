@@ -56,7 +56,7 @@ impl NetworkBackend {
             .nack_require_resend(session_id, nack.fragment_index)?;
 
         if nack.nack_type == NackType::DestinationIsDrone {
-            println!("SENT A PACKET TO A DRONE SOMEHOW");
+            eprintln!("SENT A PACKET TO A DRONE SOMEHOW");
             return None;
         }
 

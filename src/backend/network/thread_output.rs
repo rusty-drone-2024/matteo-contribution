@@ -15,7 +15,7 @@ impl NetworkBackend {
         };
 
         let Some(first) = routing_header.hops.first().copied() else {
-            println!("DRONE PASSED US DATA WITH NO SENSE (EMPTY VEC)");
+            eprintln!("DRONE PASSED US DATA WITH NO SENSE (EMPTY VEC)");
             return;
         };
 

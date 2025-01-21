@@ -56,7 +56,7 @@ impl Leaf for TextMediaClient {
 
     fn run(&mut self) {
         let Some(data) = self.threads_data.take() else {
-            return println!("Failed to initialize");
+            return eprintln!("Failed to initialize");
         };
 
         let ThreadsData {

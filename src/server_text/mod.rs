@@ -63,7 +63,6 @@ impl Leaf for TextServer {
             } = packet_msg;
 
             let response = self.handle_message(message.clone());
-            println!("----- SERVER RESPONDED [{session}] TO {message:?} WITH {response:?}");
 
             let packet_resp = PacketMessage::new(session, opposite_end, response);
             let _ = self.network.send.send(packet_resp);

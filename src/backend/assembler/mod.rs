@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 mod fragment_adder;
 mod merger;
 mod test;

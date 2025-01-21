@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 
 use common_structs::message::Message;
 use common_structs::types::SessionId;

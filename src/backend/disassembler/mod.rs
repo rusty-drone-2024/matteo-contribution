@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 mod ack;
 mod public;
 mod test;

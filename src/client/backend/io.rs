@@ -12,7 +12,7 @@ impl ClientBackend {
             Message::RespMedia(media) => Some(GotMedia(media)),
             _ => {
                 // TODO handle ErrNotFound
-                println!("WARN message currently unsupported");
+                eprintln!("WARN message currently unsupported");
                 None
             }
         }

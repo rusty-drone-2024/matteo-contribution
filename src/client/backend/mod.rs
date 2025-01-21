@@ -53,7 +53,5 @@ impl ClientBackend {
                 },
             }
         }
-
-        println!("Closing client backend");
     }
 }

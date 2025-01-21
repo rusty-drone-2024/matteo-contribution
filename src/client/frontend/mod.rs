@@ -21,14 +21,12 @@ impl ClientFrontend {
 
     pub fn loop_forever(&self) {
         let Some(server) = self.init_server() else {
-            return println!("FATAL: Cannot initialize web server");
+            return eprintln!("FATAL: Cannot initialize web server");
         };
 
         while let Ok(rq) = server.recv() {
             let _ = self.requests_channel.send(RequestWrapper::from(rq));
         }
-
-        println!("Channel returned in web frontend");
     }
 
     fn init_server(&self) -> Option<Server> {

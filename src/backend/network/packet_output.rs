@@ -1,4 +1,5 @@
 use crate::backend::network::{NetworkBackend, PacketMessage};
+use common_structs::leaf::LeafEvent::PacketSend;
 use common_structs::types::SessionId;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 use wg_2024::packet::PacketType::MsgFragment;
@@ -46,7 +47,7 @@ impl NetworkBackend {
         let routing = &packet.routing_header;
 
         let Some(node_id) = routing.current_hop() else {
-            println!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
+            eprintln!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
             return;
         };
 
@@ -58,7 +59,7 @@ impl NetworkBackend {
             return;
         };
 
-        println!("{}: {}", self.node_id, &packet.pack_type);
+        let _ = self.controller_event.send(PacketSend(packet.clone()));
         let _ = channel.send(packet);
     }
 

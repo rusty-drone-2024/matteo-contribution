@@ -19,8 +19,8 @@ pub struct TextServer {
 impl Leaf for TextServer {
     fn new(
         id: NodeId,
-        _controller_send: Sender<LeafEvent>,
-        _controller_recv: Receiver<LeafCommand>,
+        controller_send: Sender<LeafEvent>,
+        controller_recv: Receiver<LeafCommand>,
         packet_recv: Receiver<Packet>,
         packets_send: HashMap<NodeId, Sender<Packet>>,
     ) -> Self
@@ -36,6 +36,8 @@ impl Leaf for TextServer {
             thread_out,
             packet_recv,
             packets_send,
+            controller_send,
+            controller_recv,
         ));
 
         Self {

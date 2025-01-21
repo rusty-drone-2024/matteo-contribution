@@ -25,8 +25,8 @@ struct ThreadsData {
 impl Leaf for TextMediaClient {
     fn new(
         id: NodeId,
-        _controller_send: Sender<LeafEvent>,
-        _controller_recv: Receiver<LeafCommand>,
+        controller_send: Sender<LeafEvent>,
+        controller_recv: Receiver<LeafCommand>,
         packet_recv: Receiver<Packet>,
         packet_senders: HashMap<NodeId, Sender<Packet>>,
     ) -> Self
@@ -45,6 +45,8 @@ impl Leaf for TextMediaClient {
                     network_out_send,
                     packet_recv,
                     packet_senders,
+                    controller_send,
+                    controller_recv,
                 ),
                 backend: ClientBackend::new(frontend_rcv, network_out_rcv, network_in_send),
                 frontend: ClientFrontend::new(id, frontend_send),

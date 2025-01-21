@@ -1,5 +1,6 @@
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
+use common_structs::leaf::{LeafCommand, LeafEvent};
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 
@@ -23,11 +24,12 @@ pub struct NetworkBackend {
     topology: Topology,
     assembler: Assembler,
     disassembler: Disassembler,
-
     thread_in: Receiver<PacketMessage>,
     thread_out: Sender<PacketMessage>,
     packet_in: Receiver<Packet>,
     packets_out: HashMap<NodeId, Sender<Packet>>,
+    controller_event: Sender<LeafEvent>,
+    controller_command: Receiver<LeafCommand>,
 }
 
 impl NetworkBackend {
@@ -37,6 +39,8 @@ impl NetworkBackend {
         thread_out: Sender<PacketMessage>,
         packet_in: Receiver<Packet>,
         packets_out: HashMap<NodeId, Sender<Packet>>,
+        controller_event: Sender<LeafEvent>,
+        controller_command: Receiver<LeafCommand>,
     ) -> Self {
         Self {
             node_id,
@@ -47,6 +51,8 @@ impl NetworkBackend {
             thread_out,
             packet_in,
             packets_out,
+            controller_event,
+            controller_command,
         }
     }
 

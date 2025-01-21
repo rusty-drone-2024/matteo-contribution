@@ -1,6 +1,6 @@
 use crate::backend::topology::Topology;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
-use wg_2024::packet::{FloodResponse, NodeType};
+use wg_2024::packet::NodeType;
 
 impl Topology {
     pub fn add_flood_response(&mut self, flood_id: u64, path: Vec<(NodeId, NodeType)>) {

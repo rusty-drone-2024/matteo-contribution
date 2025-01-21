@@ -2,7 +2,7 @@ use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::PacketType::MsgFragment;
-use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
+use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, Packet, PacketType};
 
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
@@ -40,7 +40,7 @@ impl NetworkBackend {
                 self.handle_nack(session_id, &nack);
             }
             PacketType::FloodRequest(flood) => {
-                let response = self.create_flood_response_packet(flood);
+                let response = Self::create_flood_response_packet(session_id, flood);
                 self.send_packet(response);
             }
             PacketType::FloodResponse(flood_resp) => {
@@ -64,7 +64,7 @@ impl NetworkBackend {
         Some(())
     }
 
-    fn create_flood_response_packet(&self, flood_request: FloodRequest) -> Packet {
+    fn create_flood_response_packet(session_id: SessionId, flood_request: FloodRequest) -> Packet {
         let flood_id = flood_request.flood_id;
         let path = flood_request.path_trace;
 
@@ -74,7 +74,7 @@ impl NetworkBackend {
 
         Packet::new_flood_response(
             routing,
-            flood_id,
+            session_id,
             FloodResponse {
                 flood_id,
                 path_trace: path,

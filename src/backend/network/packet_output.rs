@@ -42,22 +42,19 @@ impl NetworkBackend {
     }
 
     pub(super) fn send_packet(&mut self, packet: Packet) {
-        let Packet {
-            routing_header,
-            session_id,
-            ..
-        } = &packet;
+        let session_id = packet.session_id;
+        let routing = &packet.routing_header;
 
-        let Some(node_id) = packet.routing_header.current_hop() else {
-            println!("DROPPING A PACKET! VERY BAD BEHAVIOUR!");
+        let Some(node_id) = routing.current_hop() else {
+            println!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
             return;
         };
 
         let Some(channel) = self.packets_out.get(&node_id) else {
             // TODO Intentional unwrap (as it cannot be empty) -> still remove
-            let destination = routing_header.hops.first().unwrap();
+            let destination = routing.hops.first().unwrap();
             self.topology
-                .add_waiting(*session_id, *destination, packet.pack_type);
+                .add_waiting(session_id, *destination, packet.pack_type);
             return;
         };
 

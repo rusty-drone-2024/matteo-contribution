@@ -2,7 +2,7 @@ use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::PacketType::MsgFragment;
-use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, Packet, PacketType};
+use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
 
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
@@ -40,7 +40,7 @@ impl NetworkBackend {
                 self.handle_nack(session_id, &nack);
             }
             PacketType::FloodRequest(flood) => {
-                let response = Self::create_flood_response_packet(session_id, flood);
+                let response = self.create_flood_response_packet(session_id, flood);
                 self.send_packet(response);
             }
             PacketType::FloodResponse(flood_resp) => {
@@ -64,20 +64,19 @@ impl NetworkBackend {
         Some(())
     }
 
-    fn create_flood_response_packet(session_id: SessionId, flood_request: FloodRequest) -> Packet {
-        let flood_id = flood_request.flood_id;
-        let path = flood_request.path_trace;
+    fn create_flood_response_packet(&self, session_id: SessionId, flood: FloodRequest) -> Packet {
+        let flood_id = flood.flood_id;
+        let mut path_trace = flood.path_trace;
 
-        let hops = path.iter().map(|(id, _)| *id).rev().collect();
-
-        let routing = SourceRoutingHeader::with_first_hop(hops);
+        path_trace.push((self.node_id, NodeType::Client));
+        let hops = path_trace.iter().map(|(id, _)| *id).rev().collect();
 
         Packet::new_flood_response(
-            routing,
+            SourceRoutingHeader::with_first_hop(hops),
             session_id,
             FloodResponse {
                 flood_id,
-                path_trace: path,
+                path_trace,
             },
         )
     }

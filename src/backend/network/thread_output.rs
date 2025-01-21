@@ -11,8 +11,7 @@ impl NetworkBackend {
         fragment: Fragment,
     ) {
         let Some(message) = self.assembler.merge_fragment(session_id, fragment) else {
-            // Packet not ready yet
-            return;
+            return; // Packet not ready yet
         };
 
         let Some(first) = routing_header.hops.first().copied() else {

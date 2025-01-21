@@ -7,6 +7,7 @@ use wg_2024::packet::Packet;
 mod inputs;
 mod packet_output;
 mod thread_output;
+mod simulation_controller;
 
 pub use crate::backend::assembler::Assembler;
 pub use crate::backend::disassembler::Disassembler;
@@ -71,6 +72,16 @@ impl NetworkBackend {
             }
 
             select! {
+                recv(self.controller_command) -> msg => {
+                    let Ok(msg) = msg else {
+                        continue;
+                    };
+                    
+                    let exit = self.handle_command(msg);
+                    if exit {
+                        break;
+                    }
+                },
                 recv(self.packet_in) -> msg => {
                     if let Ok(msg) = msg{
                         self.check_packet_and_chain(msg);

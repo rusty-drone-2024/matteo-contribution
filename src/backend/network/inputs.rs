@@ -1,27 +1,11 @@
 use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
-use crossbeam_channel::select;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::PacketType::MsgFragment;
-use wg_2024::packet::{FloodRequest, Packet, PacketType};
+use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
 
 impl NetworkBackend {
-    pub(super) fn read_input_and_chain(&mut self) {
-        select! {
-            recv(self.packet_in) -> msg => {
-                if let Ok(msg) = msg{
-                    self.check_packet_and_chain(msg);
-                }
-            },
-            recv(self.thread_in) -> msg => {
-                if let Ok(msg) = msg{
-                    self.handle_send_msg(msg);
-                }
-            }
-        }
-    }
-
-    fn check_packet_and_chain(&mut self, packet: Packet) {
+    pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
         let Packet {
             session_id,
             routing_header,
@@ -29,49 +13,72 @@ impl NetworkBackend {
         } = packet;
 
         // TODO check routing,....
+        //TODO at the moment packet never pass via SC
 
-        self.decide_response_and_chain(session_id, routing_header, pack_type);
+        self.decide_response_and_chain(session_id, &routing_header, pack_type);
     }
 
     fn decide_response_and_chain(
         &mut self,
         session_id: SessionId,
-        routing: SourceRoutingHeader,
+        routing: &SourceRoutingHeader,
         pack_type: PacketType,
     ) {
         match pack_type {
             MsgFragment(fragment) => {
-                self.handle_send_packet(Packet::new_ack(
+                self.send_packet(Packet::new_ack(
                     routing.get_reversed(),
                     session_id,
                     fragment.fragment_index,
                 ));
-                self.merger_and_chain(session_id, routing, fragment);
+                self.send_to_thread(session_id, routing, fragment);
             }
             PacketType::Ack(ack) => {
                 self.disassembler.ack(session_id, ack.fragment_index);
             }
             PacketType::Nack(nack) => {
-                let fragment_to_resend = self
-                    .disassembler
-                    .nack_require_resend(session_id, nack.fragment_index);
-
-                if let Some((routing, fragment)) = fragment_to_resend {
-                    let response = Packet::new_fragment(routing, session_id, fragment);
-                    self.handle_send_packet(response);
-                }
+                self.handle_nack(session_id, &nack);
             }
             PacketType::FloodRequest(flood) => {
-                let response = NetworkBackend::packet_response_from_flood_request(flood);
-                self.handle_send_packet(response);
+                let response = self.create_flood_response_packet(flood);
+                self.send_packet(response);
             }
-            PacketType::FloodResponse(_flood_resp) => {
-                todo!() // Create topology
+            PacketType::FloodResponse(flood_resp) => {
+                self.topology
+                    .add_flood_response(flood_resp.flood_id, flood_resp.path_trace);
             }
         }
     }
 
-    fn packet_response_from_flood_request(_flood_request: FloodRequest) -> Packet {
-        todo!()
+    fn handle_nack(&mut self, session_id: SessionId, nack: &Nack) -> Option<()> {
+        let (destination, fragment) = self
+            .disassembler
+            .nack_require_resend(session_id, nack.fragment_index)?;
+
+        if nack.nack_type == NackType::DestinationIsDrone {
+            println!("SENT A PACKET TO A DRONE SOMEHOW");
+            return None;
+        }
+
+        self.send_fragment(session_id, destination, fragment);
+        Some(())
+    }
+
+    fn create_flood_response_packet(&self, flood_request: FloodRequest) -> Packet {
+        let flood_id = flood_request.flood_id;
+        let path = flood_request.path_trace;
+
+        let hops = path.iter().map(|(id, _)| *id).rev().collect();
+
+        let routing = SourceRoutingHeader::with_first_hop(hops);
+
+        Packet::new_flood_response(
+            routing,
+            flood_id,
+            FloodResponse {
+                flood_id,
+                path_trace: path,
+            },
+        )
     }
 }

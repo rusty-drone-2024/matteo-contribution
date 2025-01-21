@@ -1,7 +1,7 @@
 mod io;
 mod request_handler;
 
-use crate::backend::network::PacketMessage;
+use crate::backend::PacketMessage;
 use crate::client::frontend::RequestWrapper;
 use common_structs::message::Link;
 use crossbeam_channel::{select, Receiver, Sender};
@@ -9,7 +9,6 @@ use std::collections::HashMap;
 use wg_2024::network::NodeId;
 
 pub struct ClientBackend {
-    node_id: NodeId,
     new_session_id: u64,
     open_requests: HashMap<u64, RequestWrapper>,
     dns: HashMap<Link, NodeId>,
@@ -20,7 +19,6 @@ pub struct ClientBackend {
 
 impl ClientBackend {
     pub fn new(
-        node_id: NodeId,
         frontend_rcv: Receiver<RequestWrapper>,
         network_rcv: Receiver<PacketMessage>,
         network_send: Sender<PacketMessage>,
@@ -29,7 +27,6 @@ impl ClientBackend {
         Self: Sized,
     {
         Self {
-            node_id,
             new_session_id: 0,
             open_requests: HashMap::default(),
             dns: HashMap::default(),

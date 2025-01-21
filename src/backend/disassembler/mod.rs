@@ -5,7 +5,7 @@ mod to_send;
 
 use common_structs::types::FragmentIndex;
 use std::collections::{HashMap, HashSet};
-use wg_2024::network::SourceRoutingHeader;
+use wg_2024::network::NodeId;
 use wg_2024::packet::Fragment;
 
 pub struct Disassembler {
@@ -22,7 +22,7 @@ impl Disassembler {
 
 #[derive(Clone)]
 struct DisassembledPacket {
-    routing: SourceRoutingHeader,
+    destination: NodeId,
     pieces: Vec<Fragment>,
     ack_received: HashSet<FragmentIndex>,
 }

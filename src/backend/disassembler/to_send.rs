@@ -2,17 +2,17 @@ use super::{DisassembledPacket, Disassembler};
 use common_structs::message::Message;
 use common_structs::types::SessionId;
 use std::collections::HashSet;
-use wg_2024::network::SourceRoutingHeader;
+use wg_2024::network::NodeId;
 
 impl Disassembler {
     pub(super) fn add_message_to_send(
         &mut self,
         session_id: SessionId,
-        routing: SourceRoutingHeader,
+        destination: NodeId,
         message: Message,
     ) -> DisassembledPacket {
         let disassembled = DisassembledPacket {
-            routing,
+            destination,
             pieces: message.into_fragments(),
             ack_received: HashSet::default(),
         };

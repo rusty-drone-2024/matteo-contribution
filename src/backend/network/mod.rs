@@ -1,13 +1,13 @@
+use common_structs::leaf::{LeafCommand, LeafEvent};
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
-use common_structs::leaf::{LeafCommand, LeafEvent};
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 
 mod inputs;
 mod packet_output;
-mod thread_output;
 mod simulation_controller;
+mod thread_output;
 
 pub use crate::backend::assembler::Assembler;
 pub use crate::backend::disassembler::Disassembler;
@@ -76,7 +76,7 @@ impl NetworkBackend {
                     let Ok(msg) = msg else {
                         continue;
                     };
-                    
+
                     let exit = self.handle_command(msg);
                     if exit {
                         break;
@@ -84,6 +84,7 @@ impl NetworkBackend {
                 },
                 recv(self.packet_in) -> msg => {
                     if let Ok(msg) = msg{
+
                         self.check_packet_and_chain(msg);
                     }
                 },

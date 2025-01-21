@@ -1,4 +1,5 @@
 use crate::backend::network::{NetworkBackend, PacketMessage};
+use common_structs::leaf::LeafEvent::PacketSend;
 use common_structs::types::SessionId;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 use wg_2024::packet::PacketType::MsgFragment;
@@ -58,7 +59,7 @@ impl NetworkBackend {
             return;
         };
 
-        println!("{}: {}", self.node_id, &packet.pack_type);
+        let _ = self.controller_event.send(PacketSend(packet.clone()));
         let _ = channel.send(packet);
     }
 

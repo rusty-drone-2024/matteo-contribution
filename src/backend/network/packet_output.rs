@@ -54,7 +54,7 @@ impl NetworkBackend {
 
         let Some(channel) = self.packets_out.get(&node_id) else {
             // TODO Intentional unwrap (as it cannot be empty) -> still remove
-            let destination = routing.hops.first().unwrap();
+            let destination = routing.hops.last().unwrap();
             self.topology
                 .add_waiting(session_id, *destination, packet.pack_type);
             return;

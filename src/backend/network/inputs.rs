@@ -26,8 +26,10 @@ impl NetworkBackend {
     ) {
         match pack_type {
             MsgFragment(fragment) => {
+                let mut routing_rev = routing.get_reversed();
+                routing_rev.increase_hop_index();
                 self.send_packet(Packet::new_ack(
-                    routing.get_reversed(),
+                    routing_rev,
                     session_id,
                     fragment.fragment_index,
                 ));

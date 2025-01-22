@@ -1,7 +1,6 @@
 use crate::backend::PacketMessage;
 use crate::client::backend::ClientBackend;
-use crate::client::frontend::ClientNetworkResponse::ListOfAll;
-use crate::client::frontend::{ClientNetworkResponse, RequestWrapper};
+use crate::client::frontend::RequestWrapper;
 
 impl ClientBackend {
     pub(super) fn handle_frontend_request(&mut self, frontend_request: RequestWrapper) {
@@ -12,9 +11,11 @@ impl ClientBackend {
         let session_id = self.fresh_session_id();
         self.open_requests.insert(session_id, frontend_request);
 
+        //TODO remove unwrap
+        let server_id = self.get_from_dns(&client_req).unwrap();
         let msg = Self::convert_request(client_req);
-        //TODO dehardcode
-        let packet_msg = PacketMessage::new(session_id, 20, msg);
+
+        let packet_msg = PacketMessage::new(session_id, server_id, msg);
         let _ = self.network_send.send(packet_msg);
     }
 
@@ -26,23 +27,14 @@ impl ClientBackend {
 
     pub(super) fn handle_network_response(&mut self, packet_message: PacketMessage) -> Option<()> {
         let PacketMessage {
-            session, message, ..
+            session,
+            message,
+            opposite_end,
         } = packet_message;
 
         let resp = Self::convert_response(message)?;
-        self.save_to_dns_if_needed(&resp);
+        self.save_to_dns(opposite_end, &resp);
         let frontend_request = self.open_requests.remove(&session)?;
         frontend_request.post_response(resp)
-    }
-
-    fn save_to_dns_if_needed(&mut self, response: &ClientNetworkResponse) {
-        let ListOfAll(list) = response else {
-            return;
-        };
-
-        for link in list {
-            // TODO use real value
-            self.dns.insert(link.clone(), 20);
-        }
     }
 }

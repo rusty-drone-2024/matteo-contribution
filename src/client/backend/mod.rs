@@ -1,3 +1,4 @@
+mod dns;
 mod io;
 mod request_handler;
 

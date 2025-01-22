@@ -3,16 +3,17 @@ use crate::client::frontend::ClientNetworkRequest::{Get, ListAll};
 use crate::client::frontend::ClientNetworkResponse::{GotFile, GotMedia, ListOfAll};
 use crate::client::frontend::{ClientNetworkRequest, ClientNetworkResponse};
 use common_structs::message::Message;
+use common_structs::message::Message::{RespFile, RespFilesList, RespMedia};
 
 impl ClientBackend {
     pub(super) fn convert_response(message: Message) -> Option<ClientNetworkResponse> {
         match message {
-            Message::RespFilesList(list) => Some(ListOfAll(list)),
-            Message::RespFile(file) => Some(GotFile(file)),
-            Message::RespMedia(media) => Some(GotMedia(media)),
-            _ => {
+            RespFilesList(list) => Some(ListOfAll(list)),
+            RespFile(file) => Some(GotFile(file)),
+            RespMedia(media) => Some(GotMedia(media)),
+            other => {
                 // TODO handle ErrNotFound
-                eprintln!("WARN message currently unsupported");
+                eprintln!("WARN message currently unsupported {other:?}");
                 None
             }
         }

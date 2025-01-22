@@ -20,19 +20,23 @@ impl TextServer {
             return None;
         }
 
-        //TODO self.id instead of 20
+        let mut img = "";
+        let mut related_data = HashMap::new();
+        if link == "marco" {
+            img = "<img src=\"http://localhost:7710/?link=test.jpg\"\
+                style=\"width: 100%;\"></img>";
+            related_data.insert("test.jpg".to_string(), 30);
+        }
+
         let file = format!(
             "<!DOCTYPE html><html><body><h1>{} - {}</h1><p>\
             sdadsadsadsasadasdsdasdsadsadsadasdasdsadsadasdsdasdsa<br>\
             asdsadsadddddddddddddddddddddddddddsdsadsadsadsadasdsad<br>\
             asdsdasdsaaaadsdasdsadsadsadsadasdsadsadsadsadsadsadsad<br>\
-            <p></body></html>",
-            20, link
+            <p>{}</body></html>",
+            self.node_id, link, img
         );
 
-        Some(FileWithData {
-            file,
-            related_data: HashMap::new(),
-        })
+        Some(FileWithData { file, related_data })
     }
 }

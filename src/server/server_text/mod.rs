@@ -12,6 +12,7 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 
 pub struct TextServer {
+    node_id: NodeId,
     files: Vec<Link>,
     network: NetworkCommunication,
 }
@@ -41,6 +42,7 @@ impl Leaf for TextServer {
         ));
 
         Self {
+            node_id: id,
             files: Self::init_files(),
             network: NetworkCommunication {
                 backend: network_backend,

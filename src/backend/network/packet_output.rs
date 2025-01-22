@@ -12,6 +12,7 @@ impl NetworkBackend {
             opposite_end: destination,
             message,
         } = msg;
+        println!("SENDING MESSAGE to {destination} of type {}", &message);
         let fragments = self.disassembler.split(session, destination, message);
 
         let Some(routing) = self.topology.get_routing_for(destination) else {

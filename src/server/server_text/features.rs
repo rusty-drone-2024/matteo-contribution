@@ -11,6 +11,8 @@ impl TextServer {
             "localfile.with.image",
             "localfile.with.embed",
             "localfile.text",
+            "https://www.youtube.com/?app=desktop",
+            "https://theuselessweb.com/",
         ];
         
         res.iter().map(|&s| s.to_string()).collect()
@@ -21,9 +23,11 @@ impl TextServer {
     }
 
     pub(super) fn get_file(&self, link: &Link) -> Option<FileWithData> {
+        /* TODO reenable in the future
         if !self.get_files_list().contains(link) {
             return None;
         }
+        */
 
         if link.starts_with("localfile") {
             return Some(self.test_local_file(link));

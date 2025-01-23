@@ -1,8 +1,8 @@
 use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
-use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
 use wg_2024::packet::NackType::{ErrorInRouting, UnexpectedRecipient};
+use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
 
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
@@ -11,7 +11,7 @@ impl NetworkBackend {
             routing_header: routing,
             pack_type,
         } = packet;
-        
+
         if let PacketType::FloodRequest(_) = pack_type {
             return self.decide_response_and_chain(session_id, &routing, pack_type);
         }
@@ -22,15 +22,24 @@ impl NetworkBackend {
                 self.nack(routing, session_id, fragment.fragment_index, nack_type);
             } else {
                 self.nack(routing, session_id, 0, nack_type); //TODO Check if 0 or 1
-            }
+            };
         }
 
         if let Some(next) = routing.next_hop() {
             return if let PacketType::MsgFragment(fragment) = &pack_type {
-                self.nack(routing, session_id, fragment.fragment_index, ErrorInRouting(next));
+                self.nack(
+                    routing,
+                    session_id,
+                    fragment.fragment_index,
+                    ErrorInRouting(next),
+                );
             } else {
-                self.shortcut(Packet{session_id, routing_header: routing, pack_type});
-            }
+                self.shortcut(Packet {
+                    session_id,
+                    routing_header: routing,
+                    pack_type,
+                });
+            };
         }
         self.decide_response_and_chain(session_id, &routing, pack_type);
     }

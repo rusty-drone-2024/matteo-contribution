@@ -85,8 +85,8 @@ impl NetworkBackend {
             let _ = sender.send(packet.clone());
         }
     }
-    
-    pub(super) fn shortcut(&self, packet: Packet){
+
+    pub(super) fn shortcut(&self, packet: Packet) {
         let _ = self.controller_event.send(ControllerShortcut(packet));
     }
 }

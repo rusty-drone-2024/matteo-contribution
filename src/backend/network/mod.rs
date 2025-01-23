@@ -4,11 +4,11 @@ use std::collections::HashMap;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
 
+mod ack_nack;
 mod inputs;
 mod packet_output;
 mod simulation_controller;
 mod thread_output;
-mod ack_nack;
 
 pub use crate::backend::assembler::Assembler;
 pub use crate::backend::disassembler::Disassembler;

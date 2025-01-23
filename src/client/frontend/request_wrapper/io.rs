@@ -15,7 +15,7 @@ impl RequestWrapper {
             return Ok(ListAll);
         }
 
-        let link = link.strip_prefix("/?link=").ok_or(())?.to_owned();
+        let link = link.strip_prefix("/file/").ok_or(())?.to_owned();
         Ok(Get(link))
     }
 

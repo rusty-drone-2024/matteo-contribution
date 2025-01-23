@@ -5,7 +5,7 @@ impl RequestWrapper {
     pub(super) fn create_homepage(list: &Vec<Link>) -> String {
         let mut inner_html = String::new();
         for link in list {
-            inner_html.push_str(&format!("<a href=\".?link={link}\">{link}</a><br>"));
+            inner_html.push_str(&format!("<a href=\"/file/{link}\">{link}</a><br>"));
         }
 
         format!(

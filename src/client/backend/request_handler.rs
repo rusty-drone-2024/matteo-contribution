@@ -11,8 +11,8 @@ impl ClientBackend {
         let session_id = self.fresh_session_id();
         self.open_requests.insert(session_id, frontend_request);
 
-        //TODO remove unwrap
-        let server_id = self.get_from_dns(&client_req).unwrap();
+        //TODO handle better
+        let server_id = self.get_from_dns(&client_req).unwrap_or(20);
         let msg = Self::convert_request(client_req);
 
         let packet_msg = PacketMessage::new(session_id, server_id, msg);

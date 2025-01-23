@@ -1,8 +1,8 @@
 use crate::backend::network::{NetworkBackend, PacketMessage};
-use common_structs::leaf::LeafEvent::PacketSend;
+use common_structs::leaf::LeafEvent::{ControllerShortcut, PacketSend};
 use common_structs::types::SessionId;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
-use wg_2024::packet::PacketType::MsgFragment;
+use wg_2024::packet::PacketType::{Ack, FloodResponse, MsgFragment, Nack};
 use wg_2024::packet::{FloodRequest, Fragment, NodeType, Packet};
 
 impl NetworkBackend {
@@ -47,16 +47,26 @@ impl NetworkBackend {
         let session_id = packet.session_id;
         let routing = &packet.routing_header;
 
+        let Some(destination) = routing.hops.last() else {
+            return eprintln!(
+                "DROPPING A PACKET AS ROUTING IS EMPTY! VERY BAD! PACKET: {packet:?}"
+            );
+        };
+
         let Some(node_id) = routing.current_hop() else {
-            eprintln!("DROPPING A PACKET! VERY BAD BEHAVIOUR! PACKET: {packet:?}");
-            return;
+            return eprintln!("DROPPING A PACKET AS NO NEXT HOP! VERY BAD! PACKET: {packet:?}");
         };
 
         let Some(channel) = self.packets_out.get(&node_id) else {
-            // TODO Intentional unwrap (as it cannot be empty) -> still remove
-            let destination = routing.hops.last().unwrap();
-            self.topology
-                .add_waiting(session_id, *destination, packet.pack_type);
+            match packet.pack_type {
+                Ack(_) | Nack(_) | FloodResponse(_) => {
+                    self.shortcut(packet);
+                }
+                _ => {
+                    self.topology
+                        .add_waiting(session_id, *destination, packet.pack_type);
+                }
+            }
             return;
         };
 
@@ -74,5 +84,9 @@ impl NetworkBackend {
         for sender in self.packets_out.values() {
             let _ = sender.send(packet.clone());
         }
+    }
+    
+    pub(super) fn shortcut(&self, packet: Packet){
+        let _ = self.controller_event.send(ControllerShortcut(packet));
     }
 }

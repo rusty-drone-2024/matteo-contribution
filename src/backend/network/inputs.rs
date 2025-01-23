@@ -1,21 +1,38 @@
 use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
-use wg_2024::packet::PacketType::MsgFragment;
 use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
+use wg_2024::packet::NackType::{ErrorInRouting, UnexpectedRecipient};
 
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
         let Packet {
             session_id,
-            routing_header,
+            routing_header: routing,
             pack_type,
         } = packet;
+        
+        if let PacketType::FloodRequest(_) = pack_type {
+            return self.decide_response_and_chain(session_id, &routing, pack_type);
+        }
 
-        // TODO check routing,....
-        //TODO at the moment packet never pass via SC
+        if Some(self.node_id) != routing.current_hop() {
+            let nack_type = UnexpectedRecipient(self.node_id);
+            return if let PacketType::MsgFragment(fragment) = &pack_type {
+                self.nack(routing, session_id, fragment.fragment_index, nack_type);
+            } else {
+                self.nack(routing, session_id, 0, nack_type); //TODO Check if 0 or 1
+            }
+        }
 
-        self.decide_response_and_chain(session_id, &routing_header, pack_type);
+        if let Some(next) = routing.next_hop() {
+            return if let PacketType::MsgFragment(fragment) = &pack_type {
+                self.nack(routing, session_id, fragment.fragment_index, ErrorInRouting(next));
+            } else {
+                self.shortcut(Packet{session_id, routing_header: routing, pack_type});
+            }
+        }
+        self.decide_response_and_chain(session_id, &routing, pack_type);
     }
 
     fn decide_response_and_chain(
@@ -25,14 +42,8 @@ impl NetworkBackend {
         pack_type: PacketType,
     ) {
         match pack_type {
-            MsgFragment(fragment) => {
-                let mut routing_rev = routing.get_reversed();
-                routing_rev.increase_hop_index();
-                self.send_packet(Packet::new_ack(
-                    routing_rev,
-                    session_id,
-                    fragment.fragment_index,
-                ));
+            PacketType::MsgFragment(fragment) => {
+                self.ack(routing.clone(), session_id, fragment.fragment_index);
                 self.send_to_thread(session_id, routing, fragment);
             }
             PacketType::Ack(ack) => {

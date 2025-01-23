@@ -14,7 +14,7 @@ impl TextServer {
             "https://www.youtube.com/?app=desktop",
             "https://theuselessweb.com/",
         ];
-        
+
         res.iter().map(|&s| s.to_string()).collect()
     }
 
@@ -38,12 +38,15 @@ impl TextServer {
         if !resp.is_success() {
             return None;
         }
-        
+
         //TODO related data
-        Some(FileWithData { file: resp.text().ok()?, related_data: HashMap::default() })
+        Some(FileWithData {
+            file: resp.text().ok()?,
+            related_data: HashMap::default(),
+        })
     }
-    
-    fn test_local_file(&self, link: &Link) -> FileWithData{
+
+    fn test_local_file(&self, link: &Link) -> FileWithData {
         let mut content = "";
         let mut related_data = HashMap::new();
         if link == "localfile.with.image" {

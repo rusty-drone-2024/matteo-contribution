@@ -4,7 +4,7 @@ use crate::client::frontend::RequestWrapper;
 
 impl ClientBackend {
     pub(super) fn handle_frontend_request(&mut self, frontend_request: RequestWrapper) {
-        let Ok(client_req) = frontend_request.get_request() else {
+        let Some(client_req) = frontend_request.get_request() else {
             return frontend_request.post_err_not_found();
         };
 

@@ -64,10 +64,12 @@ impl Leaf for TextServer {
                 message,
             } = packet_msg;
 
-            let response = self.handle_message(message.clone());
+            let response = self.handle_message(message.clone(), session, opposite_end);
 
-            let packet_resp = PacketMessage::new(session, opposite_end, response);
-            let _ = self.network.send.send(packet_resp);
+            if let Some(response) = response {
+                let packet_resp = PacketMessage::new(session, opposite_end, response);
+                let _ = self.network.send.send(packet_resp);
+            }
         }
     }
 }

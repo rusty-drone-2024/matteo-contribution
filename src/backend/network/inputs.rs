@@ -57,7 +57,7 @@ impl NetworkBackend {
         match pack_type {
             PacketType::MsgFragment(fragment) => {
                 self.ack(routing.clone(), session_id, fragment.fragment_index);
-                self.send_to_thread(session_id, routing, fragment);
+                self.send_msg_to_thread(session_id, routing, fragment);
             }
             PacketType::Ack(ack) => {
                 self.disassembler.ack(session_id, ack.fragment_index);
@@ -70,8 +70,12 @@ impl NetworkBackend {
                 self.send_packet(response);
             }
             PacketType::FloodResponse(flood_resp) => {
-                self.topology
+                let new_leaf = self.topology
                     .add_flood_response(flood_resp.flood_id, flood_resp.path_trace);
+                
+                if let Some((node_id, node_type)) = new_leaf {
+                    self.send_new_leaf_to_thread(node_id, node_type);
+                }
             }
         }
     }

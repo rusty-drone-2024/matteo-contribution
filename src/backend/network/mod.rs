@@ -64,10 +64,11 @@ impl NetworkBackend {
     }
 
     pub fn run(&mut self) {
+        self.flood();
+
         loop {
             if self.topology.require_flood() {
-                let flood_id = self.topology.take_fresh_flood_id();
-                self.flood(flood_id);
+                self.flood();
             }
 
             let to_send = self.topology.take_sendable();

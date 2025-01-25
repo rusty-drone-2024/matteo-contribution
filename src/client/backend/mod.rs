@@ -2,13 +2,13 @@ mod dns;
 mod io;
 mod request_handler;
 
+use crate::backend::network::NetworkOutput;
 use crate::backend::PacketMessage;
 use crate::client::frontend::RequestWrapper;
 use common_structs::message::Link;
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
-use crate::backend::network::NetworkOutput;
 
 pub struct ClientBackend {
     new_session_id: u64,
@@ -51,13 +51,13 @@ impl ClientBackend {
                     let Ok(net_msg) = res else {
                         break;
                     };
-                    
+
                     match net_msg {
                         NetworkOutput::MsgReceived(msg) => {
                             self.handle_network_response(msg);
                         },
-                        NetworkOutput::NewLeafFound(_,_) => {
-                            todo!();
+                        NetworkOutput::NewLeafFound(a, b) => {
+                            println!("{a:?}, {b:?}")
                         },
                     }
                 },

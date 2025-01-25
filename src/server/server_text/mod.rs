@@ -1,6 +1,7 @@
 mod features;
 mod message_handler;
 
+use crate::backend::network::NetworkOutput::MsgReceived;
 use crate::backend::network::{NetworkBackend, NetworkCommunication};
 use crate::backend::PacketMessage;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
@@ -10,7 +11,6 @@ use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
-use crate::backend::network::NetworkOutput::MsgReceived;
 
 pub struct TextServer {
     node_id: NodeId,

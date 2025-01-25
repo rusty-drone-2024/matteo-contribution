@@ -56,9 +56,7 @@ impl ClientBackend {
     }
 
     pub(super) fn handle_new_leaf(&mut self, node_id: NodeId, node_type: NodeType) {
-        println!("{node_id} {node_type:?}");
         if node_type == NodeType::Server {
-            println!("{node_id}");
             self.servers.push((node_id, None));
 
             let packet_req_type =

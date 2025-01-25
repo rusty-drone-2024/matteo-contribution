@@ -50,12 +50,18 @@ impl ClientBackend {
     ) -> Option<(SessionId, ClientNetworkResponse)> {
         let full_req_session = *self.split_req.get(&session)?;
         let acc = self.accumulator_list_all.get_mut(&full_req_session)?;
-        acc.1.push((server_id, list));
-
-        if acc.0 != acc.1.len() {
+        
+        acc.1.push((server_id, list.clone()));
+        let finished =  acc.0 == acc.1.len();
+        
+        for link in list {
+            self.save_to_dns(server_id, link);
+        }
+        
+        if !finished {
             return None;
         }
-
+        
         self.split_req.remove(&session);
         let acc_res = self.accumulator_list_all.remove(&full_req_session)?.1;
         Some((full_req_session, ListOfAll(acc_res)))

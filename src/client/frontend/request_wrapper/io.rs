@@ -42,8 +42,6 @@ impl RequestWrapper {
 
                 file = file.replace("url(/file/\"", "url(\"");
 
-                println!("\n\nFILE CAN BE DESCRIBED AS \n{file}  \n\n");
-
                 Response::from_data(file.to_string())
             }
             GotMedia(media) => Response::from_data(media),

@@ -19,7 +19,8 @@ impl TextServer {
             "https://www.youtube.com/?app=desktop",
             "https://theuselessweb.com/",
             "https://unsplash.com/",
-            "https://start.duckduckgo.com/"
+            "https://start.duckduckgo.com/",
+            "https://www.yahoo.com/?",
         ];
 
         res.iter().map(|&s| s.to_string()).collect()
@@ -80,16 +81,16 @@ impl TextServer {
         let mut content = "";
         let mut related_data = HashMap::new();
         if link == "localfile.with.image" {
-            content = "<img src=\"http://localhost:7710/file/test.jpg\"\
+            content = "<img src=\"test.jpg\"\
                 style=\"width: 100%;\"></img>";
-            related_data.insert("test.jpg".to_string(), 30);
+            related_data.insert("test.jpg".to_string(), 12);
         }
         if link == "localfile.with.embed" {
             content = "<iframe width=\"100%\" height=\"375\"\
                 src=\"https://www.youtube.com/embed/_vhf0RZg0fg\"\
                 frameborder=\"0\" allow=\"autoplay; encrypted-media\"\
                 allowfullscreen></iframe>";
-            related_data.insert("test.jpg".to_string(), 30);
+            related_data.insert("test.jpg".to_string(), 12);
         }
 
         let file = format!(

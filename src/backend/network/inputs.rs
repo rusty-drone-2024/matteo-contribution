@@ -2,7 +2,7 @@ use crate::backend::network::NetworkBackend;
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::NackType::{ErrorInRouting, UnexpectedRecipient};
-use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, NodeType, Packet, PacketType};
+use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, Packet, PacketType};
 
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
@@ -70,9 +70,10 @@ impl NetworkBackend {
                 self.send_packet(response);
             }
             PacketType::FloodResponse(flood_resp) => {
-                let new_leaf = self.topology
+                let new_leaf = self
+                    .topology
                     .add_flood_response(flood_resp.flood_id, flood_resp.path_trace);
-                
+
                 if let Some((node_id, node_type)) = new_leaf {
                     self.send_new_leaf_to_thread(node_id, node_type);
                 }
@@ -98,7 +99,7 @@ impl NetworkBackend {
         let flood_id = flood.flood_id;
         let mut path_trace = flood.path_trace;
 
-        path_trace.push((self.node_id, NodeType::Client));
+        path_trace.push((self.node_id, self.node_type));
         let hops = path_trace.iter().map(|(id, _)| *id).rev().collect();
 
         Packet::new_flood_response(

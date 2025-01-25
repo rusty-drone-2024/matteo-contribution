@@ -10,7 +10,7 @@ use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
-use wg_2024::packet::Packet;
+use wg_2024::packet::{NodeType, Packet};
 
 pub struct TextServer {
     node_id: NodeId,
@@ -34,6 +34,7 @@ impl Leaf for TextServer {
 
         let network_backend = Some(NetworkBackend::new(
             id,
+            NodeType::Server,
             thread_in,
             thread_out,
             packet_recv,
@@ -59,10 +60,10 @@ impl Leaf for TextServer {
         }
 
         while let Ok(net_msg) = self.network.rcv.recv() {
-            let MsgReceived(packet_msg) = net_msg else{
+            let MsgReceived(packet_msg) = net_msg else {
                 continue; // Ignore update of network
             };
-            
+
             let PacketMessage {
                 session,
                 opposite_end,

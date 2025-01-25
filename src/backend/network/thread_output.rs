@@ -1,5 +1,5 @@
-use crate::backend::network::NetworkOutput::{MsgReceived, NewLeafFound};
 use crate::backend::network::NetworkBackend;
+use crate::backend::network::NetworkOutput::{MsgReceived, NewLeafFound};
 use crate::backend::PacketMessage;
 use common_structs::types::SessionId;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
@@ -25,11 +25,7 @@ impl NetworkBackend {
         let _ = self.thread_out.send(sendable);
     }
 
-    pub(super) fn send_new_leaf_to_thread(
-        &mut self,
-        node_id: NodeId,
-        node_type: NodeType,
-    ) {
+    pub(super) fn send_new_leaf_to_thread(&mut self, node_id: NodeId, node_type: NodeType) {
         let sendable = NewLeafFound(node_id, node_type);
         let _ = self.thread_out.send(sendable);
     }

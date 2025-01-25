@@ -15,7 +15,7 @@ pub use crate::backend::disassembler::Disassembler;
 use crate::backend::topology::Topology;
 use crate::backend::PacketMessage;
 
-pub enum NetworkOutput{
+pub enum NetworkOutput {
     MsgReceived(PacketMessage),
     NewLeafFound(NodeId, NodeType),
 }
@@ -28,6 +28,7 @@ pub struct NetworkCommunication {
 
 pub struct NetworkBackend {
     node_id: NodeId,
+    node_type: NodeType,
     topology: Topology,
     assembler: Assembler,
     disassembler: Disassembler,
@@ -40,8 +41,10 @@ pub struct NetworkBackend {
 }
 
 impl NetworkBackend {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         node_id: NodeId,
+        node_type: NodeType,
         thread_in: Receiver<PacketMessage>,
         thread_out: Sender<NetworkOutput>,
         packet_in: Receiver<Packet>,
@@ -51,6 +54,7 @@ impl NetworkBackend {
     ) -> Self {
         Self {
             node_id,
+            node_type,
             topology: Topology::new(node_id),
             assembler: Assembler::new(),
             disassembler: Disassembler::new(),

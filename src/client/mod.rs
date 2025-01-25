@@ -10,7 +10,7 @@ use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
-use wg_2024::packet::Packet;
+use wg_2024::packet::{NodeType, Packet};
 
 pub struct TextMediaClient {
     threads_data: Option<ThreadsData>,
@@ -41,6 +41,7 @@ impl Leaf for TextMediaClient {
             threads_data: Some(ThreadsData {
                 network_backend: NetworkBackend::new(
                     id,
+                    NodeType::Client,
                     network_in_rcv,
                     network_out_send,
                     packet_recv,

@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
+use crate::backend::network::NetworkOutput::MsgReceived;
 
 pub struct TextServer {
     node_id: NodeId,
@@ -57,7 +58,11 @@ impl Leaf for TextServer {
             thread::spawn(move || net_backend.run());
         }
 
-        while let Ok(packet_msg) = self.network.rcv.recv() {
+        while let Ok(net_msg) = self.network.rcv.recv() {
+            let MsgReceived(packet_msg) = net_msg else{
+                continue; // Ignore update of network
+            };
+            
             let PacketMessage {
                 session,
                 opposite_end,

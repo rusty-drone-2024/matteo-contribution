@@ -8,20 +8,21 @@ use common_structs::message::Link;
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
+use crate::backend::network::NetworkOutput;
 
 pub struct ClientBackend {
     new_session_id: u64,
     open_requests: HashMap<u64, RequestWrapper>,
     dns: HashMap<Link, NodeId>,
     frontend_rcv: Receiver<RequestWrapper>,
-    network_rcv: Receiver<PacketMessage>,
+    network_rcv: Receiver<NetworkOutput>,
     network_send: Sender<PacketMessage>,
 }
 
 impl ClientBackend {
     pub fn new(
         frontend_rcv: Receiver<RequestWrapper>,
-        network_rcv: Receiver<PacketMessage>,
+        network_rcv: Receiver<NetworkOutput>,
         network_send: Sender<PacketMessage>,
     ) -> Self
     where
@@ -47,10 +48,18 @@ impl ClientBackend {
                     self.handle_frontend_request(frontend_rq);
                 },
                 recv(self.network_rcv) -> res => {
-                    let Ok(packet_msg) = res else {
+                    let Ok(net_msg) = res else {
                         break;
                     };
-                    self.handle_network_response(packet_msg);
+                    
+                    match net_msg {
+                        NetworkOutput::MsgReceived(msg) => {
+                            self.handle_network_response(msg);
+                        },
+                        NetworkOutput::NewLeafFound(_,_) => {
+                            todo!();
+                        },
+                    }
                 },
             }
         }

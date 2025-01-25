@@ -1,7 +1,9 @@
-use crate::backend::network::{NetworkBackend, PacketMessage};
+use crate::backend::network::{NetworkBackend};
 use common_structs::types::SessionId;
 use wg_2024::network::SourceRoutingHeader;
 use wg_2024::packet::Fragment;
+use crate::backend::network::NetworkOutput::MsgReceived;
+use crate::backend::PacketMessage;
 
 impl NetworkBackend {
     pub(super) fn send_to_thread(
@@ -21,6 +23,6 @@ impl NetworkBackend {
 
         let _ = self
             .thread_out
-            .send(PacketMessage::new(session_id, first, message));
+            .send(MsgReceived(PacketMessage::new(session_id, first, message)));
     }
 }

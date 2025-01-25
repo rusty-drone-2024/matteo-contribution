@@ -2,7 +2,7 @@ use common_structs::leaf::{LeafCommand, LeafEvent};
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
-use wg_2024::packet::Packet;
+use wg_2024::packet::{NodeType, Packet};
 
 mod ack_nack;
 mod inputs;
@@ -15,9 +15,14 @@ pub use crate::backend::disassembler::Disassembler;
 use crate::backend::topology::Topology;
 use crate::backend::PacketMessage;
 
+pub enum NetworkOutput{
+    MsgReceived(PacketMessage),
+    NewLeafFound(NodeId, NodeType),
+}
+
 pub struct NetworkCommunication {
     pub backend: Option<NetworkBackend>,
-    pub rcv: Receiver<PacketMessage>,
+    pub rcv: Receiver<NetworkOutput>,
     pub send: Sender<PacketMessage>,
 }
 
@@ -27,7 +32,7 @@ pub struct NetworkBackend {
     assembler: Assembler,
     disassembler: Disassembler,
     thread_in: Receiver<PacketMessage>,
-    thread_out: Sender<PacketMessage>,
+    thread_out: Sender<NetworkOutput>,
     packet_in: Receiver<Packet>,
     packets_out: HashMap<NodeId, Sender<Packet>>,
     controller_event: Sender<LeafEvent>,
@@ -38,7 +43,7 @@ impl NetworkBackend {
     pub fn new(
         node_id: NodeId,
         thread_in: Receiver<PacketMessage>,
-        thread_out: Sender<PacketMessage>,
+        thread_out: Sender<NetworkOutput>,
         packet_in: Receiver<Packet>,
         packets_out: HashMap<NodeId, Sender<Packet>>,
         controller_event: Sender<LeafEvent>,

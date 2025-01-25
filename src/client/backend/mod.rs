@@ -1,10 +1,12 @@
 mod dns;
-mod io;
-mod request_handler;
+mod input;
+mod output;
 
+use crate::backend::network::NetworkOutput;
 use crate::backend::PacketMessage;
 use crate::client::frontend::RequestWrapper;
-use common_structs::message::Link;
+use common_structs::message::{Link, ServerType};
+use common_structs::types::SessionId;
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
@@ -14,14 +16,19 @@ pub struct ClientBackend {
     open_requests: HashMap<u64, RequestWrapper>,
     dns: HashMap<Link, NodeId>,
     frontend_rcv: Receiver<RequestWrapper>,
-    network_rcv: Receiver<PacketMessage>,
+    network_rcv: Receiver<NetworkOutput>,
     network_send: Sender<PacketMessage>,
+    servers: Vec<(NodeId, Option<ServerType>)>,
+    /// Contains partial and total
+    split_req: HashMap<SessionId, SessionId>,
+    #[allow(clippy::type_complexity)]
+    accumulator_list_all: HashMap<SessionId, (usize, Vec<(NodeId, Vec<Link>)>)>,
 }
 
 impl ClientBackend {
     pub fn new(
         frontend_rcv: Receiver<RequestWrapper>,
-        network_rcv: Receiver<PacketMessage>,
+        network_rcv: Receiver<NetworkOutput>,
         network_send: Sender<PacketMessage>,
     ) -> Self
     where
@@ -34,6 +41,9 @@ impl ClientBackend {
             frontend_rcv,
             network_rcv,
             network_send,
+            servers: vec![],
+            split_req: HashMap::default(),
+            accumulator_list_all: HashMap::default(),
         }
     }
 
@@ -47,10 +57,18 @@ impl ClientBackend {
                     self.handle_frontend_request(frontend_rq);
                 },
                 recv(self.network_rcv) -> res => {
-                    let Ok(packet_msg) = res else {
+                    let Ok(net_msg) = res else {
                         break;
                     };
-                    self.handle_network_response(packet_msg);
+
+                    match net_msg {
+                        NetworkOutput::MsgReceived(msg) => {
+                            self.handle_network_response(msg);
+                        },
+                        NetworkOutput::NewLeafFound(node_id, node_type) => {
+                            self.handle_new_leaf(node_id, node_type);
+                        },
+                    }
                 },
             }
         }

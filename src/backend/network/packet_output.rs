@@ -74,7 +74,10 @@ impl NetworkBackend {
         let _ = channel.send(packet);
     }
 
-    pub(super) fn flood(&self, flood_id: u64) {
+    pub(super) fn flood(&mut self) {
+        let flood_id = self.topology.take_fresh_flood_id();
+        println!("==> FLOODING FROM {}", self.node_id);
+
         let packet = Packet::new_flood_request(
             SourceRoutingHeader::empty_route(),
             0,

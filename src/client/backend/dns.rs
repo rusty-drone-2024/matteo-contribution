@@ -8,7 +8,6 @@ impl ClientBackend {
         match response {
             ListOfAll(list) => {
                 for link in list {
-                    // TODO use real value
                     self.dns.insert(link.clone(), node_id);
                 }
             }

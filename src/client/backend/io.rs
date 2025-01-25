@@ -13,7 +13,6 @@ impl ClientBackend {
             RespMedia(media) => Some(GotMedia(media)),
             ErrNotFound => Some(Err404),
             other => {
-                // TODO handle ErrNotFound
                 eprintln!("WARN message currently unsupported {other:?}");
                 None
             }

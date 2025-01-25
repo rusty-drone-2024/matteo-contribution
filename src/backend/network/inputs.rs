@@ -21,7 +21,11 @@ impl NetworkBackend {
             return if let PacketType::MsgFragment(fragment) = &pack_type {
                 self.nack(routing, session_id, fragment.fragment_index, nack_type);
             } else {
-                self.nack(routing, session_id, 0, nack_type); //TODO Check if 0 or 1
+                self.shortcut(Packet {
+                    session_id,
+                    routing_header: routing,
+                    pack_type,
+                });
             };
         }
 

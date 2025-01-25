@@ -17,7 +17,6 @@ impl Disassembler {
             ack_received: HashSet::default(),
         };
 
-        // TODO owerwrite check
         self.messages_to_send
             .insert(session_id, disassembled.clone());
 

@@ -1,6 +1,11 @@
 use super::TextServer;
+use crate::backend::PacketMessage;
+use common_structs::message::Message::{ErrNotFound, RespFile};
 use common_structs::message::{FileWithData, Link};
+use common_structs::types::SessionId;
 use std::collections::HashMap;
+use std::thread;
+use wg_2024::network::NodeId;
 
 impl TextServer {
     pub(super) fn init_files() -> Vec<Link> {
@@ -13,6 +18,9 @@ impl TextServer {
             "localfile.text",
             "https://www.youtube.com/?app=desktop",
             "https://theuselessweb.com/",
+            "https://unsplash.com/",
+            "https://start.duckduckgo.com/",
+            "https://www.yahoo.com/?",
         ];
 
         res.iter().map(|&s| s.to_string()).collect()
@@ -22,44 +30,67 @@ impl TextServer {
         self.files.clone()
     }
 
-    pub(super) fn get_file(&self, link: &Link) -> Option<FileWithData> {
-        /* TODO reenable in the future
-        if !self.get_files_list().contains(link) {
-            return None;
-        }
-        */
-
+    pub(super) fn async_get_file(
+        &self,
+        link: &Link,
+        session: SessionId,
+        other_end: NodeId,
+    ) -> Option<FileWithData> {
         if link.starts_with("localfile") {
             return Some(self.test_local_file(link));
         }
 
-        let resp = attohttpc::get(link).send().ok()?;
+        //TODO LIMITS THREADS
+        let sender = self.network.send.clone();
+        let link = link.to_string();
+        thread::spawn(move || {
+            if !link.starts_with("http") {
+                let _ = sender.send(PacketMessage::new(session, other_end, ErrNotFound));
+                return;
+            }
 
-        if !resp.is_success() {
-            return None;
-        }
+            let req = attohttpc::get(link);
+            let Ok(resp) = req.send() else {
+                let _ = sender.send(PacketMessage::new(session, other_end, ErrNotFound));
+                return;
+            };
 
-        //TODO related data
-        Some(FileWithData {
-            file: resp.text().ok()?,
-            related_data: HashMap::default(),
-        })
+            if !resp.is_success() {
+                let _ = sender.send(PacketMessage::new(session, other_end, ErrNotFound));
+                return;
+            }
+
+            let Ok(file) = resp.text() else {
+                let _ = sender.send(PacketMessage::new(session, other_end, ErrNotFound));
+                return;
+            };
+
+            //TODO related data
+            let resp = FileWithData {
+                file,
+                related_data: HashMap::default(),
+            };
+
+            let _ = sender.send(PacketMessage::new(session, other_end, RespFile(resp)));
+        });
+
+        None
     }
 
     fn test_local_file(&self, link: &Link) -> FileWithData {
         let mut content = "";
         let mut related_data = HashMap::new();
         if link == "localfile.with.image" {
-            content = "<img src=\"http://localhost:7710/file/test.jpg\"\
+            content = "<img src=\"test.jpg\"\
                 style=\"width: 100%;\"></img>";
-            related_data.insert("test.jpg".to_string(), 30);
+            related_data.insert("test.jpg".to_string(), 12);
         }
         if link == "localfile.with.embed" {
             content = "<iframe width=\"100%\" height=\"375\"\
                 src=\"https://www.youtube.com/embed/_vhf0RZg0fg\"\
                 frameborder=\"0\" allow=\"autoplay; encrypted-media\"\
                 allowfullscreen></iframe>";
-            related_data.insert("test.jpg".to_string(), 30);
+            related_data.insert("test.jpg".to_string(), 12);
         }
 
         let file = format!(

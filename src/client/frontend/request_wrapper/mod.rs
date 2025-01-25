@@ -22,6 +22,7 @@ pub enum ClientNetworkRequest {
 
 #[derive(Debug, Clone)]
 pub enum ClientNetworkResponse {
+    Err404,
     ListOfAll(Vec<Link>),
     GotFile(FileWithData),
     #[allow(dead_code)]

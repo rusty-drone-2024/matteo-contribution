@@ -1,5 +1,5 @@
 use crate::client::backend::ClientBackend;
-use crate::client::frontend::ClientNetworkResponse::{GotFile, GotMedia, ListOfAll};
+use crate::client::frontend::ClientNetworkResponse::{GotFile, ListOfAll};
 use crate::client::frontend::{ClientNetworkRequest, ClientNetworkResponse};
 use wg_2024::network::NodeId;
 
@@ -17,7 +17,7 @@ impl ClientBackend {
                     self.dns.insert(link.clone(), *id);
                 }
             }
-            GotMedia(_) => {}
+            _ => {}
         }
     }
 
@@ -25,7 +25,7 @@ impl ClientBackend {
         match request {
             ClientNetworkRequest::ListAll => {
                 //TODO remove hardcoded
-                Some(20)
+                Some(11)
             }
             ClientNetworkRequest::Get(link) => self.dns.get(link).copied(),
         }

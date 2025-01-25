@@ -4,7 +4,7 @@ use crate::client::frontend::RequestWrapper;
 
 impl ClientBackend {
     pub(super) fn handle_frontend_request(&mut self, frontend_request: RequestWrapper) {
-        let Ok(client_req) = frontend_request.get_request() else {
+        let Some(client_req) = frontend_request.get_request() else {
             return frontend_request.post_err_not_found();
         };
 
@@ -12,7 +12,7 @@ impl ClientBackend {
         self.open_requests.insert(session_id, frontend_request);
 
         //TODO handle better
-        let server_id = self.get_from_dns(&client_req).unwrap_or(20);
+        let server_id = self.get_from_dns(&client_req).unwrap_or(11);
         let msg = Self::convert_request(client_req);
 
         let packet_msg = PacketMessage::new(session_id, server_id, msg);

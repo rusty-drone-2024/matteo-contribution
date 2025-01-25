@@ -10,6 +10,9 @@ crossbeam-channel = ">=0.5.13"
 tiny_http = "0.12.0"
 attohttpc = "0.28.2"
 
+rusty_tester = { git = "https://github.com/rusty-drone-2024/rusty-tester.git", branch = "matteo-allow-run-leaf-optionally", features = ["leaf"] }
+rusty_drones = { git = "https://github.com/rusty-drone-2024/rusty-drone.git" }
+
 [dev-dependencies]
 wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize", "debug"] }
 # rusty_tester = { git = "https://github.com/rusty-drone-2024/rusty-tester.git", branch = "main" }

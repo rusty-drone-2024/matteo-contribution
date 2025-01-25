@@ -12,7 +12,7 @@ impl ClientBackend {
         self.open_requests.insert(session_id, frontend_request);
 
         //TODO handle better
-        let server_id = self.get_from_dns(&client_req).unwrap_or(20);
+        let server_id = self.get_from_dns(&client_req).unwrap_or(11);
         let msg = Self::convert_request(client_req);
 
         let packet_msg = PacketMessage::new(session_id, server_id, msg);

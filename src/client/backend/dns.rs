@@ -25,7 +25,7 @@ impl ClientBackend {
         match request {
             ClientNetworkRequest::ListAll => {
                 //TODO remove hardcoded
-                Some(20)
+                Some(11)
             }
             ClientNetworkRequest::Get(link) => self.dns.get(link).copied(),
         }

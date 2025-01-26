@@ -4,6 +4,12 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::{Packet, PacketType};
 
 impl Topology {
+    pub(super) fn remove_from_waiting(&mut self, destination: NodeId) {
+        if let Some(waiting) = self.waiting_packets.remove(&destination) {
+            self.waiting_finished_packets.insert(destination, waiting);
+        }
+    }
+    
     pub fn add_waiting(
         &mut self,
         sesssion: SessionId,
@@ -19,7 +25,7 @@ impl Topology {
     }
 
     #[must_use]
-    pub(crate) fn require_flood(&mut self) -> bool {
+    pub fn require_flood(&mut self) -> bool {
         if self.new_waiting > 0 {
             self.new_waiting = 0;
             return true;

@@ -86,8 +86,23 @@ impl NetworkBackend {
             .disassembler
             .nack_require_resend(session_id, nack.fragment_index)?;
 
+        match nack.nack_type {
+            ErrorInRouting(node_id) => {
+                self.topology.remove_node(node_id);
+            }
+            NackType::Dropped => {
+                // TODO
+            }
+            NackType::DestinationIsDrone => {
+                eprintln!("SENT A PACKET TO A DRONE SOMEHOW");
+            }
+            UnexpectedRecipient(dest) => {
+                eprintln!("SENT A PACKET TO {dest} SOMEHOW");
+            }
+        }
+        
         if nack.nack_type == NackType::DestinationIsDrone {
-            eprintln!("SENT A PACKET TO A DRONE SOMEHOW");
+            
             return None;
         }
 

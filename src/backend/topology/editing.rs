@@ -33,5 +33,7 @@ impl Topology {
         None
     }
 
-
+    pub(crate) fn remove_node(&mut self, to_remove: NodeId) {
+        self.graph.remove_node(to_remove);
+    }
 }

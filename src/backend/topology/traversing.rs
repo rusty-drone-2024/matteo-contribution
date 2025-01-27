@@ -3,6 +3,7 @@ use petgraph::algo::astar;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 
 impl Topology {
+    #[must_use]
     pub fn get_routing_for(&self, to: NodeId) -> Option<SourceRoutingHeader> {
         let path = astar(
             &self.graph,

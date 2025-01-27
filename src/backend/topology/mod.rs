@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 mod editing;
+mod test;
 mod traversing;
 
 use petgraph::graphmap::UnGraphMap;

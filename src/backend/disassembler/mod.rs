@@ -22,7 +22,7 @@ impl Disassembler {
         let fragments = msg.into_fragments();
         let split = Split::new(dest, fragments);
 
-        if self.waiting.entry(dest).or_default().insert(session){
+        if self.waiting.entry(dest).or_default().insert(session) {
             self.new_waiting += 1;
         }
         self.splits.insert(session, split);

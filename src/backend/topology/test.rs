@@ -24,16 +24,16 @@ fn simple_path() {
     let mut topology = Topology::new(11);
     let path = vec![11, 1, 2, 3];
     topology.add_path(path.clone());
-    
+
     let routing = topology.get_routing_for(3);
-    assert_eq!(path, routing.unwrap().hops);  
+    assert_eq!(path, routing.unwrap().hops);
 }
 
 #[test]
 fn remove_node() {
     let mut topology = Topology::new(11);
     let path = vec![11, 1, 2, 3];
-    
+
     topology.add_path(path);
     topology.remove_node(2);
     assert!(!topology.graph.contains_node(2));
@@ -50,7 +50,7 @@ fn readd_node() {
     topology.add_path(path.clone());
     topology.remove_node(2);
     assert!(!topology.graph.contains_node(2));
-    
+
     topology.add_path(path.clone());
     assert!(topology.graph.contains_node(2));
 
@@ -64,7 +64,7 @@ fn shortest_path() {
     let path1 = vec![11, 1, 2, 3, 4, 5];
     let path2 = vec![11, 1, 4, 2, 3, 5];
     let expected = vec![11, 1, 4, 5];
-    
+
     topology.add_path(path1);
     topology.add_path(path2);
 

@@ -10,17 +10,22 @@ impl Disassembler {
         required
     }
 
-    pub fn add_waiting(&mut self, session: SessionId, dest: NodeId, fragment_id: FragmentIndex) -> Result<bool, String>{
+    pub fn add_waiting(
+        &mut self,
+        session: SessionId,
+        dest: NodeId,
+        fragment_id: FragmentIndex,
+    ) -> Result<bool, String> {
         let Some(split) = self.splits.get_mut(&session) else {
             return Err("Split is missing".to_string());
         };
 
-        if !split.add_waiting(fragment_id){
+        if !split.add_waiting(fragment_id) {
             return Ok(false);
         }
 
         let entry = self.waiting.entry(dest).or_default();
-        if entry.insert(session){
+        if entry.insert(session) {
             self.new_waiting += 1;
         }
         Ok(true)

@@ -59,21 +59,21 @@ fn flood_needed() {
 }
 
 #[test]
-fn split_add_all_to_waiting(){
+fn split_add_all_to_waiting() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
     assert!(disassembler.waiting.contains_key(&0));
 }
 
 #[test]
-fn get_and_get_mut_fail(){
+fn get_and_get_mut_fail() {
     let mut disassembler = Disassembler::default();
     assert!(disassembler.get(0).is_none());
     assert!(disassembler.get_mut(0).is_none());
 }
 
 #[test]
-fn get_and_get_mut_pass(){
+fn get_and_get_mut_pass() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqFilesList);
     assert!(disassembler.get(0).is_some());
@@ -94,14 +94,14 @@ fn add_waiting_to_already_waiting_all() {
 }
 
 #[test]
-fn take_ready_empty(){
+fn take_ready_empty() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
     assert!(disassembler.take_ready().is_empty());
 }
 
 #[test]
-fn take_ready_not_empty(){
+fn take_ready_not_empty() {
     let mut disassembler = Disassembler::default();
     disassembler.split(10, 1, Message::ReqServerType);
     disassembler.split(20, 2, Message::ReqServerType);

@@ -10,8 +10,8 @@ mod packet_output;
 mod simulation_controller;
 mod thread_output;
 
-pub use crate::backend::assembler::Assembler;
-pub use crate::backend::disassembler::Disassembler;
+use crate::backend::assembler::Assembler;
+use crate::backend::disassembler::Disassembler;
 use crate::backend::topology::Topology;
 use crate::backend::PacketMessage;
 
@@ -56,8 +56,8 @@ impl NetworkBackend {
             node_id,
             node_type,
             topology: Topology::new(node_id),
-            assembler: Assembler::new(),
-            disassembler: Disassembler::new(),
+            assembler: Assembler::default(),
+            disassembler: Disassembler::default(),
             thread_in,
             thread_out,
             packet_in,
@@ -68,43 +68,41 @@ impl NetworkBackend {
     }
 
     pub fn run(&mut self) {
+        let mut exit = false;
         self.flood();
 
-        loop {
-            if self.topology.require_flood() {
-                self.flood();
-            }
-
-            let to_send = self.topology.take_sendable();
-            if !to_send.is_empty() {
-                for packet in to_send {
-                    self.send_packet(packet);
-                }
-            }
-
+        while !exit {
             select! {
                 recv(self.controller_command) -> msg => {
-                    let Ok(msg) = msg else {
-                        continue;
+                    if let Ok(msg) = msg {
+                        exit = self.handle_command(msg);
                     };
-
-                    let exit = self.handle_command(msg);
-                    if exit {
-                        break;
-                    }
                 },
                 recv(self.packet_in) -> msg => {
-                    if let Ok(msg) = msg{
-
-                        self.check_packet_and_chain(msg);
-                    }
+                    let Ok(msg) = msg else { continue; };
+                    self.check_packet_and_chain(msg);
+                    self.send_if_possible();
                 },
                 recv(self.thread_in) -> msg => {
-                    if let Ok(msg) = msg{
-                        self.send_message(msg);
-                    }
+                    let Ok(msg) = msg else { continue; };
+                    self.send_message(msg);
+                    self.flood_if_needed();
                 }
             }
+        }
+    }
+
+    fn flood_if_needed(&mut self) {
+        if self.disassembler.require_flood() {
+            self.flood();
+        }
+    }
+
+    fn send_if_possible(&mut self) {
+        let to_send = self.disassembler.take_ready();
+
+        for session in to_send {
+            self.send_split(session);
         }
     }
 }

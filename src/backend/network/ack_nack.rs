@@ -7,18 +7,18 @@ impl NetworkBackend {
     pub(super) fn ack(
         &mut self,
         mut routing: SourceRoutingHeader,
-        session_id: SessionId,
+        session: SessionId,
         fragment_index: FragmentIndex,
     ) {
         routing.reverse();
         routing.increase_hop_index();
-        self.send_packet(Packet::new_ack(routing, session_id, fragment_index));
+        self.send_packet(Packet::new_ack(routing, session, fragment_index));
     }
 
     pub(super) fn nack(
         &mut self,
         mut routing: SourceRoutingHeader,
-        session_id: SessionId,
+        session: SessionId,
         fragment_index: FragmentIndex,
         nack_type: NackType,
     ) {
@@ -26,7 +26,7 @@ impl NetworkBackend {
         routing.increase_hop_index();
         self.send_packet(Packet::new_nack(
             routing,
-            session_id,
+            session,
             Nack {
                 fragment_index,
                 nack_type,

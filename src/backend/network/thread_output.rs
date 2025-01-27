@@ -21,6 +21,11 @@ impl NetworkBackend {
             return;
         };
 
+        println!(
+            "RECEIVED MESSAGE (from {}, to {}): {}",
+            first, self.node_id, message
+        );
+
         let sendable = MsgReceived(PacketMessage::new(session_id, first, message));
         let _ = self.thread_out.send(sendable);
     }

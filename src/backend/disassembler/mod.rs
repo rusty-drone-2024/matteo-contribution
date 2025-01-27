@@ -1,28 +1,46 @@
-mod ack;
-mod public;
+mod fragment_info;
+mod split;
 mod test;
-mod to_send;
+mod waiting;
 
-use common_structs::types::FragmentIndex;
-use std::collections::{HashMap, HashSet};
+pub use crate::backend::disassembler::split::Split;
+use common_structs::message::Message;
+use common_structs::types::{FragmentIndex, SessionId};
+use std::collections::HashMap;
 use wg_2024::network::NodeId;
-use wg_2024::packet::Fragment;
 
+#[derive(Default)]
 pub struct Disassembler {
-    messages_to_send: HashMap<u64, DisassembledPacket>,
+    splits: HashMap<SessionId, Split>,
+    new_waiting: usize,
+    waiting: HashMap<NodeId, Vec<SessionId>>,
+    finished_waiting: HashMap<NodeId, Vec<SessionId>>,
 }
 
 impl Disassembler {
-    pub fn new() -> Self {
-        Self {
-            messages_to_send: HashMap::new(),
-        }
+    pub fn split(&mut self, session: SessionId, dest: NodeId, msg: Message) {
+        let fragments = msg.into_fragments();
+        let split = Split::new(dest, fragments);
+        self.splits.insert(session, split);
     }
-}
 
-#[derive(Clone)]
-struct DisassembledPacket {
-    destination: NodeId,
-    pieces: Vec<Fragment>,
-    ack_received: HashSet<FragmentIndex>,
+    pub fn get(&self, session: SessionId) -> Option<&Split> {
+        self.splits.get(&session)
+    }
+
+    pub fn get_mut(&mut self, session: SessionId) -> Option<&mut Split> {
+        self.splits.get_mut(&session)
+    }
+
+    pub fn ack(&mut self, session: SessionId, fragment_id: FragmentIndex) -> Result<bool, String> {
+        let split = self.splits.get_mut(&session).ok_or("No session id")?;
+
+        let res = split.ack(fragment_id)?;
+        let is_acked = split.is_acked();
+
+        if res && is_acked {
+            self.splits.remove(&session);
+        }
+        Ok(res)
+    }
 }

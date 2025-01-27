@@ -7,22 +7,22 @@ use wg_2024::packet::{FloodRequest, FloodResponse, Nack, NackType, Packet, Packe
 impl NetworkBackend {
     pub(super) fn check_packet_and_chain(&mut self, packet: Packet) {
         let Packet {
-            session_id,
+            session_id: session,
             routing_header: routing,
             pack_type,
         } = packet;
 
         if let PacketType::FloodRequest(_) = pack_type {
-            return self.decide_response_and_chain(session_id, &routing, pack_type);
+            return self.decide_response_and_chain(session, &routing, pack_type);
         }
 
         if Some(self.node_id) != routing.current_hop() {
             let nack_type = UnexpectedRecipient(self.node_id);
             return if let PacketType::MsgFragment(fragment) = &pack_type {
-                self.nack(routing, session_id, fragment.fragment_index, nack_type);
+                self.nack(routing, session, fragment.fragment_index, nack_type);
             } else {
                 self.shortcut(Packet {
-                    session_id,
+                    session_id: session,
                     routing_header: routing,
                     pack_type,
                 });
@@ -33,40 +33,40 @@ impl NetworkBackend {
             return if let PacketType::MsgFragment(fragment) = &pack_type {
                 self.nack(
                     routing,
-                    session_id,
+                    session,
                     fragment.fragment_index,
                     ErrorInRouting(next),
                 );
             } else {
                 self.shortcut(Packet {
-                    session_id,
+                    session_id: session,
                     routing_header: routing,
                     pack_type,
                 });
             };
         }
-        self.decide_response_and_chain(session_id, &routing, pack_type);
+        self.decide_response_and_chain(session, &routing, pack_type);
     }
 
     fn decide_response_and_chain(
         &mut self,
-        session_id: SessionId,
+        session: SessionId,
         routing: &SourceRoutingHeader,
         pack_type: PacketType,
     ) {
         match pack_type {
             PacketType::MsgFragment(fragment) => {
-                self.ack(routing.clone(), session_id, fragment.fragment_index);
-                self.send_msg_to_thread(session_id, routing, fragment);
+                self.ack(routing.clone(), session, fragment.fragment_index);
+                self.send_msg_to_thread(session, routing, fragment);
             }
             PacketType::Ack(ack) => {
-                self.disassembler.ack(session_id, ack.fragment_index);
+                self.disassembler.ack(session, ack.fragment_index).ok();
             }
             PacketType::Nack(nack) => {
-                self.handle_nack(session_id, &nack);
+                self.handle_nack(session, &nack);
             }
             PacketType::FloodRequest(flood) => {
-                let response = self.create_flood_response_packet(session_id, flood);
+                let response = self.create_flood_response_packet(session, flood);
                 self.send_packet(response);
             }
             PacketType::FloodResponse(flood_resp) => {
@@ -75,27 +75,42 @@ impl NetworkBackend {
                     .add_flood_response(flood_resp.flood_id, flood_resp.path_trace);
 
                 if let Some((node_id, node_type)) = new_leaf {
+                    self.disassembler.remove_waiting_for(node_id);
                     self.send_new_leaf_to_thread(node_id, node_type);
                 }
             }
         }
     }
 
-    fn handle_nack(&mut self, session_id: SessionId, nack: &Nack) -> Option<()> {
-        let (destination, fragment) = self
-            .disassembler
-            .nack_require_resend(session_id, nack.fragment_index)?;
+    fn handle_nack(&mut self, session: SessionId, nack: &Nack) -> Option<()> {
+        let split = self.disassembler.get(session)?;
+        let fragment = split.get_fragment(nack.fragment_index).ok()?;
+        let dest = split.destination();
+
+        match nack.nack_type {
+            ErrorInRouting(node_id) => {
+                self.topology.remove_node(node_id);
+            }
+            NackType::Dropped => {
+                // TODO
+            }
+            NackType::DestinationIsDrone => {
+                eprintln!("SENT A PACKET TO A DRONE SOMEHOW");
+            }
+            UnexpectedRecipient(dest) => {
+                eprintln!("SENT A PACKET TO {dest} SOMEHOW");
+            }
+        }
 
         if nack.nack_type == NackType::DestinationIsDrone {
-            eprintln!("SENT A PACKET TO A DRONE SOMEHOW");
             return None;
         }
 
-        self.send_fragment(session_id, destination, fragment);
+        self.send_fragment(session, dest, fragment);
         Some(())
     }
 
-    fn create_flood_response_packet(&self, session_id: SessionId, flood: FloodRequest) -> Packet {
+    fn create_flood_response_packet(&self, session: SessionId, flood: FloodRequest) -> Packet {
         let flood_id = flood.flood_id;
         let mut path_trace = flood.path_trace;
 
@@ -104,7 +119,7 @@ impl NetworkBackend {
 
         Packet::new_flood_response(
             SourceRoutingHeader::with_first_hop(hops),
-            session_id,
+            session,
             FloodResponse {
                 flood_id,
                 path_trace,

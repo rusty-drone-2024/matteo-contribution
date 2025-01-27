@@ -38,6 +38,7 @@ impl ClientBackend {
                     }
                 }
 
+                // TODO Stop assuming that is already done topology
                 if count == 0 {
                     return None;
                 }

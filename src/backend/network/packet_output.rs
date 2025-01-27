@@ -83,12 +83,12 @@ impl NetworkBackend {
 
     pub(super) fn flood(&mut self) {
         let flood_id = self.topology.take_fresh_flood_id();
-        println!("==> FLOODING FROM {}", self.node_id);
+        println!("==> FLOODING FROM {}", self.id);
 
         let packet = Packet::new_flood_request(
             SourceRoutingHeader::empty_route(),
             0,
-            FloodRequest::initialize(flood_id, self.node_id, NodeType::Client),
+            FloodRequest::initialize(flood_id, self.id, NodeType::Client),
         );
 
         for sender in self.packets_out.values() {

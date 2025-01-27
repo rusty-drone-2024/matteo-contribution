@@ -16,8 +16,8 @@ impl NetworkBackend {
             return self.decide_response_and_chain(session, &routing, pack_type);
         }
 
-        if Some(self.node_id) != routing.current_hop() {
-            let nack_type = UnexpectedRecipient(self.node_id);
+        if Some(self.id) != routing.current_hop() {
+            let nack_type = UnexpectedRecipient(self.id);
             return if let PacketType::MsgFragment(fragment) = &pack_type {
                 self.nack(routing, session, fragment.fragment_index, nack_type);
             } else {
@@ -114,7 +114,7 @@ impl NetworkBackend {
         let flood_id = flood.flood_id;
         let mut path_trace = flood.path_trace;
 
-        path_trace.push((self.node_id, self.node_type));
+        path_trace.push((self.id, self.node_type));
         let hops = path_trace.iter().map(|(id, _)| *id).rev().collect();
 
         Packet::new_flood_response(

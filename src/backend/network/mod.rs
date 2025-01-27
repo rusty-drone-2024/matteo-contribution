@@ -27,7 +27,7 @@ pub struct NetworkCommunication {
 }
 
 pub struct NetworkBackend {
-    node_id: NodeId,
+    id: NodeId,
     node_type: NodeType,
     topology: Topology,
     assembler: Assembler,
@@ -53,7 +53,7 @@ impl NetworkBackend {
         controller_command: Receiver<LeafCommand>,
     ) -> Self {
         Self {
-            node_id,
+            id: node_id,
             node_type,
             topology: Topology::new(node_id),
             assembler: Assembler::default(),

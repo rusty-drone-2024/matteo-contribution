@@ -6,7 +6,7 @@ impl Topology {
     pub fn get_routing_for(&self, to: NodeId) -> Option<SourceRoutingHeader> {
         let path = astar(
             &self.graph,
-            self.this_node_id,
+            self.start_id,
             |finish| finish == to,
             |_| 1,
             |_| 0,

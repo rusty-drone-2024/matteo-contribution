@@ -15,7 +15,8 @@ impl Topology {
         }
 
         let last = flood_path.last().copied()?;
-        self.add_path(flood_path.into_iter().map(|(id, _)| id).collect());
+        let path = flood_path.into_iter().map(|(id, _)| id).collect::<Vec<_>>();
+        self.add_path(&path);
 
         // Only add last as only leaf are valid destination (which are always at end)
         if last.1 == NodeType::Drone {
@@ -24,7 +25,7 @@ impl Topology {
         Some(last)
     }
 
-    pub fn add_path(&mut self, path: Vec<NodeId>) {
+    pub fn add_path(&mut self, path: &[NodeId]) {
         for window in path.windows(2) {
             self.graph.add_edge(window[0], window[1], ());
         }

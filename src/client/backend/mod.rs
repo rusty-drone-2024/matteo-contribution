@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use wg_2024::network::NodeId;
 
 pub struct ClientBackend {
-    new_session_id: u64,
+    new_session: u64,
     open_requests: HashMap<u64, RequestWrapper>,
     dns: HashMap<Link, NodeId>,
     frontend_rcv: Receiver<RequestWrapper>,
@@ -35,7 +35,7 @@ impl ClientBackend {
         Self: Sized,
     {
         Self {
-            new_session_id: 0,
+            new_session: 0,
             open_requests: HashMap::default(),
             dns: HashMap::default(),
             frontend_rcv,

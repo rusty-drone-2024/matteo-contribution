@@ -2,30 +2,37 @@ use crate::backend::network::{NetworkBackend, PacketMessage};
 use common_structs::leaf::LeafEvent::{ControllerShortcut, PacketSend};
 use common_structs::types::SessionId;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
-use wg_2024::packet::PacketType::{Ack, FloodResponse, MsgFragment, Nack};
+use wg_2024::packet::PacketType::MsgFragment;
 use wg_2024::packet::{FloodRequest, Fragment, NodeType, Packet};
 
 impl NetworkBackend {
     pub(super) fn send_message(&mut self, msg: PacketMessage) {
         let PacketMessage {
             session,
-            opposite_end: destination,
+            opposite_end: dest,
             message,
         } = msg;
-        println!("SENDING MESSAGE to {destination} of type {}", &message);
-        let fragments = self.disassembler.split(session, destination, message);
+        println!("SENDING MESSAGE to {dest} of type {}", &message);
+        self.disassembler.split(session, dest, message);
+        self.send_split(session);
+    }
 
-        let Some(routing) = self.topology.get_routing_for(destination) else {
-            for fragment in fragments {
-                self.topology
-                    .add_waiting(session, destination, MsgFragment(fragment));
-            }
-            return;
+    /// # return
+    /// True if send immediately, false else and if there was a problem
+    pub(super) fn send_split(&mut self, session: SessionId) -> Option<bool> {
+        let split = self.disassembler.get_mut(session)?;
+        let dest = split.destination();
+
+        let Some(routing) = self.topology.get_routing_for(dest) else {
+            split.add_all_to_waiting();
+            return Some(false);
         };
 
-        for fragment in fragments {
+        for fragment in split.take_waiting() {
             self.send_packet(Packet::new_fragment(routing.clone(), session, fragment));
         }
+
+        Some(true)
     }
 
     pub(super) fn send_fragment(
@@ -35,8 +42,8 @@ impl NetworkBackend {
         fragment: Fragment,
     ) {
         let Some(routing) = self.topology.get_routing_for(destination) else {
-            self.topology
-                .add_waiting(sesssion, destination, MsgFragment(fragment));
+            self.disassembler
+                .add_waiting(sesssion, destination, fragment.fragment_index);
             return;
         };
 
@@ -44,7 +51,7 @@ impl NetworkBackend {
     }
 
     pub(super) fn send_packet(&mut self, packet: Packet) {
-        let session_id = packet.session_id;
+        let session = packet.session_id;
         let routing = &packet.routing_header;
 
         let Some(destination) = routing.hops.last() else {
@@ -59,12 +66,12 @@ impl NetworkBackend {
 
         let Some(channel) = self.packets_out.get(&node_id) else {
             match packet.pack_type {
-                Ack(_) | Nack(_) | FloodResponse(_) => {
-                    self.shortcut(packet);
+                MsgFragment(fragment) => {
+                    self.disassembler
+                        .add_waiting(session, *destination, fragment.fragment_index);
                 }
                 _ => {
-                    self.topology
-                        .add_waiting(session_id, *destination, packet.pack_type);
+                    self.shortcut(packet);
                 }
             }
             return;

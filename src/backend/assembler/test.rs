@@ -4,13 +4,13 @@ use common_structs::message::Message;
 
 #[test]
 fn missing_session() {
-    let mut assembler = Assembler::new();
+    let mut assembler = Assembler::default();
     assert!(assembler.get_full_message(11).is_none());
 }
 
 #[test]
 fn assemble_msg() {
-    let mut assembler = Assembler::new();
+    let mut assembler = Assembler::default();
 
     let msg = Message::RespMedia(
         "Test of somewhat long string passed as media"

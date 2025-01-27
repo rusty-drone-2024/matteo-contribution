@@ -10,14 +10,14 @@ use wg_2024::network::NodeId;
 impl TextServer {
     pub(super) fn handle_message(
         &self,
-        message: Message,
-        session_id: SessionId,
+        msg: Message,
+        session: SessionId,
         other_end: NodeId,
     ) -> Option<Message> {
-        Some(match message {
+        Some(match msg {
             ReqServerType => RespServerType(ServerType::Text),
             ReqFilesList => RespFilesList(self.get_files_list()),
-            ReqFile(link) => RespFile(self.async_get_file(&link, session_id, other_end)?),
+            ReqFile(link) => RespFile(self.async_get_file(&link, session, other_end)?),
             _ => ErrUnsupportedRequestType,
         })
     }

@@ -20,7 +20,7 @@ impl ClientBackend {
     }
 
     fn handle_frontend_rq_types(&mut self, rq: &RequestWrapper) -> Option<SessionId> {
-        let session_id = self.fresh_session_id();
+        let session = self.fresh_session();
 
         match rq.get_request()? {
             ListAll => {
@@ -29,9 +29,9 @@ impl ClientBackend {
                 // TODO remove clone
                 for (id, server_type) in self.servers.clone() {
                     if let Some(ServerType::Text) = server_type {
-                        let part_session_id = self.fresh_session_id();
+                        let part_session_id = self.fresh_session();
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
-                        self.split_req.insert(part_session_id, session_id);
+                        self.split_req.insert(part_session_id, session);
                         let _ = self.network_send.send(packet_msg);
 
                         count += 1;
@@ -42,17 +42,16 @@ impl ClientBackend {
                     return None;
                 }
 
-                self.accumulator_list_all
-                    .insert(session_id, (count, vec![]));
+                self.accumulator_list_all.insert(session, (count, vec![]));
             }
             Get(link) => {
                 let server_id = self.get_from_dns(&link)?;
-                let packet_msg = PacketMessage::new(session_id, server_id, ReqFile(link));
+                let packet_msg = PacketMessage::new(session, server_id, ReqFile(link));
                 let _ = self.network_send.send(packet_msg);
             }
         }
 
-        Some(session_id)
+        Some(session)
     }
 
     pub(super) fn handle_new_leaf(&mut self, node_id: NodeId, node_type: NodeType) {
@@ -60,15 +59,15 @@ impl ClientBackend {
             self.servers.push((node_id, None));
 
             let packet_req_type =
-                PacketMessage::new(self.fresh_session_id(), node_id, Message::ReqServerType);
+                PacketMessage::new(self.fresh_session(), node_id, Message::ReqServerType);
 
             let _ = self.network_send.send(packet_req_type);
         }
     }
 
-    fn fresh_session_id(&mut self) -> u64 {
-        let res = self.new_session_id;
-        self.new_session_id += 1;
+    fn fresh_session(&mut self) -> u64 {
+        let res = self.new_session;
+        self.new_session += 1;
         res
     }
 }

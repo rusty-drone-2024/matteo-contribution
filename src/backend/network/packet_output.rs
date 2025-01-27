@@ -42,7 +42,7 @@ impl NetworkBackend {
         fragment: Fragment,
     ) {
         let Some(routing) = self.topology.get_routing_for(destination) else {
-            self.disassembler
+            let _ = self.disassembler
                 .add_waiting(sesssion, destination, fragment.fragment_index);
             return;
         };
@@ -67,7 +67,7 @@ impl NetworkBackend {
         let Some(channel) = self.packets_out.get(&node_id) else {
             match packet.pack_type {
                 MsgFragment(fragment) => {
-                    self.disassembler
+                    let _ = self.disassembler
                         .add_waiting(session, *destination, fragment.fragment_index);
                 }
                 _ => {

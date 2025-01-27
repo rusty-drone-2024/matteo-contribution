@@ -47,9 +47,11 @@ impl Split {
         Ok(self.get_piece(fragment_id)?.fragment().clone())
     }
 
-    pub fn add_waiting(&mut self, fragment_id: FragmentIndex) {
-        self.waiting_all = false;
-        self.waiting.insert(fragment_id);
+    pub fn add_waiting(&mut self, fragment_id: FragmentIndex) -> bool {
+        if self.waiting_all {
+            return false;
+        }
+        self.waiting.insert(fragment_id)
     }
 
     pub fn add_all_to_waiting(&mut self) {

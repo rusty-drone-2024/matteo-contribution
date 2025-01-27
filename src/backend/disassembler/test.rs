@@ -5,12 +5,12 @@ use common_structs::message::Message;
 #[test]
 fn missing_session() {
     let disassembler = Disassembler::default();
-    // TODO better test
     assert!(!disassembler.splits.contains_key(&11));
+    assert!(disassembler.get(11).is_none());
 }
 
 #[test]
-fn check_fragment_packets() {
+fn fragment_packets() {
     let mut disassembler = Disassembler::default();
 
     let msg = Message::RespMedia(
@@ -26,7 +26,7 @@ fn check_fragment_packets() {
 }
 
 #[test]
-fn check_fragment_acks() {
+fn fragment_acks() {
     let mut disassembler = Disassembler::default();
 
     let msg = Message::RespMedia(
@@ -42,4 +42,69 @@ fn check_fragment_acks() {
         assert_eq!(Ok(true), disassembler.ack(11, i));
     }
     assert!(!disassembler.splits.contains_key(&11));
+}
+
+#[test]
+fn flood_not_needed() {
+    let mut disassembler = Disassembler::default();
+    assert!(!disassembler.require_flood());
+}
+
+#[test]
+fn flood_needed() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::ReqServerType);
+    let _ = disassembler.add_waiting(0, 0, 0);
+    assert!(disassembler.require_flood());
+}
+
+#[test]
+fn split_add_all_to_waiting() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::ReqServerType);
+    assert!(disassembler.waiting.contains_key(&0));
+}
+
+#[test]
+fn get_and_get_mut_fail() {
+    let mut disassembler = Disassembler::default();
+    assert!(disassembler.get(0).is_none());
+    assert!(disassembler.get_mut(0).is_none());
+}
+
+#[test]
+fn get_and_get_mut_pass() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::ReqFilesList);
+    assert!(disassembler.get(0).is_some());
+    assert!(disassembler.get_mut(0).is_some());
+}
+
+#[test]
+fn add_waiting_to_nothing() {
+    let mut disassembler = Disassembler::default();
+    assert!(disassembler.add_waiting(0, 0, 0).is_err());
+}
+
+#[test]
+fn add_waiting_to_already_waiting_all() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::RespMedia(vec![0; 100]));
+    assert!(disassembler.add_waiting(0, 0, 0).is_ok());
+}
+
+#[test]
+fn take_ready_empty() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::ReqServerType);
+    assert!(disassembler.take_ready().is_empty());
+}
+
+#[test]
+fn take_ready_not_empty() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(10, 1, Message::ReqServerType);
+    disassembler.split(20, 2, Message::ReqServerType);
+    disassembler.remove_waiting_for(1);
+    assert_eq!(vec![10], disassembler.take_ready());
 }

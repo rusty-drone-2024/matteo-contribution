@@ -3,3 +3,6 @@ Cargo.lock
 
 .idea
 *.log
+
+# Test files
+*.jpeg

@@ -10,19 +10,31 @@ impl Disassembler {
         required
     }
 
-    pub fn add_waiting(&mut self, session: SessionId, dest: NodeId, fragment_id: FragmentIndex) {
+    pub fn add_waiting(
+        &mut self,
+        session: SessionId,
+        dest: NodeId,
+        fragment_id: FragmentIndex,
+    ) -> Result<bool, String> {
         let Some(split) = self.splits.get_mut(&session) else {
-            return;
+            return Err("Split is missing".to_string());
         };
 
-        split.add_waiting(fragment_id);
-        self.waiting.entry(dest).or_default().push(session);
-        self.new_waiting += 1;
+        if !split.add_waiting(fragment_id) {
+            return Ok(false);
+        }
+
+        let entry = self.waiting.entry(dest).or_default();
+        if entry.insert(session) {
+            self.new_waiting += 1;
+        }
+        Ok(true)
     }
 
-    pub fn remove_waiting_for(&mut self, destination: NodeId) {
-        if let Some(waiting) = self.waiting.remove(&destination) {
-            self.finished_waiting.insert(destination, waiting);
+    pub fn remove_waiting_for(&mut self, dest: NodeId) {
+        if let Some(waitings) = self.waiting.remove(&dest) {
+            let entry = self.finished_waiting.entry(dest).or_default();
+            entry.extend(waitings);
         }
     }
 

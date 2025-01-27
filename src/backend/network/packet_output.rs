@@ -42,7 +42,8 @@ impl NetworkBackend {
         fragment: Fragment,
     ) {
         let Some(routing) = self.topology.get_routing_for(destination) else {
-            self.disassembler
+            let _ = self
+                .disassembler
                 .add_waiting(sesssion, destination, fragment.fragment_index);
             return;
         };
@@ -67,8 +68,11 @@ impl NetworkBackend {
         let Some(channel) = self.packets_out.get(&node_id) else {
             match packet.pack_type {
                 MsgFragment(fragment) => {
-                    self.disassembler
-                        .add_waiting(session, *destination, fragment.fragment_index);
+                    let _ = self.disassembler.add_waiting(
+                        session,
+                        *destination,
+                        fragment.fragment_index,
+                    );
                 }
                 _ => {
                     self.shortcut(packet);
@@ -83,12 +87,12 @@ impl NetworkBackend {
 
     pub(super) fn flood(&mut self) {
         let flood_id = self.topology.take_fresh_flood_id();
-        println!("==> FLOODING FROM {}", self.node_id);
+        println!("==> FLOODING FROM {}", self.id);
 
         let packet = Packet::new_flood_request(
             SourceRoutingHeader::empty_route(),
             0,
-            FloodRequest::initialize(flood_id, self.node_id, NodeType::Client),
+            FloodRequest::initialize(flood_id, self.id, NodeType::Client),
         );
 
         for sender in self.packets_out.values() {

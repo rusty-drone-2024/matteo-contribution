@@ -6,21 +6,25 @@ mod waiting;
 pub use crate::backend::disassembler::split::Split;
 use common_structs::message::Message;
 use common_structs::types::{FragmentIndex, SessionId};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use wg_2024::network::NodeId;
 
 #[derive(Default)]
 pub struct Disassembler {
     splits: HashMap<SessionId, Split>,
     new_waiting: usize,
-    waiting: HashMap<NodeId, Vec<SessionId>>,
-    finished_waiting: HashMap<NodeId, Vec<SessionId>>,
+    waiting: HashMap<NodeId, HashSet<SessionId>>,
+    finished_waiting: HashMap<NodeId, HashSet<SessionId>>,
 }
 
 impl Disassembler {
     pub fn split(&mut self, session: SessionId, dest: NodeId, msg: Message) {
         let fragments = msg.into_fragments();
         let split = Split::new(dest, fragments);
+
+        if self.waiting.entry(dest).or_default().insert(session) {
+            self.new_waiting += 1;
+        }
         self.splits.insert(session, split);
     }
 

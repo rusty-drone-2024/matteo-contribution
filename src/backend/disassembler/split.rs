@@ -21,6 +21,7 @@ impl Split {
             n_acked: 0,
             pieces: pieces.collect(),
             waiting: HashSet::default(),
+            // TODO either or, not both state in weird way
             waiting_all: true,
         }
     }
@@ -47,14 +48,14 @@ impl Split {
         Ok(self.get_piece(fragment_id)?.fragment().clone())
     }
 
-    pub fn add_waiting(&mut self, fragment_id: FragmentIndex) -> bool {
+    pub(super) fn add_waiting(&mut self, fragment_id: FragmentIndex) -> bool {
         if self.waiting_all {
             return false;
         }
         self.waiting.insert(fragment_id)
     }
 
-    pub fn add_all_to_waiting(&mut self) {
+    pub(super) fn add_all_to_waiting(&mut self) {
         self.waiting.clear();
         self.waiting_all = true;
     }

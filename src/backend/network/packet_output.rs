@@ -24,7 +24,7 @@ impl NetworkBackend {
         let dest = split.destination();
 
         let Some(routing) = self.topology.get_routing_for(dest) else {
-            split.add_all_to_waiting();
+            let _ = self.disassembler.add_all_waiting(session);
             return Some(false);
         };
 

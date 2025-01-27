@@ -56,6 +56,7 @@ impl NetworkBackend {
     ) {
         match pack_type {
             PacketType::MsgFragment(fragment) => {
+                let _ = self.topology.add_path(&routing.hops, true);
                 self.ack(routing.clone(), session, fragment.fragment_index);
                 self.send_msg_to_thread(session, routing, fragment);
             }
@@ -63,7 +64,7 @@ impl NetworkBackend {
                 self.disassembler.ack(session, ack.fragment_index).ok();
             }
             PacketType::Nack(nack) => {
-                self.handle_nack(session, &nack);
+                self.handle_nack(session, &nack, routing);
             }
             PacketType::FloodRequest(flood) => {
                 let response = self.create_flood_response_packet(session, flood);
@@ -82,7 +83,7 @@ impl NetworkBackend {
         }
     }
 
-    fn handle_nack(&mut self, session: SessionId, nack: &Nack) -> Option<()> {
+    fn handle_nack(&mut self, session: SessionId, nack: &Nack, routing: &SourceRoutingHeader) -> Option<()> {
         let split = self.disassembler.get(session)?;
         let fragment = split.get_fragment(nack.fragment_index).ok()?;
         let dest = split.destination();
@@ -92,7 +93,9 @@ impl NetworkBackend {
                 self.topology.remove_node(node_id);
             }
             NackType::Dropped => {
-                // TODO
+                if let Some(first) = routing.hops.first(){
+                    self.topology.mark_drop(*first);
+                }
             }
             NackType::DestinationIsDrone => {
                 eprintln!("SENT A PACKET TO A DRONE SOMEHOW");

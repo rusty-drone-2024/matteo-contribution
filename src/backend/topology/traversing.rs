@@ -5,11 +5,16 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 impl Topology {
     #[must_use]
     pub fn get_routing_for(&self, to: NodeId) -> Option<SourceRoutingHeader> {
+        let edge_cost = |(node_start, _, _)| {
+            let weight = self.weights.get(&node_start).copied().unwrap_or_default();
+            u64::from(weight) + 1
+        };
+
         let path = astar(
             &self.graph,
             self.start_id,
             |finish| finish == to,
-            |_| 1,
+            edge_cost,
             |_| 0,
         )?;
 

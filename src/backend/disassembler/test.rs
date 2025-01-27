@@ -59,6 +59,15 @@ fn flood_needed() {
 }
 
 #[test]
+fn flood_cleared() {
+    let mut disassembler = Disassembler::default();
+    disassembler.split(0, 0, Message::ReqServerType);
+    let _ = disassembler.add_waiting(0, 0, 0);
+    assert!(disassembler.require_flood());
+    assert!(!disassembler.require_flood());
+}
+
+#[test]
 fn split_add_all_to_waiting() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);

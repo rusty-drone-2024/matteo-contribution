@@ -41,6 +41,9 @@ fn main() {
             .unwrap();
     }
 
+    net.send_as_simulation_controller_to(8, DroneCommand::SetPacketDropRate(1.0))
+        .unwrap();
+
     net.create_and_run_leaf::<MediaServer>(11).unwrap();
     net.create_and_run_leaf::<SamSer<SamText>>(12).unwrap();
     net.create_and_run_leaf::<SamSer<SamMedia>>(13).unwrap();

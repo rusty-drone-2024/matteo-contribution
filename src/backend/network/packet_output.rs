@@ -12,7 +12,10 @@ impl NetworkBackend {
             opposite_end: dest,
             message,
         } = msg;
-        println!("SENDING MESSAGE to {dest} of type {}", &message);
+        println!(
+            "SENDING MESSAGE from {} to {dest} of type {}",
+            self.id, &message
+        );
         self.disassembler.split(session, dest, message);
         self.send_split(session);
     }
@@ -24,7 +27,7 @@ impl NetworkBackend {
         let dest = split.destination();
 
         let Some(routing) = self.topology.get_routing_for(dest) else {
-            split.add_all_to_waiting();
+            let _ = self.disassembler.add_all_waiting(session);
             return Some(false);
         };
 

@@ -3,13 +3,15 @@ mod editing;
 mod test;
 mod traversing;
 
-use petgraph::graphmap::UnGraphMap;
+use petgraph::graphmap::DiGraphMap;
+use std::collections::HashMap;
 use wg_2024::network::NodeId;
 
 pub struct Topology {
     start_id: NodeId,
     current_flood_id: u64,
-    graph: UnGraphMap<u8, ()>,
+    graph: DiGraphMap<NodeId, ()>,
+    weights: HashMap<NodeId, u8>,
 }
 
 impl Topology {}
@@ -19,7 +21,8 @@ impl Topology {
         Self {
             start_id: this_node_id,
             current_flood_id: 0,
-            graph: UnGraphMap::new(),
+            graph: DiGraphMap::new(),
+            weights: HashMap::default(),
         }
     }
 

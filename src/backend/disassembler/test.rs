@@ -51,29 +51,28 @@ fn flood_not_needed() {
 }
 
 #[test]
-#[ignore]
 fn flood_needed() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
-    let _ = disassembler.add_waiting(0, 0, 0);
+    let _ = disassembler.add_session_to_wait_queue(0);
     assert!(disassembler.require_flood());
 }
 
 #[test]
-#[ignore]
 fn flood_cleared() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
-    let _ = disassembler.add_waiting(0, 0, 0);
+    let _ = disassembler.add_session_to_wait_queue(0);
     assert!(disassembler.require_flood());
     assert!(!disassembler.require_flood());
 }
 
 #[test]
-#[ignore]
 fn split_add_all_to_waiting() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
+
+    disassembler.add_session_to_wait_queue(0).unwrap();
     assert!(disassembler.waiting.contains_key(&0));
 }
 
@@ -95,29 +94,34 @@ fn get_and_get_mut_pass() {
 #[test]
 fn add_waiting_to_nothing() {
     let mut disassembler = Disassembler::default();
-    assert!(disassembler.add_waiting(0, 0, 0).is_err());
+    assert!(disassembler.add_session_to_wait_queue(0).is_err());
 }
 
 #[test]
 fn add_waiting_to_already_waiting_all() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::RespMedia(vec![0; 100]));
-    assert!(disassembler.add_waiting(0, 0, 0).is_ok());
+    assert!(disassembler.add_session_to_wait_queue(0).is_ok());
 }
 
 #[test]
 fn take_ready_empty() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
-    assert!(disassembler.take_ready().is_empty());
+    assert_eq!(1, disassembler.get_mut(0).unwrap().take_to_send().len());
+    assert!(disassembler.take_ready_session().is_empty());
 }
 
 #[test]
-#[ignore]
 fn take_ready_not_empty() {
     let mut disassembler = Disassembler::default();
     disassembler.split(10, 1, Message::ReqServerType);
     disassembler.split(20, 2, Message::ReqServerType);
-    disassembler.remove_waiting_for(1);
-    assert_eq!(vec![10], disassembler.take_ready());
+
+    disassembler.add_session_to_wait_queue(10).unwrap();
+
+    disassembler.add_session_to_wait_queue(20).unwrap();
+
+    disassembler.ready_sessions_waiting_for(1);
+    assert_eq!(vec![10], disassembler.take_ready_session());
 }

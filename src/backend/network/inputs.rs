@@ -76,7 +76,7 @@ impl NetworkBackend {
                     .add_flood_response(flood_resp.flood_id, flood_resp.path_trace);
 
                 if let Some((node_id, node_type)) = new_leaf {
-                    self.disassembler.remove_waiting_for(node_id);
+                    self.disassembler.ready_sessions_waiting_for(node_id);
                     self.send_new_leaf_to_thread(node_id, node_type);
                 }
             }
@@ -89,10 +89,6 @@ impl NetworkBackend {
         nack: &Nack,
         routing: &SourceRoutingHeader,
     ) -> Option<()> {
-        let split = self.disassembler.get(session)?;
-        let fragment = split.get_fragment(nack.fragment_index).ok()?;
-        let dest = split.destination();
-
         match nack.nack_type {
             ErrorInRouting(node_id) => {
                 self.topology.remove_node(node_id);
@@ -110,11 +106,9 @@ impl NetworkBackend {
             }
         }
 
-        if nack.nack_type == NackType::DestinationIsDrone {
-            return None;
-        }
-
-        self.send_fragment(session, dest, fragment);
+        let split = self.disassembler.get_mut(session)?;
+        split.wait_for(nack.fragment_index);
+        self.send_split(session);
         Some(())
     }
 

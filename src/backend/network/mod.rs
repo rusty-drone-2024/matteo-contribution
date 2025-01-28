@@ -99,7 +99,7 @@ impl NetworkBackend {
     }
 
     fn send_if_possible(&mut self) {
-        let to_send = self.disassembler.take_ready();
+        let to_send = self.disassembler.take_ready_session();
 
         for session in to_send {
             self.send_split(session);

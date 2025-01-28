@@ -24,6 +24,7 @@ impl Disassembler {
         self.splits.insert(session, split);
     }
 
+    #[allow(dead_code)]
     pub fn get(&self, session: SessionId) -> Option<&Split> {
         self.splits.get(&session)
     }

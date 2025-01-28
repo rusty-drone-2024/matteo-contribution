@@ -117,7 +117,7 @@ fn avoid_dead() {
 
     topology.add_path(&path1, true).unwrap();
     topology.add_path(&path2, false).unwrap();
-    
+
     for _ in 0..10 {
         topology.mark_drop(5);
     }

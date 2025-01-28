@@ -83,7 +83,12 @@ impl NetworkBackend {
         }
     }
 
-    fn handle_nack(&mut self, session: SessionId, nack: &Nack, routing: &SourceRoutingHeader) -> Option<()> {
+    fn handle_nack(
+        &mut self,
+        session: SessionId,
+        nack: &Nack,
+        routing: &SourceRoutingHeader,
+    ) -> Option<()> {
         let split = self.disassembler.get(session)?;
         let fragment = split.get_fragment(nack.fragment_index).ok()?;
         let dest = split.destination();
@@ -93,7 +98,7 @@ impl NetworkBackend {
                 self.topology.remove_node(node_id);
             }
             NackType::Dropped => {
-                if let Some(first) = routing.hops.first(){
+                if let Some(first) = routing.hops.first() {
                     self.topology.mark_drop(*first);
                 }
             }

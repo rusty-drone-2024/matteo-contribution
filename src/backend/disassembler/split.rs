@@ -21,7 +21,7 @@ impl Split {
             n_acked: 0,
             pieces: pieces.collect(),
             waiting: HashSet::default(),
-            // TODO either or, not both state in weird way
+            // TODO either or, not both state in weird way (fail tests)
             waiting_all: true,
         }
     }
@@ -48,6 +48,8 @@ impl Split {
         Ok(self.get_piece(fragment_id)?.fragment().clone())
     }
 
+    /// # return
+    /// true in case of success (false if already waiting)
     pub(super) fn add_waiting(&mut self, fragment_id: FragmentIndex) -> bool {
         if self.waiting_all {
             return false;

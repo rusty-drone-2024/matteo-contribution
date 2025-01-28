@@ -22,7 +22,7 @@ impl Topology {
             start_id: this_node_id,
             current_flood_id: 0,
             graph: DiGraphMap::new(),
-            weights: Default::default(),
+            weights: HashMap::default(),
         }
     }
 

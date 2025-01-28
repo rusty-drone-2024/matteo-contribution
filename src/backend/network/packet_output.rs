@@ -12,7 +12,10 @@ impl NetworkBackend {
             opposite_end: dest,
             message,
         } = msg;
-        println!("SENDING MESSAGE from {} to {dest} of type {}", self.id, &message);
+        println!(
+            "SENDING MESSAGE from {} to {dest} of type {}",
+            self.id, &message
+        );
         self.disassembler.split(session, dest, message);
         self.send_split(session);
     }

@@ -5,7 +5,7 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 impl Topology {
     #[must_use]
     pub fn get_routing_for(&self, to: NodeId) -> Option<SourceRoutingHeader> {
-        let edge_cost = |(node_start, _, _)| {
+        let edge_cost = |(node_start, _, &())| {
             let weight = self.weights.get(&node_start).copied().unwrap_or_default();
             u64::from(weight) + 1
         };

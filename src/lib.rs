@@ -3,6 +3,11 @@ mod backend;
 mod client;
 mod server;
 
+pub use client::TextMediaClient;
+pub use server::MediaServer;
+pub use server::TextServer;
+
+/*
 use crate::server::{MediaServer, TextServer};
 use client::TextMediaClient;
 use rusty_drones::RustyDrone;
@@ -13,6 +18,7 @@ use rusty_drones_servers::TextServer as SamText;
 use rusty_tester::utils::Network;
 use std::thread::sleep;
 use std::time::Duration;
+
 
 fn main() {
     let topology = &[
@@ -48,4 +54,4 @@ fn main() {
         sleep(Duration::from_secs(1));
     }
 }
-
+*/

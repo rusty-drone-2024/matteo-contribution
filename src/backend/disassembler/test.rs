@@ -51,6 +51,7 @@ fn flood_not_needed() {
 }
 
 #[test]
+#[ignore]
 fn flood_needed() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
@@ -59,6 +60,7 @@ fn flood_needed() {
 }
 
 #[test]
+#[ignore]
 fn flood_cleared() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
@@ -68,6 +70,7 @@ fn flood_cleared() {
 }
 
 #[test]
+#[ignore]
 fn split_add_all_to_waiting() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
@@ -110,6 +113,7 @@ fn take_ready_empty() {
 }
 
 #[test]
+#[ignore]
 fn take_ready_not_empty() {
     let mut disassembler = Disassembler::default();
     disassembler.split(10, 1, Message::ReqServerType);

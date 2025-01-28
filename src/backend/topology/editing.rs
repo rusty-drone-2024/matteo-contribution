@@ -64,7 +64,7 @@ impl Topology {
 
         let weight = self.weights.entry(node).or_default();
         let new_weight = (u64::from(*weight) * (MEM_LEN - 1) + new_res) / MEM_LEN;
-        
+
         *weight = u8::try_from(new_weight).unwrap_or(0);
     }
 }

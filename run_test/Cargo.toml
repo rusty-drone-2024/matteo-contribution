@@ -1,0 +1,11 @@
+[package]
+name = "run_test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+matteo_contribution = { path = "../../matteo-contribution" }
+
+rusty_tester = { git = "https://github.com/rusty-drone-2024/rusty-tester.git", features = ["leaf"] }
+rusty_drones = { git = "https://github.com/rusty-drone-2024/rusty-drone.git" }
+rusty-drones-servers = { git = "https://github.com/rusty-drone-2024/samuel-contribution.git" }

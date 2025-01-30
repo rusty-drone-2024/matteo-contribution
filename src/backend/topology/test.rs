@@ -125,3 +125,19 @@ fn avoid_dead() {
     let routing = topology.get_routing_for(9);
     assert_eq!(expected, routing.unwrap().hops);
 }
+
+#[test]
+fn max_weight_decrease() {
+    let mut topology = Topology::new(11);
+    let path1 = vec![11, 1, 5, 8, 9];
+    topology.add_path(&path1, true).unwrap();
+
+    for _ in 0..100 {
+        topology.mark_drop(5);
+    }
+    assert!(*topology.weights.get(&5).unwrap() > 0);
+    for _ in 0..100 {
+        topology.update_weight(5, true);
+    }
+    assert_eq!(0u8, *topology.weights.get(&5).unwrap());
+}

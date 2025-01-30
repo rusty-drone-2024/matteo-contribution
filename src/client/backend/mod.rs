@@ -6,7 +6,7 @@ use crate::backend::network::NetworkOutput;
 use crate::backend::PacketMessage;
 use crate::client::frontend::RequestWrapper;
 use common_structs::message::{Link, ServerType};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
@@ -20,9 +20,9 @@ pub struct ClientBackend {
     network_send: Sender<PacketMessage>,
     servers: Vec<(NodeId, Option<ServerType>)>,
     /// Contains partial and total
-    split_req: HashMap<SessionId, SessionId>,
+    split_req: HashMap<Session, Session>,
     #[allow(clippy::type_complexity)]
-    accumulator_list_all: HashMap<SessionId, (usize, Vec<(NodeId, Vec<Link>)>)>,
+    accumulator_list_all: HashMap<Session, (usize, Vec<(NodeId, Vec<Link>)>)>,
 }
 
 impl ClientBackend {

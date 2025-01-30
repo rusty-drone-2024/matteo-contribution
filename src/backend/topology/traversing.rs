@@ -1,10 +1,11 @@
 use crate::backend::topology::Topology;
+use common_structs::types::Routing;
 use petgraph::algo::astar;
-use wg_2024::network::{NodeId, SourceRoutingHeader};
+use wg_2024::network::NodeId;
 
 impl Topology {
     #[must_use]
-    pub fn get_routing_for(&self, to: NodeId) -> Option<SourceRoutingHeader> {
+    pub fn get_routing_for(&self, to: NodeId) -> Option<Routing> {
         let edge_cost = |(node_start, _, &())| {
             let weight = self.weights.get(&node_start).copied().unwrap_or_default();
             u64::from(weight) + 1
@@ -18,6 +19,6 @@ impl Topology {
             |_| 0,
         )?;
 
-        Some(SourceRoutingHeader::new(path.1, 1))
+        Some(Routing::new(path.1, 1))
     }
 }

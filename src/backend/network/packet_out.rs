@@ -1,9 +1,8 @@
 use crate::backend::network::{NetworkBackend, PacketMessage};
 use common_structs::leaf::LeafEvent::{ControllerShortcut, PacketSend};
-use common_structs::types::SessionId;
-use wg_2024::network::{NodeId, SourceRoutingHeader};
+use common_structs::types::{Routing, Session};
 use wg_2024::packet::PacketType::MsgFragment;
-use wg_2024::packet::{FloodRequest, Fragment, NodeType, Packet};
+use wg_2024::packet::{FloodRequest, NodeType, Packet};
 
 impl NetworkBackend {
     pub(super) fn send_message(&mut self, msg: PacketMessage) {
@@ -12,57 +11,33 @@ impl NetworkBackend {
             opposite_end: dest,
             message,
         } = msg;
-        println!(
-            "SENDING MESSAGE from {} to {dest} of type {}",
-            self.id, &message
-        );
+
+        println!("===SENDING===> ({} -> {dest}): {}", self.id, &message);
         self.disassembler.split(session, dest, message);
         self.send_split(session);
     }
 
     /// # return
     /// True if send immediately, false else and if there was a problem
-    pub(super) fn send_split(&mut self, session: SessionId) -> Option<bool> {
+    pub(super) fn send_split(&mut self, session: Session) -> Option<bool> {
         let split = self.disassembler.get_mut(session)?;
         let dest = split.destination();
 
         let Some(routing) = self.topology.get_routing_for(dest) else {
-            let _ = self.disassembler.add_all_waiting(session);
+            let _ = self.disassembler.add_session_to_wait_queue(session);
             return Some(false);
         };
 
-        for fragment in split.take_waiting() {
+        for fragment in split.take_to_send() {
             self.send_packet(Packet::new_fragment(routing.clone(), session, fragment));
         }
 
         Some(true)
     }
 
-    pub(super) fn send_fragment(
-        &mut self,
-        sesssion: SessionId,
-        destination: NodeId,
-        fragment: Fragment,
-    ) {
-        let Some(routing) = self.topology.get_routing_for(destination) else {
-            let _ = self
-                .disassembler
-                .add_waiting(sesssion, destination, fragment.fragment_index);
-            return;
-        };
-
-        self.send_packet(Packet::new_fragment(routing, sesssion, fragment));
-    }
-
     pub(super) fn send_packet(&mut self, packet: Packet) {
         let session = packet.session_id;
         let routing = &packet.routing_header;
-
-        let Some(destination) = routing.hops.last() else {
-            return eprintln!(
-                "DROPPING A PACKET AS ROUTING IS EMPTY! VERY BAD! PACKET: {packet:?}"
-            );
-        };
 
         let Some(node_id) = routing.current_hop() else {
             return eprintln!("DROPPING A PACKET AS NO NEXT HOP! VERY BAD! PACKET: {packet:?}");
@@ -71,11 +46,10 @@ impl NetworkBackend {
         let Some(channel) = self.packets_out.get(&node_id) else {
             match packet.pack_type {
                 MsgFragment(fragment) => {
-                    let _ = self.disassembler.add_waiting(
-                        session,
-                        *destination,
-                        fragment.fragment_index,
-                    );
+                    let _ = self
+                        .disassembler
+                        .add_session_to_wait_queue(session)
+                        .map(|split| split.wait_for(fragment.fragment_index));
                 }
                 _ => {
                     self.shortcut(packet);
@@ -93,7 +67,7 @@ impl NetworkBackend {
         println!("==> FLOODING FROM {}", self.id);
 
         let packet = Packet::new_flood_request(
-            SourceRoutingHeader::empty_route(),
+            Routing::empty_route(),
             0,
             FloodRequest::initialize(flood_id, self.id, NodeType::Client),
         );

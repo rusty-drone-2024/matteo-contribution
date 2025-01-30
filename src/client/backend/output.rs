@@ -3,7 +3,7 @@ use crate::client::backend::ClientBackend;
 use crate::client::frontend::ClientNetworkResponse;
 use crate::client::frontend::ClientNetworkResponse::{Err404, GotFile, GotMedia, ListOfAll};
 use common_structs::message::{Link, Message};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use wg_2024::network::NodeId;
 
 impl ClientBackend {
@@ -44,10 +44,10 @@ impl ClientBackend {
 
     fn handle_resp_files_list(
         &mut self,
-        session: SessionId,
+        session: Session,
         server_id: NodeId,
         list: Vec<Link>,
-    ) -> Option<(SessionId, ClientNetworkResponse)> {
+    ) -> Option<(Session, ClientNetworkResponse)> {
         let full_req_session = *self.split_req.get(&session)?;
         let acc = self.accumulator_list_all.get_mut(&full_req_session)?;
 

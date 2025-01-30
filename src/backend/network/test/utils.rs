@@ -13,7 +13,7 @@ fn test_flood(source: NodeId, path_trace: Vec<(NodeId, NodeType)>) -> FloodReque
 
 fn test_flood_resp(path: Vec<(NodeId, NodeType)>) -> Packet {
     let hops = path.iter().map(|(id, _)| id).copied().rev().collect();
-    
+
     Packet::new_flood_response(
         Routing::new(hops, 1),
         11,
@@ -30,7 +30,7 @@ fn new_flood_resp_client() {
     let path = vec![(5, NodeType::Server), (10, NodeType::Drone)];
     let flood = test_flood(5, path.clone());
     let res = Net::new_flood_resp(self_def.0, self_def.1, 11, flood);
-    
+
     let expect_path = vec![(5, NodeType::Server), (10, NodeType::Drone), self_def];
     let expected = test_flood_resp(expect_path);
     assert_eq!(expected, res);

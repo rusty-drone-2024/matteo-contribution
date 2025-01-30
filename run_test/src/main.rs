@@ -1,11 +1,11 @@
+use matteo_contribution::{MediaServer, TextMediaClient, TextServer};
 use rusty_drones::RustyDrone;
+use rusty_drones_servers::ChatServer as SamChat;
+use rusty_drones_servers::MediaServer as SamMedia;
+use rusty_drones_servers::TextServer as SamText;
 use rusty_tester::utils::Network;
 use std::thread::sleep;
 use std::time::Duration;
-use rusty_drones_servers::TextServer as SamText;
-use rusty_drones_servers::MediaServer as SamMedia;
-use rusty_drones_servers::ChatServer as SamChat;
-use matteo_contribution::{MediaServer, TextMediaClient, TextServer};
 
 fn main() {
     let topology = &[

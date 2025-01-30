@@ -4,11 +4,13 @@ use std::collections::HashMap;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
-mod ack_nack;
-mod inputs;
-mod packet_output;
-mod simulation_controller;
-mod thread_output;
+mod command;
+mod errors;
+mod packet_in;
+mod packet_out;
+mod test;
+mod thread_out;
+mod utils;
 
 use crate::backend::assembler::Assembler;
 use crate::backend::disassembler::Disassembler;
@@ -74,13 +76,18 @@ impl NetworkBackend {
         while !exit {
             select! {
                 recv(self.controller_command) -> msg => {
-                    if let Ok(msg) = msg {
-                        exit = self.handle_command(msg);
-                    };
+                    let Ok(comm) = msg else { continue; };
+                    exit = Self::handle_command(&mut self.packets_out, comm);
                 },
                 recv(self.packet_in) -> msg => {
-                    let Ok(msg) = msg else { continue; };
-                    self.check_packet_and_chain(msg);
+                    let Ok(packet) = msg else { continue; };
+
+                    if let Some(error) = Self::find_routing_error(self.id, &packet) {
+                        self.handle_error(packet, error);
+                        continue;
+                    }
+
+                    self.handle_packet(packet);
                     self.send_if_possible();
                 },
                 recv(self.thread_in) -> msg => {
@@ -99,7 +106,7 @@ impl NetworkBackend {
     }
 
     fn send_if_possible(&mut self) {
-        let to_send = self.disassembler.take_ready();
+        let to_send = self.disassembler.take_ready_session();
 
         for session in to_send {
             self.send_split(session);

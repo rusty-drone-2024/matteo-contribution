@@ -1,21 +1,21 @@
 use crate::backend::topology::Topology;
 use wg_2024::network::NodeId;
-use wg_2024::packet::NodeType;
+use wg_2024::packet::{FloodResponse, NodeType};
 
 impl Topology {
     #[must_use]
     /// Return a new leaf if it is found
-    pub fn add_flood_response(
-        &mut self,
-        flood_id: u64,
-        flood_path: Vec<(NodeId, NodeType)>,
-    ) -> Option<(NodeId, NodeType)> {
+    pub fn add_flood_response(&mut self, flood_res: FloodResponse) -> Option<(NodeId, NodeType)> {
+        let FloodResponse {
+            flood_id,
+            path_trace,
+        } = flood_res;
         if flood_id != self.current_flood_id {
             return None;
         }
 
-        let (id, node_type) = flood_path.last().copied()?;
-        let path = flood_path.into_iter().map(|(id, _)| id).collect::<Vec<_>>();
+        let (id, node_type) = path_trace.last().copied()?;
+        let path = path_trace.into_iter().map(|(id, _)| id).collect::<Vec<_>>();
 
         // Only add last as only leaf are valid destination (which are always at end)
         if node_type == NodeType::Drone {

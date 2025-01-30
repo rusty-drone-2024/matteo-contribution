@@ -1,5 +1,5 @@
 use common_structs::message::Message;
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use wg_2024::network::NodeId;
 
 mod assembler;
@@ -9,13 +9,13 @@ mod topology;
 
 #[derive(Debug)]
 pub struct PacketMessage {
-    pub session: SessionId,
+    pub session: Session,
     pub opposite_end: NodeId,
     pub message: Message,
 }
 
 impl PacketMessage {
-    pub fn new(session: SessionId, opposite_end: NodeId, message: Message) -> Self {
+    pub fn new(session: Session, opposite_end: NodeId, message: Message) -> Self {
         Self {
             session,
             opposite_end,

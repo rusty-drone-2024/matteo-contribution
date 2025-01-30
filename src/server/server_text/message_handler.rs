@@ -4,14 +4,14 @@ use common_structs::message::Message::{
     RespServerType,
 };
 use common_structs::message::{Message, ServerType};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use wg_2024::network::NodeId;
 
 impl TextServer {
     pub(super) fn handle_message(
         &self,
         msg: Message,
-        session: SessionId,
+        session: Session,
         other_end: NodeId,
     ) -> Option<Message> {
         Some(match msg {

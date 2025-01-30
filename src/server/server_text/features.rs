@@ -2,7 +2,7 @@ use super::TextServer;
 use crate::backend::PacketMessage;
 use common_structs::message::Message::{ErrNotFound, RespFile};
 use common_structs::message::{FileWithData, Link};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
@@ -33,7 +33,7 @@ impl TextServer {
     pub(super) fn async_get_file(
         &self,
         link: &Link,
-        session: SessionId,
+        session: Session,
         other_end: NodeId,
     ) -> Option<FileWithData> {
         if link.starts_with("localfile") {

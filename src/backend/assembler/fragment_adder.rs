@@ -1,9 +1,9 @@
 use super::{Assembler, MessageToAssemble};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use wg_2024::packet::Fragment;
 
 impl Assembler {
-    pub fn add_fragment(&mut self, session: SessionId, fragment: Fragment) -> bool {
+    pub fn add_fragment(&mut self, session: Session, fragment: Fragment) -> bool {
         let total = fragment.total_n_fragments;
 
         let to_assemble = self

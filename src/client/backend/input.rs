@@ -4,7 +4,7 @@ use crate::client::frontend::ClientNetworkRequest::{Get, ListAll};
 use crate::client::frontend::RequestWrapper;
 use common_structs::message::Message::{ReqFile, ReqFilesList};
 use common_structs::message::{Message, ServerType};
-use common_structs::types::SessionId;
+use common_structs::types::Session;
 use wg_2024::network::NodeId;
 use wg_2024::packet::NodeType;
 
@@ -19,7 +19,7 @@ impl ClientBackend {
         self.open_requests.insert(session, rq);
     }
 
-    fn handle_frontend_rq_types(&mut self, rq: &RequestWrapper) -> Option<SessionId> {
+    fn handle_frontend_rq_types(&mut self, rq: &RequestWrapper) -> Option<Session> {
         let session = self.fresh_session();
 
         match rq.get_request()? {

@@ -31,11 +31,11 @@ fn main() {
 
     net.create_and_run_leaf::<TextServer>(11).unwrap();
     net.create_and_run_leaf::<MediaServer>(12).unwrap();
-
     net.create_and_run_leaf::<SamText>(13).unwrap();
     net.create_and_run_leaf::<SamMedia>(14).unwrap();
-
     net.create_and_run_leaf::<SamChat>(15).unwrap();
+    // TODO fix need to do after for temp problem
+    net.create_and_run_leaf::<TextMediaClient>(0).unwrap();
 
     loop {
         sleep(Duration::from_secs(1));

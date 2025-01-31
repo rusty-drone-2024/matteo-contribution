@@ -1,29 +1,55 @@
 use crate::model::{Message, Model};
 use client_bridge::send::{recv_over, send_over};
 use client_bridge::{GuiRequest, GuiResponse};
+use iced::widget::markdown;
 use std::net::TcpStream;
+use iced::Task;
 
-pub fn update(model: &mut Model, message: Message) {
+pub fn update(model: &mut Model, message: Message) -> Task<Message>{
     match message {
         Message::Selected(idx) => {
             model.selected = idx;
 
-            // TODO not single threaded
-            let mut stream = TcpStream::connect(&model.addr).unwrap();
-            send_over(&mut stream, GuiRequest::Get(model.list[idx].to_string()));
-            let res = recv_over::<GuiResponse>(&mut stream).unwrap();
-
-            match res {
+            let req = GuiRequest::Get(model.list[idx].to_string());
+            match communicate(model, req) {
                 GuiResponse::Err404 => {
-                    model.log = "ERROR 404".to_string();
+                    model.markdown = markdown::parse("# ERROR 404").collect();
                 }
                 GuiResponse::GotFile(file) => {
-                    model.log = file.file;
+                    model.markdown = markdown::parse(&file.file).collect();
+                }
+                _ => {}
+            }
+        }
+        Message::LinkClicked(url) => {
+            println!("LINK CLICKED {url:?}");
+            let searched = &url.to_string();
+            if let Some(pos) = model.list.iter().position(|el| el == searched) {
+                return Task::done(Message::Selected(pos));
+            }
+        }
+        Message::Refresh => {
+            let req = GuiRequest::ListAll;
+            match communicate(model, req) {
+                GuiResponse::ListOfAll(list) => {
+                    let mut final_list = vec![];
+                    for (_, el) in list {
+                        final_list.extend(el.into_iter());
+                    }
+                    model.list = final_list;
                 }
                 _ => {}
             }
         }
     }
+    Task::none()
+}
+
+fn communicate(model: &mut Model, request: GuiRequest) -> GuiResponse {
+    // TODO not single threaded
+    let mut stream = TcpStream::connect(&model.addr).unwrap();
+    send_over(&mut stream, request);
+    recv_over::<GuiResponse>(&mut stream).unwrap()
 }
 
 /*

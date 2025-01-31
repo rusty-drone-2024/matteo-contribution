@@ -1,8 +1,10 @@
+use iced::widget::markdown;
+
 pub struct Model {
     pub addr: String,
     pub list: Vec<String>,
     pub selected: usize,
-    pub log: String,
+    pub markdown: Vec<markdown::Item>,
 }
 
 impl Model {
@@ -11,12 +13,14 @@ impl Model {
             addr,
             list,
             selected: 0,
-            log: String::default(),
+            markdown: markdown::parse("").collect(),
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
+    LinkClicked(markdown::Url),
     Selected(usize),
+    Refresh,
 }

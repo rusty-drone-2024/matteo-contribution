@@ -1,7 +1,7 @@
 use crate::backend::PacketMessage;
 use crate::client::backend::ClientBackend;
-use crate::client::frontend::ClientNetworkResponse;
-use crate::client::frontend::ClientNetworkResponse::{Err404, GotFile, GotMedia, ListOfAll};
+use client_bridge::GuiResponse;
+use client_bridge::GuiResponse::{Err404, GotFile, GotMedia, ListOfAll};
 use common_structs::message::{Link, Message};
 use common_structs::types::Session;
 use wg_2024::network::NodeId;
@@ -47,7 +47,7 @@ impl ClientBackend {
         session: Session,
         server_id: NodeId,
         list: Vec<Link>,
-    ) -> Option<(Session, ClientNetworkResponse)> {
+    ) -> Option<(Session, GuiResponse)> {
         let full_req_session = *self.split_req.get(&session)?;
         let acc = self.accumulator_list_all.get_mut(&full_req_session)?;
 

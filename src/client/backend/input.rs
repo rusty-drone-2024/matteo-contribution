@@ -1,7 +1,6 @@
 use crate::backend::PacketMessage;
 use crate::client::backend::ClientBackend;
-use crate::client::frontend::ClientNetworkRequest::{Get, ListAll};
-use crate::client::frontend::RequestWrapper;
+use client_bridge::{GuiRequest, RequestWrapper};
 use common_structs::message::Message::{ReqFile, ReqFilesList};
 use common_structs::message::{Message, ServerType};
 use common_structs::types::Session;
@@ -9,21 +8,22 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::NodeType;
 
 impl ClientBackend {
-    pub(super) fn handle_frontend_request(&mut self, rq: RequestWrapper) {
-        let res = self.handle_frontend_rq_types(&rq);
+    pub(super) fn handle_frontend_request(&mut self, mut rq: RequestWrapper) {
+        let res = self.handle_frontend_rq_types(&mut rq);
 
         let Some(session) = res else {
-            return rq.post_err_not_found();
+            rq.post_err_not_found();
+            return;
         };
 
         self.open_requests.insert(session, rq);
     }
 
-    fn handle_frontend_rq_types(&mut self, rq: &RequestWrapper) -> Option<Session> {
+    fn handle_frontend_rq_types(&mut self, rq: &mut RequestWrapper) -> Option<Session> {
         let session = self.fresh_session();
 
-        match rq.get_request()? {
-            ListAll => {
+        match rq.take_request()? {
+            GuiRequest::ListAll => {
                 let mut count = 0;
 
                 // TODO remove clone
@@ -45,7 +45,7 @@ impl ClientBackend {
 
                 self.accumulator_list_all.insert(session, (count, vec![]));
             }
-            Get(link) => {
+            GuiRequest::Get(link) => {
                 let server_id = self.get_from_dns(&link)?;
                 let packet_msg = PacketMessage::new(session, server_id, ReqFile(link));
                 let _ = self.network_send.send(packet_msg);

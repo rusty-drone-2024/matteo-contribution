@@ -4,7 +4,7 @@ mod output;
 
 use crate::backend::network::NetworkOutput;
 use crate::backend::PacketMessage;
-use crate::client::frontend::RequestWrapper;
+use client_bridge::RequestWrapper;
 use common_structs::message::{Link, ServerType};
 use common_structs::types::Session;
 use crossbeam_channel::{select, Receiver, Sender};

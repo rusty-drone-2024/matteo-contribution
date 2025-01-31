@@ -1,4 +1,4 @@
-use crate::client::frontend::request_wrapper::RequestWrapper;
+use crate::RequestWrapper;
 use common_structs::message::Link;
 use wg_2024::network::NodeId;
 

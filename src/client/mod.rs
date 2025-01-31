@@ -2,9 +2,8 @@ mod backend;
 mod frontend;
 
 use crate::backend::network::NetworkBackend;
-use crate::client::frontend::ClientFrontend;
-
 use crate::client::backend::ClientBackend;
+use crate::client::frontend::ClientFrontend;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use std::collections::HashMap;

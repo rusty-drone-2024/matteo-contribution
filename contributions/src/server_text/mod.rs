@@ -1,8 +1,8 @@
-mod features;
 mod message_handler;
+mod test_files;
 
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
-use common_structs::message::Link;
+use common_structs::message::{FileWithData, Link};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkOutput::MsgReceived;
 use network::PacketMessage;
@@ -13,8 +13,8 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
 pub struct TextServer {
-    node_id: NodeId,
-    files: Vec<Link>,
+    _node_id: NodeId,
+    files: HashMap<Link, FileWithData>,
     network: NetworkCommunication,
 }
 
@@ -44,7 +44,7 @@ impl Leaf for TextServer {
         ));
 
         Self {
-            node_id: id,
+            _node_id: id,
             files: Self::init_files(),
             network: NetworkCommunication {
                 backend: network_backend,
@@ -70,7 +70,7 @@ impl Leaf for TextServer {
                 message,
             } = packet_msg;
 
-            let response = self.handle_message(message.clone(), session, opposite_end);
+            let response = self.handle_message(message.clone());
 
             if let Some(response) = response {
                 let packet_resp = PacketMessage::new(session, opposite_end, response);

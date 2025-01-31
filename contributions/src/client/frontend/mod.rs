@@ -1,6 +1,5 @@
 use client_bridge::RequestWrapper;
 use crossbeam_channel::Sender;
-use std::env::current_exe;
 use std::net::TcpListener;
 use std::process::Command;
 use wg_2024::network::NodeId;
@@ -23,12 +22,14 @@ impl ClientFrontend {
             return eprintln!("FATAL: Cannot initialize TCP server");
         };
 
-        let mut exe = current_exe().unwrap();
-        exe.pop();
-        exe.push("client_ui");
-
-        // TODO fix its use
-        let mut child = Command::new(exe).arg(addr).spawn().unwrap();
+        // TODO fix its use (+ is temp fix)
+        let mut child = Command::new("cargo")
+            .arg("run")
+            .arg("--bin")
+            .arg("client_ui")
+            .arg(addr)
+            .spawn()
+            .unwrap();
 
         while let Ok((stream, _)) = server.accept() {
             let _ = self.requests_channel.send(stream.into());

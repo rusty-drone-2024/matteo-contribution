@@ -1,4 +1,4 @@
-use contributions::{MediaServer, TextMediaClient, TextServer};
+use matteo_contribution::{MediaServer, TextMediaClient, TextServer};
 use rusty_drones::RustyDrone;
 use rusty_drones_servers::ChatServer as SamChat;
 use rusty_drones_servers::MediaServer as SamMedia;

@@ -35,7 +35,6 @@ impl ClientFrontend {
         }
 
         child.wait().unwrap();
-        dbg!("EXITING TCP");
     }
 
     fn init_server(&self) -> Option<(TcpListener, String)> {

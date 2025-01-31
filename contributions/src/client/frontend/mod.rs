@@ -23,7 +23,13 @@ impl ClientFrontend {
         };
 
         // TODO fix its use (+ is temp fix)
-        let mut child = Command::new("cargo").arg("run").arg("--bin").arg("client_ui").arg(addr).spawn().unwrap();
+        let mut child = Command::new("cargo")
+            .arg("run")
+            .arg("--bin")
+            .arg("client_ui")
+            .arg(addr)
+            .spawn()
+            .unwrap();
 
         while let Ok((stream, _)) = server.accept() {
             let _ = self.requests_channel.send(stream.into());

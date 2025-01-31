@@ -1,30 +1,22 @@
-use crate::client::GuiResponse;
-use client_bridge::GuiResponse;
-use iced::widget::text_editor::{Action, Content};
-
-pub struct Model{
+pub struct Model {
     pub addr: String,
     pub list: Vec<String>,
-    pub content: Content,
     pub selected: usize,
+    pub log: String,
 }
 
 impl Model {
-    pub fn new(addr: String) -> Self {
-        Self{
+    pub fn new(addr: String, list: Vec<String>) -> Self {
+        Self {
             addr,
-            list: vec!["Ciao".to_string(), "Ciao2".to_string()],
-            content: Default::default(),
+            list,
             selected: 0,
+            log: String::default(),
         }
     }
 }
 
-
-
 #[derive(Debug, Clone)]
 pub enum Message {
-    TextEditorAction(Action),
     Selected(usize),
-    Backend(GuiResponse),
 }

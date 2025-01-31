@@ -4,7 +4,7 @@ use std::net::TcpStream;
 use wg_2024::network::NodeId;
 
 mod io;
-mod pages;
+pub mod send;
 
 pub struct RequestWrapper {
     stream: TcpStream,

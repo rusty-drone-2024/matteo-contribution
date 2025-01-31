@@ -1,0 +1,15 @@
+[package]
+name = "network"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize"] }
+common_structs = { git = "https://github.com/rusty-drone-2024/common-structs.git" }
+petgraph = { version = "0.7.1", default-features = false, features = ["graphmap"] }
+crossbeam-channel = "0.5.14"
+
+[dev-dependencies]
+wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize", "debug"] }
+common_structs = { git = "https://github.com/rusty-drone-2024/common-structs.git", features = ["debug"] }
+rusty_tester = { git = "https://github.com/rusty-drone-2024/rusty-tester.git" }

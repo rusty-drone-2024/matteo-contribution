@@ -8,10 +8,10 @@ impl TextServer {
             .iter()
             .map(|(title, file)| {
                 (
-                    title.to_string(),
+                    (*title).to_string(),
                     FileWithData {
-                        file: file.to_string(),
-                        related_data: Default::default(),
+                        file: (*file).to_string(),
+                        related_data: HashMap::default(),
                     },
                 )
             })
@@ -30,7 +30,9 @@ pub const TEST_FILES: &[(&str, &str)] = &[
     ("Lorem random text", "dsads"),
     ("File9asd", "[File3](File3)"),
     ("File.md", "# Content in file2\n## LOl\n### No\ntext\n"),
-    ("Full Example online", r#"
+    (
+        "Full Example online",
+        r#"
 # h1 Heading 8-)
 ## h2 Heading
 ### h3 Heading
@@ -264,5 +266,6 @@ It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
 ::: warning
 *here be dragons*
 :::
-"#)
+"#,
+    ),
 ];

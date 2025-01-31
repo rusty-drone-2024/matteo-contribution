@@ -17,5 +17,5 @@ pub fn main() {
 
     // TODO Handle
     let _ = iced::application("Matteo Text & Media Client", update, view)
-        .run_with(|| (Model::new(addr, vec!()), Task::done(Message::Refresh)));
+        .run_with(|| (Model::new(addr, vec![]), Task::done(Message::Refresh)));
 }

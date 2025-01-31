@@ -6,7 +6,11 @@ use iced::{Element, Fill, Renderer, Theme};
 type El<'a> = Element<'a, Message, Theme, Renderer>;
 
 pub fn view(model: &Model) -> Element<Message> {
-    let header: El = container(row![container(text("File list")).width(Fill), button("R").on_press(Message::Refresh)]).into();
+    let header: El = container(row![
+        container(text("File list")).width(Fill),
+        button("R").on_press(Message::Refresh)
+    ])
+    .into();
 
     let mut res: Vec<El> = vec![header];
 
@@ -24,18 +28,12 @@ pub fn view(model: &Model) -> Element<Message> {
         &model.markdown,
         markdown::Settings::default(),
         markdown::Style::from_palette(Theme::Light.palette()),
-    ).map(Message::LinkClicked);
+    )
+    .map(Message::LinkClicked);
 
     row![
         Column::from_vec(res).width(200).spacing(2),
-        scrollable(
-            container(
-                md
-            )
-            .padding(20)
-            .width(Fill)
-        )
-        .width(Fill),
+        scrollable(container(md).padding(20).width(Fill)).width(Fill),
     ]
     .height(Fill)
     .into()

@@ -2,10 +2,10 @@ use crate::model::{Message, Model};
 use client_bridge::send::{recv_over, send_over};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::widget::markdown;
-use std::net::TcpStream;
 use iced::Task;
+use std::net::TcpStream;
 
-pub fn update(model: &mut Model, message: Message) -> Task<Message>{
+pub fn update(model: &mut Model, message: Message) -> Task<Message> {
     match message {
         Message::Selected(idx) => {
             model.selected = idx;
@@ -30,15 +30,13 @@ pub fn update(model: &mut Model, message: Message) -> Task<Message>{
         }
         Message::Refresh => {
             let req = GuiRequest::ListAll;
-            match communicate(model, req) {
-                GuiResponse::ListOfAll(list) => {
-                    let mut final_list = vec![];
-                    for (_, el) in list {
-                        final_list.extend(el.into_iter());
-                    }
-                    model.list = final_list;
+            let resp = communicate(model, req);
+            if let GuiResponse::ListOfAll(list) = resp {
+                let mut final_list = vec![];
+                for (_, el) in list {
+                    final_list.extend(el.into_iter());
                 }
-                _ => {}
+                model.list = final_list;
             }
         }
     }

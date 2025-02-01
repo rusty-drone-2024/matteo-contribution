@@ -1,13 +1,13 @@
 use iced::widget::markdown;
 
-pub struct Model {
+pub struct ClientUI {
     pub addr: String,
     pub list: Vec<String>,
     pub selected: usize,
     pub markdown: Vec<markdown::Item>,
 }
 
-impl Model {
+impl ClientUI {
     pub fn new(addr: String, list: Vec<String>) -> Self {
         Self {
             addr,

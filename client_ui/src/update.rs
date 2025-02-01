@@ -1,55 +1,56 @@
-use crate::model::{Message, Model};
+use crate::model::{ClientUI, Message};
 use client_bridge::send::{recv_over, send_over};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::widget::markdown;
 use iced::Task;
 use std::net::TcpStream;
 
-pub fn update(model: &mut Model, message: Message) -> Task<Message> {
-    match message {
-        Message::Selected(idx) => {
-            model.selected = idx;
+impl ClientUI {
+    pub fn update(&mut self, message: Message) -> Task<Message> {
+        match message {
+            Message::Selected(idx) => {
+                self.selected = idx;
 
-            let req = GuiRequest::Get(model.list[idx].to_string());
-            match communicate(model, req) {
-                GuiResponse::Err404 => {
-                    model.markdown = markdown::parse("# ERROR 404").collect();
+                let req = GuiRequest::Get(self.list[idx].to_string());
+                match self.communicate(req) {
+                    GuiResponse::Err404 => {
+                        self.markdown = markdown::parse("# ERROR 404").collect();
+                    }
+                    GuiResponse::GotFile(file) => {
+                        self.markdown = markdown::parse(&file.file).collect();
+                    }
+                    _ => {}
                 }
-                GuiResponse::GotFile(file) => {
-                    model.markdown = markdown::parse(&file.file).collect();
+            }
+            Message::LinkClicked(url) => {
+                println!("LINK CLICKED {url:?}");
+                let searched = &url.to_string();
+                if let Some(pos) = self.list.iter().position(|el| el == searched) {
+                    return Task::done(Message::Selected(pos));
                 }
-                _ => {}
             }
-        }
-        Message::LinkClicked(url) => {
-            println!("LINK CLICKED {url:?}");
-            let searched = &url.to_string();
-            if let Some(pos) = model.list.iter().position(|el| el == searched) {
-                return Task::done(Message::Selected(pos));
-            }
-        }
-        Message::Refresh => {
-            let req = GuiRequest::ListAll;
-            let resp = communicate(model, req);
-            if let GuiResponse::ListOfAll(list) = resp {
-                let mut final_list = vec![];
-                for (_, el) in list {
-                    final_list.extend(el.into_iter());
+            Message::Refresh => {
+                let req = GuiRequest::ListAll;
+                let resp = self.communicate(req);
+                if let GuiResponse::ListOfAll(list) = resp {
+                    let mut final_list = vec![];
+                    for (_, el) in list {
+                        final_list.extend(el.into_iter());
+                    }
+                    self.list = final_list;
                 }
-                model.list = final_list;
-            }
+            },
         }
+        Task::none()
     }
-    Task::none()
-}
 
-fn communicate(model: &mut Model, request: GuiRequest) -> GuiResponse {
-    // TODO not single threaded
-    let mut stream = TcpStream::connect(&model.addr).unwrap();
-    send_over(&mut stream, request);
-    recv_over::<GuiResponse>(&mut stream).unwrap()
+    fn communicate(&mut self, request: GuiRequest) -> GuiResponse {
+        // TODO not single threaded
+        let mut stream = TcpStream::connect(&self.addr).unwrap();
+        send_over(&mut stream, request);
+        recv_over::<GuiResponse>(&mut stream).unwrap()
+    }
 }
-
 /*
 impl Future for Receiver {
     type Output = Message;

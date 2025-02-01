@@ -1,6 +1,4 @@
-use crate::model::{Message, Model};
-use crate::update::update;
-use crate::view::view;
+use crate::model::{ClientUI, Message};
 use iced::Task;
 use std::env;
 
@@ -15,7 +13,10 @@ pub fn main() {
         .expect("NO ARGUMENT")
         .to_string();
 
-    // TODO Handle
-    let _ = iced::application("Matteo Text & Media Client", update, view)
-        .run_with(|| (Model::new(addr, vec![]), Task::done(Message::Refresh)));
+    let title = "Matteo Text & Media Client";
+    let initial_task = Task::done(Message::Refresh);
+    let initialization = || (ClientUI::new(addr, vec![]), initial_task);
+
+    let _ = iced::application(title, ClientUI::update, ClientUI::view)
+        .run_with(initialization);
 }

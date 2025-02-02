@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
 use common_structs::message::Message;
 use common_structs::types::Session;
 use wg_2024::network::NodeId;

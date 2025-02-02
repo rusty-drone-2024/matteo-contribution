@@ -11,6 +11,6 @@ impl RequestWrapper {
     }
 
     pub fn post_response(mut self, response: GuiResponse) -> Option<()> {
-        send_over(&mut self.stream, response.clone())
+        send_over(&mut self.stream, response)
     }
 }

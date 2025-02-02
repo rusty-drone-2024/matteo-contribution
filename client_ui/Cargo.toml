@@ -4,6 +4,26 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.13.1", features = ["markdown"] }
+serde = "1.0.217"
+serde_json = "1.0.138"
 
 client_bridge = { path = "../client_bridge" }
+
+[dependencies.iced]
+version = "0.13.1"
+default-features = false
+features = [
+    "wgpu",
+    "tiny-skia",
+    "markdown",
+    "advanced"
+]
+
+[dependencies.iced_futures]
+version = "0.13.2"
+default-features = false
+features = ["tokio"]
+
+[dependencies.tokio]
+version = "1.43.0"
+features = ["full"]

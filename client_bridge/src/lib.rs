@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
 use common_structs::message::{FileWithData, Link, Media};
 use serde::{Deserialize, Serialize};
 use std::net::TcpStream;

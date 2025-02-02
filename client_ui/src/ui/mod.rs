@@ -1,6 +1,11 @@
+mod update;
+mod view;
+
 use client_bridge::GuiResponse;
 use iced::task::Handle;
 use iced::widget::markdown;
+
+pub use view::style::custom_theme;
 
 pub struct ClientUI {
     pub addr: String,
@@ -17,7 +22,7 @@ impl ClientUI {
             list,
             older_task: None,
             selected: 0,
-            markdown: markdown::parse("").collect(),
+            markdown: vec!(),
         }
     }
 }

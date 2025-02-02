@@ -1,54 +1,17 @@
-use crate::model::Message::Selected;
-use crate::model::{ClientUI, Message};
+use crate::ui::{ClientUI, Message};
 use iced::advanced::widget::text::Text;
-use iced::border::Radius;
-use iced::widget::button::{Status, Style};
 use iced::widget::{button, column, container, markdown, row, scrollable, text, Column};
 use iced::{
-    Background, Border, Center, Color, Element, Fill, FillPortion, Renderer, Shadow, Theme,
+    Center, Color, Element, Fill, FillPortion, Renderer, Theme,
 };
+use style::btn_style;
+
+pub mod style;
+
 
 type El<'a> = Element<'a, Message, Theme, Renderer>;
 
 impl ClientUI {
-    fn btn_style(theme: &Theme, status: Status, selected: bool) -> Style {
-        let base: Style = Style {
-            background: Some(Background::Color(
-                theme.extended_palette().primary.base.color,
-            )),
-            text_color: theme.palette().text,
-            border: Border {
-                color: theme.palette().text,
-                radius: Radius::from(12),
-                width: 0.0,
-            },
-            shadow: Shadow::default(),
-        };
-
-        match (selected, status) {
-            (true, _) => base,
-            (_, Status::Pressed) => Style {
-                background: Some(Background::Color(
-                    theme.extended_palette().primary.strong.color,
-                )),
-                ..base
-            },
-            (_, Status::Hovered) => Style {
-                background: Some(Background::Color(
-                    theme.extended_palette().secondary.strong.color,
-                )),
-                ..base
-            },
-            (_, Status::Active) => Style {
-                background: Some(Background::Color(
-                    theme.extended_palette().secondary.base.color,
-                )),
-                ..base
-            },
-            _ => Style::default(),
-        }
-    }
-
     pub fn view(&self) -> Element<Message> {
         let header: El = container(row![
             Text::new("File list")
@@ -58,7 +21,7 @@ impl ClientUI {
                 .align_y(Center),
             container(
                 button("Refresh")
-                    .style(|t, s| Self::btn_style(t, s, false))
+                    .style(|t, s| btn_style(t, s, false))
                     .on_press(Message::Refresh)
                     .height(35)
             )
@@ -78,8 +41,8 @@ impl ClientUI {
             res.push(
                 button(text(name))
                     .padding(9)
-                    .style(move |t, s| Self::btn_style(t, s, selected))
-                    .on_press(Selected(i))
+                    .style(move |t, s| btn_style(t, s, selected))
+                    .on_press(Message::Selected(i))
                     .width(Fill)
                     .into(),
             );

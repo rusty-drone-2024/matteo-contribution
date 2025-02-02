@@ -10,8 +10,8 @@ impl ClientUI {
     pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Selected(idx) => {
-                if self.selected != idx {
-                    self.selected = idx;
+                if self.selected != Some(idx) {
+                    self.selected = Some(idx);
 
                     let req = GuiRequest::Get(self.list[idx].to_string());
                     return self.create_task(req);
@@ -32,13 +32,13 @@ impl ClientUI {
                 let Some(resp) = resp else {
                     exit(0);
                 };
-                self.handle_net_resp(resp);
+                return self.handle_net_resp(resp);
             }
         }
         Task::none()
     }
 
-    fn handle_net_resp(&mut self, resp: GuiResponse) {
+    fn handle_net_resp(&mut self, resp: GuiResponse) -> Task<Message> {
         match resp {
             GuiResponse::Err404 => {
                 self.markdown = markdown::parse("# ERROR 404").collect();
@@ -49,10 +49,15 @@ impl ClientUI {
             GuiResponse::ListOfAll(list) => {
                 let list = list.into_iter().flat_map(|(_, l)| l);
                 self.list = list.collect();
+                
+                self.selected = None;
+                self.markdown.clear();
             }
             GuiResponse::GotMedia(_) => {
                 eprintln!("INVALID RESPONSE {resp:?}");
             }
         }
+        
+        Task::none()
     }
 }

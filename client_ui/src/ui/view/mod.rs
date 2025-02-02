@@ -45,7 +45,7 @@ impl ClientUI {
             .iter()
             .enumerate()
             .map(|(i, name)| {
-                let selected = i == self.selected;
+                let selected = Some(i) == self.selected;
 
                 button(text(name))
                     .padding(9)

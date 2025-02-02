@@ -11,7 +11,7 @@ pub struct ClientUI {
     pub addr: String,
     pub list: Vec<String>,
     pub older_task: Option<Handle>,
-    pub selected: usize,
+    pub selected: Option<usize>,
     pub markdown: Vec<markdown::Item>,
 }
 
@@ -21,7 +21,7 @@ impl ClientUI {
             addr,
             list,
             older_task: None,
-            selected: 0,
+            selected: None,
             markdown: vec![],
         }
     }

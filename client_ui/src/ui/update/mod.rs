@@ -49,7 +49,7 @@ impl ClientUI {
             GuiResponse::ListOfAll(list) => {
                 let list = list.into_iter().flat_map(|(_, l)| l);
                 self.list = list.collect();
-                
+
                 self.selected = None;
                 self.markdown.clear();
             }
@@ -57,7 +57,7 @@ impl ClientUI {
                 eprintln!("INVALID RESPONSE {resp:?}");
             }
         }
-        
+
         Task::none()
     }
 }

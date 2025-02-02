@@ -1,10 +1,17 @@
+mod update;
+mod view;
+
 use client_bridge::GuiResponse;
+use iced::task::Handle;
 use iced::widget::markdown;
+
+pub use view::style::custom_theme;
 
 pub struct ClientUI {
     pub addr: String,
     pub list: Vec<String>,
-    pub selected: usize,
+    pub older_task: Option<Handle>,
+    pub selected: Option<usize>,
     pub markdown: Vec<markdown::Item>,
 }
 
@@ -13,8 +20,9 @@ impl ClientUI {
         Self {
             addr,
             list,
-            selected: 0,
-            markdown: markdown::parse("").collect(),
+            older_task: None,
+            selected: None,
+            markdown: vec![],
         }
     }
 }
@@ -22,7 +30,7 @@ impl ClientUI {
 #[derive(Debug, Clone)]
 pub enum Message {
     LinkClicked(markdown::Url),
-    NetResponse(GuiResponse),
+    NetResponse(Option<GuiResponse>),
     Selected(usize),
     Refresh,
 }

@@ -1,6 +1,6 @@
 [package]
 name = "client_ui"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
@@ -16,14 +16,11 @@ features = [
     "wgpu",
     "tiny-skia",
     "markdown",
-    "advanced"
+    "advanced",
+    "tokio"
 ]
-
-[dependencies.iced_futures]
-version = "0.13.2"
-default-features = false
-features = ["tokio"]
 
 [dependencies.tokio]
 version = "1.43.0"
-features = ["full"]
+default-features = false
+features = ["net", "io-util"]

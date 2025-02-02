@@ -1,3 +1,4 @@
+use client_bridge::GuiResponse;
 use iced::widget::markdown;
 
 pub struct ClientUI {
@@ -21,6 +22,7 @@ impl ClientUI {
 #[derive(Debug, Clone)]
 pub enum Message {
     LinkClicked(markdown::Url),
+    NetResponse(GuiResponse),
     Selected(usize),
     Refresh,
 }

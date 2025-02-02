@@ -1,9 +1,12 @@
 use crate::model::{ClientUI, Message};
-use client_bridge::send::{recv_over, send_over};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::widget::markdown;
 use iced::Task;
-use std::net::TcpStream;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+use tokio::io::AsyncReadExt;
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
 
 impl ClientUI {
     pub fn update(&mut self, message: Message) -> Task<Message> {
@@ -13,15 +16,8 @@ impl ClientUI {
                     self.selected = idx;
 
                     let req = GuiRequest::Get(self.list[idx].to_string());
-                    match self.communicate(req) {
-                        GuiResponse::Err404 => {
-                            self.markdown = markdown::parse("# ERROR 404").collect();
-                        }
-                        GuiResponse::GotFile(file) => {
-                            self.markdown = markdown::parse(&file.file).collect();
-                        }
-                        _ => {}
-                    }
+                    let addr = self.addr.clone();
+                    return Task::perform(communicate(addr, req), Message::NetResponse);
                 }
             }
             Message::LinkClicked(url) => {
@@ -33,56 +29,52 @@ impl ClientUI {
             }
             Message::Refresh => {
                 let req = GuiRequest::ListAll;
-                let resp = self.communicate(req);
-                if let GuiResponse::ListOfAll(list) = resp {
+                let addr = self.addr.clone();
+                return Task::perform(communicate(addr, req), Message::NetResponse);
+            }
+            Message::NetResponse(resp) => match resp {
+                GuiResponse::Err404 => {
+                    self.markdown = markdown::parse("# ERROR 404").collect();
+                }
+                GuiResponse::GotFile(file) => {
+                    self.markdown = markdown::parse(&file.file).collect();
+                }
+                GuiResponse::ListOfAll(list) => {
                     let mut final_list = vec![];
                     for (_, el) in list {
                         final_list.extend(el.into_iter());
                     }
                     self.list = final_list;
                 }
-            }
+                GuiResponse::GotMedia(_) => {
+                    eprintln!("INVALID RESPONSE {resp:?}");
+                }
+            },
         }
         Task::none()
     }
-
-    fn communicate(&mut self, request: GuiRequest) -> GuiResponse {
-        // TODO not single threaded
-        let mut stream = TcpStream::connect(&self.addr).unwrap();
-        send_over(&mut stream, request);
-        recv_over::<GuiResponse>(&mut stream).unwrap()
-    }
 }
-/*
-impl Future for Receiver {
-    type Output = Message;
 
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        println!("TRYING");
-        let mut tmp = [0; 16];
-        self.stream.set_nodelay(true).unwrap();
-        self.stream.set_read_timeout(Some(Duration::from_millis(100))).unwrap();
-        println!("TRYING2");
-        let mut res;
-        loop{
-            res =  self.stream.read(&mut tmp);
-            if res.is_ok() {
-                break;
-            }
-            println!("PENDING 1");
-            //return Poll::Pending;
-        }println!("TRYING3");
-
-        let res = res.unwrap();
-        println!("tmp {tmp:?} {res}");
-        self.partial.extend(tmp.into_iter().take(res));
-
-        let Ok(response) = serde_json::from_slice::<GuiResponse>(&self.partial) else {
-            println!("PENDING 2");
-        return Poll::Pending;
-        };
-
-        Poll::Ready(Message::Backend(response))
-    }
+async fn communicate(addr: String, request: GuiRequest) -> GuiResponse {
+    let mut stream = TcpStream::connect(addr).await.unwrap();
+    send_over(&mut stream, request).await;
+    recv_over::<GuiResponse>(&mut stream).await.unwrap()
 }
-*/
+
+async fn send_over<T: Serialize>(stream: &mut TcpStream, data: T) -> Option<()> {
+    let serialized = serde_json::to_vec(&data).ok()?;
+    let len = serialized.len();
+
+    stream.write_all(&len.to_le_bytes()).await.ok()?;
+    stream.write_all(&serialized).await.ok()
+}
+
+async fn recv_over<T: DeserializeOwned>(stream: &mut TcpStream) -> Option<T> {
+    let mut len = [0u8; size_of::<usize>()];
+    stream.read_exact(&mut len).await.ok()?;
+    let len = usize::from_le_bytes(len);
+
+    let mut vec = vec![0u8; len];
+    stream.read_exact(&mut vec).await.ok()?;
+    serde_json::from_slice(&vec).ok()
+}

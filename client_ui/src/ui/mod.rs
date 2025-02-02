@@ -22,7 +22,7 @@ impl ClientUI {
             list,
             older_task: None,
             selected: 0,
-            markdown: vec!(),
+            markdown: vec![],
         }
     }
 }

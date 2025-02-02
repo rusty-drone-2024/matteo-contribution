@@ -7,7 +7,7 @@ use std::mem;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
-impl ClientUI{
+impl ClientUI {
     pub(super) fn create_task(&mut self, req: GuiRequest) -> Task<Message> {
         let addr = self.addr.clone();
         let task = Task::perform(communicate(addr, req), Message::NetResponse);

@@ -27,25 +27,28 @@ impl ClientUI {
                     return Task::done(Message::Selected(pos));
                 }
             }
-            Message::NetResponse(resp) => match resp {
-                GuiResponse::Err404 => {
-                    self.markdown = markdown::parse("# ERROR 404").collect();
-                }
-                GuiResponse::GotFile(file) => {
-                    self.markdown = markdown::parse(&file.file).collect();
-                }
-                GuiResponse::ListOfAll(list) => {
-                    let mut final_list = vec![];
-                    for (_, el) in list {
-                        final_list.extend(el.into_iter());
-                    }
-                    self.list = final_list;
-                }
-                GuiResponse::GotMedia(_) => {
-                    eprintln!("INVALID RESPONSE {resp:?}");
-                }
-            },
+            Message::NetResponse(resp) => {
+                self.handle_net_resp(resp);
+            }
         }
         Task::none()
+    }
+
+    fn handle_net_resp(&mut self, resp: GuiResponse) {
+        match resp {
+            GuiResponse::Err404 => {
+                self.markdown = markdown::parse("# ERROR 404").collect();
+            }
+            GuiResponse::GotFile(file) => {
+                self.markdown = markdown::parse(&file.file).collect();
+            }
+            GuiResponse::ListOfAll(list) => {
+                let list = list.into_iter().flat_map(|(_, l)| l);
+                self.list = list.collect();
+            }
+            GuiResponse::GotMedia(_) => {
+                eprintln!("INVALID RESPONSE {resp:?}");
+            }
+        }
     }
 }

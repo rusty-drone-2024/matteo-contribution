@@ -4,8 +4,8 @@ use iced::widget::markdown;
 use iced::Task;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use tokio::io::AsyncReadExt;
-use tokio::io::AsyncWriteExt;
+use std::mem;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 
 impl ClientUI {
@@ -16,9 +16,12 @@ impl ClientUI {
                     self.selected = idx;
 
                     let req = GuiRequest::Get(self.list[idx].to_string());
-                    let addr = self.addr.clone();
-                    return Task::perform(communicate(addr, req), Message::NetResponse);
+                    return self.create_task(req);
                 }
+            }
+            Message::Refresh => {
+                let req = GuiRequest::ListAll;
+                return self.create_task(req);
             }
             Message::LinkClicked(url) => {
                 println!("LINK CLICKED {url:?}");
@@ -26,11 +29,6 @@ impl ClientUI {
                 if let Some(pos) = self.list.iter().position(|el| el == searched) {
                     return Task::done(Message::Selected(pos));
                 }
-            }
-            Message::Refresh => {
-                let req = GuiRequest::ListAll;
-                let addr = self.addr.clone();
-                return Task::perform(communicate(addr, req), Message::NetResponse);
             }
             Message::NetResponse(resp) => match resp {
                 GuiResponse::Err404 => {
@@ -53,12 +51,25 @@ impl ClientUI {
         }
         Task::none()
     }
+
+    fn create_task(&mut self, req: GuiRequest) -> Task<Message> {
+        let addr = self.addr.clone();
+        let task = Task::perform(communicate(addr, req), Message::NetResponse);
+        let (task, handle) = task.abortable();
+
+        let old = mem::replace(&mut self.older_task, Some(handle));
+        if let Some(old) = old {
+            old.abort();
+        }
+
+        task
+    }
 }
 
 async fn communicate(addr: String, request: GuiRequest) -> GuiResponse {
     let mut stream = TcpStream::connect(addr).await.unwrap();
-    send_over(&mut stream, request).await;
-    recv_over::<GuiResponse>(&mut stream).await.unwrap()
+    send_over(&mut stream, request).await.expect("LOL1");
+    recv_over::<GuiResponse>(&mut stream).await.expect("LOL2")
 }
 
 async fn send_over<T: Serialize>(stream: &mut TcpStream, data: T) -> Option<()> {

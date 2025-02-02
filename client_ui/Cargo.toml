@@ -16,14 +16,11 @@ features = [
     "wgpu",
     "tiny-skia",
     "markdown",
-    "advanced"
+    "advanced",
+    "tokio"
 ]
-
-[dependencies.iced_futures]
-version = "0.13.2"
-default-features = false
-features = ["tokio"]
 
 [dependencies.tokio]
 version = "1.43.0"
-features = ["full"]
+default-features = false
+features = ["net", "io-util"]

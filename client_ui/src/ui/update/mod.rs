@@ -2,6 +2,7 @@ use crate::ui::{ClientUI, Message};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::widget::markdown;
 use iced::Task;
+use std::process::exit;
 
 mod communication;
 
@@ -28,6 +29,9 @@ impl ClientUI {
                 }
             }
             Message::NetResponse(resp) => {
+                let Some(resp) = resp else {
+                    exit(0);
+                };
                 self.handle_net_resp(resp);
             }
         }

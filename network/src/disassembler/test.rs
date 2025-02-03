@@ -47,7 +47,7 @@ fn fragment_acks() {
 #[test]
 fn flood_not_needed() {
     let mut disassembler = Disassembler::default();
-    assert!(!disassembler.require_flood());
+    assert!(!disassembler.require_flood(false));
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn flood_needed() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
     let _ = disassembler.add_session_to_wait_queue(0);
-    assert!(disassembler.require_flood());
+    assert!(disassembler.require_flood(false));
 }
 
 #[test]
@@ -63,8 +63,8 @@ fn flood_cleared() {
     let mut disassembler = Disassembler::default();
     disassembler.split(0, 0, Message::ReqServerType);
     let _ = disassembler.add_session_to_wait_queue(0);
-    assert!(disassembler.require_flood());
-    assert!(!disassembler.require_flood());
+    assert!(disassembler.require_flood(false));
+    assert!(!disassembler.require_flood(false));
 }
 
 #[test]

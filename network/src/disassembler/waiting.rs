@@ -4,10 +4,10 @@ use wg_2024::network::NodeId;
 
 impl Disassembler {
     #[must_use]
-    pub fn require_flood(&mut self) -> bool {
+    pub fn require_flood(&mut self, aggressive: bool) -> bool {
         let required = self.new_waiting > 0;
         self.new_waiting = 0;
-        required
+        required || (aggressive && self.waiting.len() > 0)
     }
 
     pub fn add_session_to_wait_queue(&mut self, session: Session) -> Result<&mut Split, String> {

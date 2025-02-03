@@ -9,12 +9,14 @@ use crossbeam_channel::{select, Receiver, Sender};
 use network::NetworkOutput;
 use network::PacketMessage;
 use std::collections::HashMap;
+use tokio_util::sync::CancellationToken;
 use wg_2024::network::NodeId;
 
 pub struct ClientBackend {
     new_session: u64,
     open_requests: HashMap<u64, RequestWrapper>,
     dns: HashMap<Link, NodeId>,
+    close_frontend_token: CancellationToken,
     frontend_rcv: Receiver<RequestWrapper>,
     network_rcv: Receiver<NetworkOutput>,
     network_send: Sender<PacketMessage>,
@@ -30,6 +32,7 @@ impl ClientBackend {
         frontend_rcv: Receiver<RequestWrapper>,
         network_rcv: Receiver<NetworkOutput>,
         network_send: Sender<PacketMessage>,
+        close_frontend_token: CancellationToken,
     ) -> Self
     where
         Self: Sized,
@@ -38,6 +41,7 @@ impl ClientBackend {
             new_session: 0,
             open_requests: HashMap::default(),
             dns: HashMap::default(),
+            close_frontend_token,
             frontend_rcv,
             network_rcv,
             network_send,
@@ -72,5 +76,7 @@ impl ClientBackend {
                 },
             }
         }
+        
+        self.close_frontend_token.cancel();
     }
 }

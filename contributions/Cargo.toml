@@ -11,3 +11,10 @@ attohttpc = "0.28.2"
 
 network = { path = "../network" }
 client_bridge = { path = "../client_bridge" }
+tokio-util = "0.7.13"
+
+
+[dependencies.tokio]
+version = "1.43.0"
+default-features = false
+features = ["net", "io-util", "sync", "macros"]

@@ -1,48 +1,77 @@
 use client_bridge::RequestWrapper;
 use crossbeam_channel::Sender;
-use std::net::TcpListener;
-use std::process::Command;
+use tokio::net::TcpListener;
+use std::process::{Child, Command};
 use wg_2024::network::NodeId;
+use tokio_util::sync::CancellationToken;
 
 pub struct ClientFrontend {
     requests_channel: Sender<RequestWrapper>,
+    close_req: CancellationToken,
     node_id: NodeId,
 }
 
 impl ClientFrontend {
-    pub fn new(node_id: NodeId, requests_channel: Sender<RequestWrapper>) -> Self {
+    pub fn new(node_id: NodeId, requests_channel: Sender<RequestWrapper>, close_req: CancellationToken) -> Self {
         Self {
             requests_channel,
+            close_req,
             node_id,
         }
     }
 
     pub fn loop_forever(&self) {
-        let Some((server, addr)) = self.init_server() else {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build().unwrap();
+
+        rt.block_on(self.handle_requests());
+    }
+
+    async fn handle_requests(&self){
+        let Some((server, addr)) = self.init_server().await else {
             return eprintln!("FATAL: Cannot initialize TCP server");
         };
 
-        // TODO fix its use (+ is temp fix)
-        let mut child = Command::new("cargo")
-            .arg("run")
-            .arg("--bin")
-            .arg("client_ui")
-            .arg(addr)
-            .spawn()
-            .unwrap();
 
-        while let Ok((stream, _)) = server.accept() {
-            let _ = self.requests_channel.send(stream.into());
+        let mut child = Self::run_gui(&addr);
+
+
+        loop{
+            tokio::select!{
+                _ = self.close_req.cancelled() => {
+                    break;
+                }
+                Ok((stream, _)) = server.accept() => {
+                    let _ = self.requests_channel.send(stream.into());
+                }
+                else => {
+                    eprintln!("Error during server accepting");
+                    break;
+                }
+            }
         }
 
         child.wait().unwrap();
     }
 
-    fn init_server(&self) -> Option<(TcpListener, String)> {
+    async fn init_server(&self) -> Option<(TcpListener, String)> {
         let port = 7700 + i32::from(self.node_id);
-        let addr = &format!("localhost:{port}");
+        let addr = format!("localhost:{port}");
 
-        let server = TcpListener::bind(addr).ok()?;
-        Some((server, addr.to_string()))
+        let server = TcpListener::bind(&addr).await.ok()?;
+        Some((server, addr))
+    }
+
+    fn run_gui(addr: &str) -> Child {
+        // TODO fix its use (+ is temp fix)
+
+        Command::new("cargo")
+            .arg("run")
+            .arg("--bin")
+            .arg("client_ui")
+            .arg(addr)
+            .spawn()
+            .unwrap()
     }
 }

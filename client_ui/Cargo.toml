@@ -17,6 +17,7 @@ features = [
     "wgpu",
     "tiny-skia",
     "markdown",
+    "highlighter",
     "advanced",
     "tokio"
 ]

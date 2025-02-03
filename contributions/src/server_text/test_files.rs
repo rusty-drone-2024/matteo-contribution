@@ -27,7 +27,7 @@ pub const TEST_FILES: &[(&str, &str)] = &[
     ("File5", "Text"),
     ("File6", "Random"),
     ("File7", "adsdaasd"),
-    ("Lorem random text", "dsads"),
+    ("Lorem random text", "![Hello World!](https://imgv3.fotor.com/images/blog-richtext-image/bing-ai-image-generator-detailed-page.png)"),
     ("File9asd", "[File3](File3)"),
     ("File.md", "# Content in file2\n## LOl\n### No\ntext\n"),
     (

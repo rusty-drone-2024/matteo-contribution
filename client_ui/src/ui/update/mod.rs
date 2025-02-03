@@ -22,11 +22,7 @@ impl ClientUI {
                 return self.create_task(req);
             }
             Message::LinkClicked(url) => {
-                println!("LINK CLICKED {url:?}");
-                let searched = &url.to_string();
-                if let Some(pos) = self.list.iter().position(|el| el == searched) {
-                    return Task::done(Message::Selected(pos));
-                }
+                let _ = open::that(url.as_str());
             }
             Message::NetResponse(resp) => {
                 let Some(resp) = resp else {

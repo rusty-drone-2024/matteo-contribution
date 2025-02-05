@@ -25,6 +25,8 @@ impl ClientUI {
                 return self.create_task(req);
             }
             Message::LinkClicked(url) => {
+                let url = url.to_string();
+
                 if url.starts_with("http") {
                     let _ = open::that(url.as_str());
                 } else {
@@ -67,31 +69,29 @@ impl ClientUI {
             GuiResponse::Err404 => {
                 self.content_state = ContentState::Invalid;
             }
-
             GuiResponse::ListOfAll(list) => {
                 let list = list.into_iter().flat_map(|(_, l)| l);
                 self.list = list.collect();
                 self.content_state = ContentState::Empty;
             }
-            GuiResponse::GotFile(file) => {
-                println!("FILE: {file:?}");
-                let media = self.handle_got_file(&file);
-                return Task::batch(media.into_iter().map(|link| {
-                    let req = GuiRequest::GetMedia(link);
-                    println!("req media: {req:?}");
-                    self.create_task(req)
-                }));
+            GuiResponse::GotFile(file_link, file) => {
+                let media = self.handle_got_file(file_link, &file);
+
+                return self.create_batch_task(
+                    media.into_iter().map(|link| {
+                        GuiRequest::GetMedia(link)
+                    })
+                );
             }
-            GuiResponse::GotMedia(media) => {
-                self.handle_got_media(media);
+            GuiResponse::GotMedia(link, media) => {
+                self.handle_got_media(&link, media);
             }
         }
 
         Task::none()
     }
 
-    fn handle_got_file(&mut self, file: &FileWithData) -> Vec<Link> {
-        // TODO Check same
+    fn handle_got_file(&mut self, _link: Link, file: &FileWithData) -> Vec<Link> {
         let ContentState::Loading { index, .. } = self.content_state else {
             eprintln!("Received file when non waiting");
             return vec![];
@@ -114,7 +114,7 @@ impl ClientUI {
         file.related_data.keys().cloned().collect()
     }
 
-    fn handle_got_media(&mut self, media: Media) {
+    fn handle_got_media(&mut self, link: &Link, media: Media) {
         let ContentState::Loading {
             index,
             content,
@@ -126,7 +126,7 @@ impl ClientUI {
 
         // TODO remove hardcode (+ mkdir)
         let _ = write(
-            Path::new("/home/matteo/.cache/matteo_contribution_img/chicken.jpeg"),
+            Path::new(&format!("/home/matteo/.cache/matteo_contribution_img/{link}")),
             media,
         );
         *to_load -= 1;

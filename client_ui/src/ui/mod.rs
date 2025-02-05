@@ -41,7 +41,7 @@ impl ClientUI {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    LinkClicked(String),
+    LinkClicked(markdown::Url),
     NetResponse(Option<GuiResponse>),
     Selected(usize),
     Refresh,

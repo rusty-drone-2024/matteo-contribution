@@ -6,59 +6,74 @@ use common_structs::types::Session;
 use network::PacketMessage;
 use wg_2024::network::NodeId;
 use wg_2024::packet::NodeType;
+use crate::client::backend::requests::RequestToNet;
+use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 
 impl ClientBackend {
-    pub(super) fn handle_frontend_request(&mut self, mut rq: RequestWrapper) {
-        let res = self.handle_frontend_rq_types(&mut rq);
+    pub(super) fn handle_frontend_request(&mut self, rq: RequestWrapper) {
+        let session = self.fresh_session();
+        let res = self.handle_frontend_rq_types(session, rq);
 
-        let Some(session) = res else {
-            rq.post_err_not_found();
-            return;
+        match res {
+            Ok(net_req) => {
+                self.open_requests.insert(session, net_req);
+            }
+            Err(rq) => {
+                rq.post_err_not_found();
+            }
         };
-
-        self.open_requests.insert(session, rq);
     }
 
-    fn handle_frontend_rq_types(&mut self, rq: &mut RequestWrapper) -> Option<Session> {
-        let session = self.fresh_session();
+    fn handle_frontend_rq_types(&mut self, session: Session, mut rq: RequestWrapper) -> Result<RequestToNet, RequestWrapper> {
+        let Some(request) = rq.take_request() else {
+            return Err(rq);
+        };
 
-        match rq.take_request()? {
+        match request  {
             GuiRequest::ListAll => {
-                let mut count = 0;
+                let mut to_wait = 0;
 
-                // TODO remove clone
                 for (id, server_type) in self.servers.clone() {
                     if let Some(ServerType::Text) = server_type {
                         let part_session_id = self.fresh_session();
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
-                        self.split_req.insert(part_session_id, session);
+                        self.open_requests.insert(part_session_id, ListPartial(session));
                         let _ = self.network_send.send(packet_msg);
 
-                        count += 1;
+                        to_wait += 1;
                     }
                 }
 
                 // TODO Stop assuming that is already done topology
-                if count == 0 {
-                    return None;
+                if to_wait == 0 {
+                    return Err(rq);
                 }
 
-                self.accumulator_list_all.insert(session, (count, vec![]));
+                Ok(List {
+                    rq,
+                    to_wait,
+                    acc: vec!(),
+                })
             }
             GuiRequest::Get(link) => {
-                let server_id = self.get_from_dns(&link)?;
-                let packet_msg = PacketMessage::new(session, server_id, ReqFile(link));
+                let Some(server_id) = self.get_from_dns(&link) else {
+                    return Err(rq);
+                };
+
+                let packet_msg = PacketMessage::new(session, server_id, ReqFile(link.clone()));
                 let _ = self.network_send.send(packet_msg);
+                Ok(Get { rq, link })
             }
             GuiRequest::GetMedia(link) => {
-                println!("DNS {:?}", self.dns);
-                let server_id = self.get_from_dns(&link)?;
-                let packet_msg = PacketMessage::new(session, server_id, ReqMedia(link));
+                let Some(server_id) = self.get_from_dns(&link) else {
+                    return Err(rq);
+                };
+
+                let packet_msg = PacketMessage::new(session, server_id, ReqMedia(link.clone()));
                 let _ = self.network_send.send(packet_msg);
+                Ok(Get { rq, link })
             }
         }
-
-        Some(session)
     }
 
     pub(super) fn handle_new_leaf(&mut self, node_id: NodeId, node_type: NodeType) {

@@ -1,6 +1,7 @@
 mod dns;
 mod input;
 mod output;
+mod requests;
 
 use client_bridge::RequestWrapper;
 use common_structs::message::{Link, ServerType};
@@ -11,20 +12,17 @@ use network::PacketMessage;
 use std::collections::HashMap;
 use tokio_util::sync::CancellationToken;
 use wg_2024::network::NodeId;
+use crate::client::backend::requests::RequestToNet;
 
 pub struct ClientBackend {
-    new_session: u64,
-    open_requests: HashMap<u64, RequestWrapper>,
+    new_session: Session,
+    open_requests: HashMap<Session, RequestToNet>,
     dns: HashMap<Link, NodeId>,
     close_frontend_token: CancellationToken,
     frontend_rcv: Receiver<RequestWrapper>,
     network_rcv: Receiver<NetworkOutput>,
     network_send: Sender<PacketMessage>,
     servers: Vec<(NodeId, Option<ServerType>)>,
-    /// Contains partial and total
-    split_req: HashMap<Session, Session>,
-    #[allow(clippy::type_complexity)]
-    accumulator_list_all: HashMap<Session, (usize, Vec<(NodeId, Vec<Link>)>)>,
 }
 
 impl ClientBackend {
@@ -46,8 +44,6 @@ impl ClientBackend {
             network_rcv,
             network_send,
             servers: vec![],
-            split_req: HashMap::default(),
-            accumulator_list_all: HashMap::default(),
         }
     }
 

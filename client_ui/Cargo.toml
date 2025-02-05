@@ -12,8 +12,8 @@ common_structs = { git = "https://github.com/rusty-drone-2024/common-structs.git
 client_bridge = { path = "../client_bridge" }
 
 [dependencies.iced]
-#version = "0.13.1"
-path = "../../iced"
+#git = "https://github.com/iced-rs/iced"
+git = "https://github.com/rusty-drone-2024/iced"
 default-features = false
 features = [
     "wgpu",

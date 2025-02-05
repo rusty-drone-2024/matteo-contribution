@@ -42,12 +42,12 @@ pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
     ),
     ("File Link", &[], "[LINK TO ONLINE](https://www.google.com)"),
     ("File Link Offline", &[], "[LINK TO OFFLINE](File3)"),
-    ("Lorem random img", &[], "![Hello World!](sunset.jpg)"),
+    ("Lorem random img", &[("sunset.jpg", 12)], "![Hello World!](sunset.jpg)"),
     ("File9asd", &[], "[File3](File3)"),
     ("File.md", &[], "# Content in file2\n## LOl\n### No\ntext\n"),
     (
         "Full Example online",
-        &[],
+        &[("sunset.jpg", 12), ("ferris.png", 12)],
         r#"
 # h1 Heading 8-)
 ## h2 Heading
@@ -185,15 +185,6 @@ Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
 
 ![Mine Image](ferris.png)
 ![Mine Image2](sunset.jpg)
-![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
-
-Like links, Images also have a footnote style syntax
-
-![Alt text][id]
-
-With a reference later in the document defining the URL location:
-
-[id]: https://octodex.github.com/images/dojocat.jpg  "The Dojocat"
 
 
 ## Plugins

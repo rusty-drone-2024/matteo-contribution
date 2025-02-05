@@ -29,6 +29,6 @@ pub enum GuiRequest {
 pub enum GuiResponse {
     Err404,
     ListOfAll(Vec<(NodeId, Vec<Link>)>),
-    GotFile(FileWithData),
-    GotMedia(Media),
+    GotFile(Link, FileWithData),
+    GotMedia(Link, Media),
 }

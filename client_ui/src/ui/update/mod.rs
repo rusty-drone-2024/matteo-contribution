@@ -77,8 +77,7 @@ impl ClientUI {
             GuiResponse::GotFile(file_link, file) => {
                 let media = self.handle_got_file(file_link, &file);
 
-                return self
-                    .create_batch_task(media.into_iter().map(|link| GuiRequest::GetMedia(link)));
+                return self.create_batch_task(media.into_iter().map(GuiRequest::GetMedia));
             }
             GuiResponse::GotMedia(link, media) => {
                 self.handle_got_media(&link, media);

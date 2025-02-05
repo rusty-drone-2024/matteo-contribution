@@ -8,7 +8,7 @@ const IMAGE_PATH: &str = ".resources/img_matteo";
 impl MediaServer {
     pub(crate) fn get_test_media(link: &Link) -> Option<Media> {
         let link = &format!("{IMAGE_PATH}/{link}");
-        
+
         if let Ok(image) = read(Path::new(link)) {
             return Some(image);
         }

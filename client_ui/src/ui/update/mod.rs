@@ -121,10 +121,7 @@ impl ClientUI {
         };
 
         // TODO remove hardcode (+ mkdir)
-        let _ = write(
-            Path::new(&format!("{BASE_PATH}/{link}")),
-            media,
-        );
+        let _ = write(Path::new(&format!("{BASE_PATH}/{link}")), media);
         *to_load -= 1;
         if *to_load > 0 {
             return;

@@ -1,7 +1,6 @@
 use crate::TextServer;
-use common_structs::message::{FileWithData, Link};
+use common_structs::message::{FileWithData, Link, ServerUUID};
 use std::collections::HashMap;
-use wg_2024::network::NodeId;
 
 impl TextServer {
     pub(super) fn init_files() -> HashMap<Link, FileWithData> {
@@ -24,7 +23,7 @@ impl TextServer {
 }
 
 #[allow(clippy::type_complexity)]
-pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
+pub const TEST_FILES: &[(&str, &[(&str, ServerUUID)], &str)] = &[
     ("File1", &[], "Content in file1"),
     ("File2", &[], "Content in file2"),
     ("File3", &[], "# Title"),
@@ -32,26 +31,21 @@ pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
     ("File5", &[], "Text"),
     (
         "Chicken",
-        &[("chicken.jpeg", 12)],
-        "![Random](chicken.jpeg) very random i guess",
-    ),
-    (
-        "Chicken 2",
-        &[("chicken.jpeg", 14)],
-        "![Random](chicken.jpeg) not my chicken",
+        &[("my-chicken.jpeg", 7)],
+        "![Random](my-chicken.jpeg) very random i guess",
     ),
     ("File Link", &[], "[LINK TO ONLINE](https://www.google.com)"),
     ("File Link Offline", &[], "[LINK TO OFFLINE](File3)"),
     (
         "Lorem random img",
-        &[("sunset.jpg", 12)],
+        &[("sunset.jpg", 7)],
         "![Hello World!](sunset.jpg)",
     ),
     ("File9asd", &[], "[File3](File3)"),
     ("File.md", &[], "# Content in file2\n## LOl\n### No\ntext\n"),
     (
         "Full Example online",
-        &[("sunset.jpg", 12), ("ferris.png", 12)],
+        &[("sunset.jpg", 7), ("ferris.png", 7)],
         r#"
 # h1 Heading 8-)
 ## h2 Heading

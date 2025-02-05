@@ -3,9 +3,10 @@ mod input;
 mod output;
 mod requests;
 
+use crate::client::backend::dns::Dns;
 use crate::client::backend::requests::RequestToNet;
 use client_bridge::RequestWrapper;
-use common_structs::message::{Link, ServerType};
+use common_structs::message::ServerType;
 use common_structs::types::Session;
 use crossbeam_channel::{select, Receiver, Sender};
 use network::NetworkOutput;
@@ -17,12 +18,12 @@ use wg_2024::network::NodeId;
 pub struct ClientBackend {
     new_session: Session,
     open_requests: HashMap<Session, RequestToNet>,
-    dns: HashMap<Link, NodeId>,
+    dns: Dns,
     close_frontend_token: CancellationToken,
     frontend_rcv: Receiver<RequestWrapper>,
     network_rcv: Receiver<NetworkOutput>,
     network_send: Sender<PacketMessage>,
-    servers: Vec<(NodeId, Option<ServerType>)>,
+    servers: HashMap<NodeId, ServerType>,
 }
 
 impl ClientBackend {
@@ -38,12 +39,12 @@ impl ClientBackend {
         Self {
             new_session: 0,
             open_requests: HashMap::default(),
-            dns: HashMap::default(),
+            dns: Dns::default(),
             close_frontend_token,
             frontend_rcv,
             network_rcv,
             network_send,
-            servers: vec![],
+            servers: HashMap::default(),
         }
     }
 

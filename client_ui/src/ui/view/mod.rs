@@ -1,4 +1,4 @@
-use crate::ui::{ClientUI, ContentState, Message};
+use crate::ui::{ClientUI, ContentState, Message, BASE_PATH};
 use iced::advanced::widget::text::Text;
 use iced::widget::markdown;
 use iced::widget::{button, column, container, row, scrollable, text, Column, Container};
@@ -92,7 +92,7 @@ impl ClientUI {
     fn markdown(content: &Vec<markdown::Item>) -> Container<Message> {
         let md = markdown::view(
             content,
-            markdown::Settings::default(),
+            markdown::Settings::with_image_path(BASE_PATH.to_string()),
             markdown::Style::from_palette(Theme::Light.palette()),
         )
         .map(Message::LinkClicked);

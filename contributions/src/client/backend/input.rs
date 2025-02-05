@@ -38,7 +38,7 @@ impl ClientBackend {
                 let mut to_wait = 0;
 
                 for (id, server_type) in self.servers.clone() {
-                    if let Some(ServerType::Text) = server_type {
+                    if let ServerType::Text(_) = server_type {
                         let part_session_id = self.fresh_session();
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
                         self.open_requests
@@ -61,7 +61,7 @@ impl ClientBackend {
                 })
             }
             GuiRequest::Get(link) => {
-                let Some(server_id) = self.get_from_dns(&link) else {
+                let Some(server_id) = self.dns.get(&link) else {
                     return Err(rq);
                 };
 
@@ -70,7 +70,7 @@ impl ClientBackend {
                 Ok(Get { rq, link })
             }
             GuiRequest::GetMedia(link) => {
-                let Some(server_id) = self.get_from_dns(&link) else {
+                let Some(server_id) = self.dns.get(&link) else {
                     return Err(rq);
                 };
 
@@ -83,8 +83,6 @@ impl ClientBackend {
 
     pub(super) fn handle_new_leaf(&mut self, node_id: NodeId, node_type: NodeType) {
         if node_type == NodeType::Server {
-            self.servers.push((node_id, None));
-
             let packet_req_type =
                 PacketMessage::new(self.fresh_session(), node_id, Message::ReqServerType);
 

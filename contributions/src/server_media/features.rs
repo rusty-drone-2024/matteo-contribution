@@ -1,15 +1,17 @@
+use std::fs::read;
+use std::path::Path;
 use super::MediaServer;
-use common_structs::message::Media;
+use common_structs::message::{Link, Media};
 
 impl MediaServer {
-    pub(crate) fn get_test_media() -> Option<Media> {
-        // TODO actual media checks
-        let url = "https://brameshtechanalysis.com/wp-content/uploads/2021/03/test.jpg";
-        let resp = attohttpc::get(url).send().ok()?;
-
-        if !resp.is_success() {
-            return None;
+    pub(crate) fn get_test_media(link: &Link) -> Option<Media> {
+        println!("CHICKEN: {link}");
+        if link == "chicken.jpeg" {
+            if let Ok(image) = read(Path::new("chicken.jpeg")){
+                return Some(image);
+            } 
+            eprintln!("Coudn't load mistic image of chicken");
         }
-        resp.bytes().ok()
+        None
     }
 }

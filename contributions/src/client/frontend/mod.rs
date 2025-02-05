@@ -33,7 +33,7 @@ impl ClientFrontend {
             return eprintln!("FATAL: Cannot initialize TCP server");
         };
 
-
+        
         let mut child = Self::run_gui(&addr);
 
 

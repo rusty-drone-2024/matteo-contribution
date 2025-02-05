@@ -1,6 +1,6 @@
 use crate::client::backend::ClientBackend;
 use client_bridge::{GuiRequest, RequestWrapper};
-use common_structs::message::Message::{ReqFile, ReqFilesList};
+use common_structs::message::Message::{ReqFile, ReqFilesList, ReqMedia};
 use common_structs::message::{Message, ServerType};
 use common_structs::types::Session;
 use network::PacketMessage;
@@ -48,6 +48,12 @@ impl ClientBackend {
             GuiRequest::Get(link) => {
                 let server_id = self.get_from_dns(&link)?;
                 let packet_msg = PacketMessage::new(session, server_id, ReqFile(link));
+                let _ = self.network_send.send(packet_msg);
+            },
+            GuiRequest::GetMedia(link) => {
+                println!("DNS {:?}", self.dns);
+                let server_id = self.get_from_dns(&link)?;
+                let packet_msg = PacketMessage::new(session, server_id, ReqMedia(link));
                 let _ = self.network_send.send(packet_msg);
             }
         }

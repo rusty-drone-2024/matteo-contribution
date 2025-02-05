@@ -8,10 +8,12 @@ serde = "1.0.217"
 serde_json = "1.0.138"
 open = "5.3.2"
 
+common_structs = { git = "https://github.com/rusty-drone-2024/common-structs.git" }
 client_bridge = { path = "../client_bridge" }
 
 [dependencies.iced]
-version = "0.13.1"
+#version = "0.13.1"
+path = "../../iced"
 default-features = false
 features = [
     "wgpu",
@@ -19,7 +21,8 @@ features = [
     "markdown",
     "highlighter",
     "advanced",
-    "tokio"
+    "tokio",
+    "image"
 ]
 
 [dependencies.tokio]

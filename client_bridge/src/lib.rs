@@ -22,6 +22,7 @@ impl From<TcpStream> for RequestWrapper {
 pub enum GuiRequest {
     ListAll,
     Get(Link),
+    GetMedia(Link),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,6 +30,5 @@ pub enum GuiResponse {
     Err404,
     ListOfAll(Vec<(NodeId, Vec<Link>)>),
     GotFile(FileWithData),
-    #[allow(dead_code)]
     GotMedia(Media),
 }

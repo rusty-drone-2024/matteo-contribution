@@ -22,7 +22,9 @@ impl ClientBackend {
                 return None;
             }
             Message::RespFile(file) => {
-                self.save_to_dns(server_id, file.file.clone());
+                for (media, node) in &file.related_data{
+                    self.save_to_dns(*node, media.clone());
+                }
                 GotFile(file)
             }
             Message::RespMedia(media) => GotMedia(media),

@@ -6,6 +6,7 @@ use iced::task::Handle;
 use iced::widget::markdown;
 
 pub use view::style::custom_theme;
+const BASE_PATH: &str = ".resources/matteo_cache";
 
 pub struct ClientUI {
     pub addr: String,

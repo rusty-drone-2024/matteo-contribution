@@ -1,4 +1,4 @@
-use crate::ui::{ClientUI, ContentState, Message};
+use crate::ui::{ClientUI, ContentState, Message, BASE_PATH};
 use client_bridge::{GuiRequest, GuiResponse};
 use common_structs::message::{FileWithData, Link, Media};
 use iced::widget::markdown;
@@ -122,9 +122,7 @@ impl ClientUI {
 
         // TODO remove hardcode (+ mkdir)
         let _ = write(
-            Path::new(&format!(
-                "/home/matteo/.cache/matteo_contribution_img/{link}"
-            )),
+            Path::new(&format!("{BASE_PATH}/{link}")),
             media,
         );
         *to_load -= 1;

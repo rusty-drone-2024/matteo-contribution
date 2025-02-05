@@ -5,6 +5,4 @@ Cargo.lock
 *.log
 
 # Test files
-*.jpeg
-*.png
-*.jpg
+/.resources/

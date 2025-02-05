@@ -14,6 +14,7 @@ client_bridge = { path = "../client_bridge" }
 [dependencies.iced]
 #git = "https://github.com/iced-rs/iced"
 git = "https://github.com/rusty-drone-2024/iced"
+#path = "../../iced"
 default-features = false
 features = [
     "wgpu",

@@ -12,8 +12,6 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
 pub struct MediaServer {
-    #[allow(dead_code)]
-    node_id: NodeId,
     network: NetworkCommunication,
 }
 
@@ -43,7 +41,6 @@ impl Leaf for MediaServer {
         ));
 
         Self {
-            node_id: id,
             network: NetworkCommunication {
                 backend: network_backend,
                 rcv: network_rcv,

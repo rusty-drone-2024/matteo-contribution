@@ -1,11 +1,11 @@
 use crate::ui::{ClientUI, ContentState, Message};
 use client_bridge::{GuiRequest, GuiResponse};
+use common_structs::message::{FileWithData, Link, Media};
+use iced::widget::markdown;
 use iced::Task;
 use std::fs::write;
 use std::path::Path;
 use std::process::exit;
-use iced::widget::markdown;
-use common_structs::message::{FileWithData, Link, Media};
 
 mod communication;
 
@@ -14,7 +14,7 @@ impl ClientUI {
         match message {
             Message::Selected(idx) => {
                 let link = self.select(idx);
-                
+
                 if let Some(link) = link {
                     let req = GuiRequest::Get(link);
                     return self.create_task(req);
@@ -29,7 +29,7 @@ impl ClientUI {
                     let _ = open::that(url.as_str());
                 } else {
                     // TODO maybe invert order check
-                    let pos = self.list.iter().position(|x| url.eq(x) );
+                    let pos = self.list.iter().position(|x| url.eq(x));
                     if let Some(pos) = pos {
                         return Task::done(Message::Selected(pos));
                     }
@@ -44,21 +44,21 @@ impl ClientUI {
         }
         Task::none()
     }
-    
+
     fn select(&mut self, idx: usize) -> Option<Link> {
-        if let ContentState::Valid {index, ..} = self.content_state{
+        if let ContentState::Valid { index, .. } = self.content_state {
             if index == idx {
                 return None;
             }
         }
-        
+
         let link = self.list.get(idx)?;
-        self.content_state = ContentState::Loading{
+        self.content_state = ContentState::Loading {
             index: idx,
             content: None,
             to_load: 1,
         };
-        
+
         Some(link.to_string())
     }
 
@@ -67,7 +67,7 @@ impl ClientUI {
             GuiResponse::Err404 => {
                 self.content_state = ContentState::Invalid;
             }
-            
+
             GuiResponse::ListOfAll(list) => {
                 let list = list.into_iter().flat_map(|(_, l)| l);
                 self.list = list.collect();
@@ -89,39 +89,54 @@ impl ClientUI {
 
         Task::none()
     }
-    
-    fn handle_got_file(&mut self, file: &FileWithData) -> Vec<Link>{
+
+    fn handle_got_file(&mut self, file: &FileWithData) -> Vec<Link> {
         // TODO Check same
-        let ContentState::Loading {index, .. } = self.content_state else {
+        let ContentState::Loading { index, .. } = self.content_state else {
             eprintln!("Received file when non waiting");
-            return vec!();
+            return vec![];
         };
-        
+
         let to_load = file.related_data.len();
         let content = markdown::parse(&file.file).collect();
-        
+
         self.content_state = if to_load > 0 {
             let content = Some(content);
-            ContentState::Loading {index, content, to_load }
+            ContentState::Loading {
+                index,
+                content,
+                to_load,
+            }
         } else {
-            ContentState::Valid {index, content}
+            ContentState::Valid { index, content }
         };
-        
+
         file.related_data.keys().cloned().collect()
     }
 
     fn handle_got_media(&mut self, media: Media) {
-        let ContentState::Loading { index, content, to_load } = &mut self.content_state else {
+        let ContentState::Loading {
+            index,
+            content,
+            to_load,
+        } = &mut self.content_state
+        else {
             return eprintln!("Received media when non waiting");
         };
-        
+
         // TODO remove hardcode (+ mkdir)
-        let _ = write(Path::new("/home/matteo/.cache/matteo_contribution_img/chicken.jpeg"), media);
+        let _ = write(
+            Path::new("/home/matteo/.cache/matteo_contribution_img/chicken.jpeg"),
+            media,
+        );
         *to_load -= 1;
         if *to_load > 0 {
             return;
         }
-        
-        self.content_state = ContentState::Valid { index: *index, content: content.clone().unwrap_or_default() }
+
+        self.content_state = ContentState::Valid {
+            index: *index,
+            content: content.clone().unwrap_or_default(),
+        }
     }
 }

@@ -24,7 +24,7 @@ pub enum ContentState {
     Loading {
         index: usize,
         content: Option<Vec<markdown::Item>>,
-        to_load: usize, 
+        to_load: usize,
     },
 }
 

@@ -1,5 +1,7 @@
 use super::MediaServer;
-use common_structs::message::Message::{ErrNotFound, ErrUnsupportedRequestType, ReqMedia, ReqServerType, RespMedia, RespServerType};
+use common_structs::message::Message::{
+    ErrNotFound, ErrUnsupportedRequestType, ReqMedia, ReqServerType, RespMedia, RespServerType,
+};
 use common_structs::message::{Message, ServerType};
 
 impl MediaServer {

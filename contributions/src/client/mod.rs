@@ -36,7 +36,7 @@ impl Leaf for TextMediaClient {
         let (network_in_send, network_in_rcv) = unbounded();
         let (network_out_send, network_out_rcv) = unbounded();
         let (frontend_send, frontend_rcv) = unbounded();
-        
+
         let cancel_token = CancellationToken::new();
 
         Self {
@@ -51,7 +51,12 @@ impl Leaf for TextMediaClient {
                     controller_send,
                     controller_recv,
                 ),
-                backend: ClientBackend::new(frontend_rcv, network_out_rcv, network_in_send, cancel_token.clone()),
+                backend: ClientBackend::new(
+                    frontend_rcv,
+                    network_out_rcv,
+                    network_in_send,
+                    cancel_token.clone(),
+                ),
                 frontend: ClientFrontend::new(id, frontend_send, cancel_token),
             }),
         }

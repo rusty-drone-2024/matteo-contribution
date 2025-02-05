@@ -1,9 +1,9 @@
 use client_bridge::RequestWrapper;
 use crossbeam_channel::Sender;
-use tokio::net::TcpListener;
 use std::process::{Child, Command};
-use wg_2024::network::NodeId;
+use tokio::net::TcpListener;
 use tokio_util::sync::CancellationToken;
+use wg_2024::network::NodeId;
 
 pub struct ClientFrontend {
     requests_channel: Sender<RequestWrapper>,
@@ -12,7 +12,11 @@ pub struct ClientFrontend {
 }
 
 impl ClientFrontend {
-    pub fn new(node_id: NodeId, requests_channel: Sender<RequestWrapper>, close_req: CancellationToken) -> Self {
+    pub fn new(
+        node_id: NodeId,
+        requests_channel: Sender<RequestWrapper>,
+        close_req: CancellationToken,
+    ) -> Self {
         Self {
             requests_channel,
             close_req,
@@ -23,23 +27,23 @@ impl ClientFrontend {
     pub fn loop_forever(&self) {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
-            .build().unwrap();
+            .build()
+            .unwrap();
 
         rt.block_on(self.handle_requests());
     }
 
-    async fn handle_requests(&self){
+    async fn handle_requests(&self) {
         let Some((server, addr)) = self.init_server().await else {
             return eprintln!("FATAL: Cannot initialize TCP server");
         };
 
-        
+        #[allow(clippy::suspicious)]
         let mut child = Self::run_gui(&addr);
 
-
-        loop{
-            tokio::select!{
-                _ = self.close_req.cancelled() => {
+        loop {
+            tokio::select! {
+                () = self.close_req.cancelled() => {
                     break;
                 }
                 Ok((stream, _)) = server.accept() => {

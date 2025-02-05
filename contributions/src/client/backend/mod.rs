@@ -76,7 +76,7 @@ impl ClientBackend {
                 },
             }
         }
-        
+
         self.close_frontend_token.cancel();
     }
 }

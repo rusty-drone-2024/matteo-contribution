@@ -7,12 +7,15 @@ impl TextServer {
     pub(super) fn init_files() -> HashMap<Link, FileWithData> {
         TEST_FILES
             .iter()
-            .map(|(title,vec_media,  file)| {
+            .map(|(title, vec_media, file)| {
                 (
                     (*title).to_string(),
                     FileWithData {
                         file: (*file).to_string(),
-                        related_data: vec_media.iter().map(|(str, id)| ((*str).to_string(), *id)).collect(),
+                        related_data: vec_media
+                            .iter()
+                            .map(|(str, id)| ((*str).to_string(), *id))
+                            .collect(),
                     },
                 )
             })
@@ -20,20 +23,32 @@ impl TextServer {
     }
 }
 
-pub const TEST_FILES: &[(&str, &[(&str, NodeId)],  &str)] = &[
+#[allow(clippy::type_complexity)]
+pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
     ("File1", &[], "Content in file1"),
     ("File2", &[], "Content in file2"),
     ("File3", &[], "# Title"),
     ("File4", &[], "## Subtitle"),
     ("File5", &[], "Text"),
-    ("Chicken", &[("chicken.jpeg", 12)], "![Random](chicken.jpeg) very random i guess"),
-    ("Chicken 2", &[("chicken.jpeg", 14)], "![Random](chicken.jpeg) not my chicken"),
+    (
+        "Chicken",
+        &[("chicken.jpeg", 12)],
+        "![Random](chicken.jpeg) very random i guess",
+    ),
+    (
+        "Chicken 2",
+        &[("chicken.jpeg", 14)],
+        "![Random](chicken.jpeg) not my chicken",
+    ),
     ("File Link", &[], "[LINK TO ONLINE](https://www.google.com)"),
     ("File Link Offline", &[], "[LINK TO OFFLINE](File3)"),
     ("Lorem random img", &[], "![Hello World!](sunset.jpg)"),
     ("File9asd", &[], "[File3](File3)"),
     ("File.md", &[], "# Content in file2\n## LOl\n### No\ntext\n"),
-    ("Full Example online", &[], r#"
+    (
+        "Full Example online",
+        &[],
+        r#"
 # h1 Heading 8-)
 ## h2 Heading
 ### h3 Heading

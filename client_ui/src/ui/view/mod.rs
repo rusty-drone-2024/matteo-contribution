@@ -1,29 +1,36 @@
 use crate::ui::{ClientUI, ContentState, Message};
 use iced::advanced::widget::text::Text;
+use iced::widget::markdown;
 use iced::widget::{button, column, container, row, scrollable, text, Column, Container};
 use iced::{Center, Color, Element, Fill, FillPortion, Theme};
 use style::btn_style;
-use iced::widget::markdown;
 
 pub mod style;
 
 impl ClientUI {
     pub fn view(&self) -> Element<Message> {
         let content: Element<Message> = match &self.content_state {
-            ContentState::Valid { content, .. } => {
-                Self::markdown(content).into()
-            }
-            ContentState::Empty => {
-                text("No selection").height(Fill).width(Fill).align_y(Center).align_x(Center).into()
-            }
-            ContentState::Invalid => {
-                text("Invalid link").height(Fill).width(Fill).align_y(Center).align_x(Center).into()
-            }
-            ContentState::Loading { .. } => {
-                text("Loading...").height(Fill).width(Fill).align_y(Center).align_x(Center).into()
-            }
+            ContentState::Valid { content, .. } => Self::markdown(content).into(),
+            ContentState::Empty => text("No selection")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
+            ContentState::Invalid => text("Invalid link")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
+            ContentState::Loading { .. } => text("Loading...")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
         };
-        
+
         row![self.sidebar(), content].height(Fill).into()
     }
 
@@ -56,12 +63,13 @@ impl ClientUI {
     }
 
     fn col_of_btn(&self) -> Column<Message> {
-        let selected= match self.content_state {
+        #[allow(clippy::match_same_arms)]
+        let selected = match self.content_state {
             ContentState::Valid { index, .. } => Some(index),
             ContentState::Loading { index, .. } => Some(index),
             _ => None,
         };
-        
+
         let btns = self
             .list
             .iter()

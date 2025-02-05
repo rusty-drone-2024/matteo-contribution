@@ -1,7 +1,7 @@
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
 
 pub async fn send_over<T: Serialize>(stream: &mut TcpStream, data: T) -> Option<()> {
     let serialized = serde_json::to_vec(&data).ok()?;

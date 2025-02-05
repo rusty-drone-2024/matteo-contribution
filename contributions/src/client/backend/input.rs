@@ -49,7 +49,7 @@ impl ClientBackend {
                 let server_id = self.get_from_dns(&link)?;
                 let packet_msg = PacketMessage::new(session, server_id, ReqFile(link));
                 let _ = self.network_send.send(packet_msg);
-            },
+            }
             GuiRequest::GetMedia(link) => {
                 println!("DNS {:?}", self.dns);
                 let server_id = self.get_from_dns(&link)?;

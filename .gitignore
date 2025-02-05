@@ -6,3 +6,5 @@ Cargo.lock
 
 # Test files
 *.jpeg
+*.png
+*.jpg

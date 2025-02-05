@@ -42,7 +42,11 @@ pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
     ),
     ("File Link", &[], "[LINK TO ONLINE](https://www.google.com)"),
     ("File Link Offline", &[], "[LINK TO OFFLINE](File3)"),
-    ("Lorem random img", &[("sunset.jpg", 12)], "![Hello World!](sunset.jpg)"),
+    (
+        "Lorem random img",
+        &[("sunset.jpg", 12)],
+        "![Hello World!](sunset.jpg)",
+    ),
     ("File9asd", &[], "[File3](File3)"),
     ("File.md", &[], "# Content in file2\n## LOl\n### No\ntext\n"),
     (

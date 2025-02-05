@@ -3,6 +3,7 @@ mod input;
 mod output;
 mod requests;
 
+use crate::client::backend::requests::RequestToNet;
 use client_bridge::RequestWrapper;
 use common_structs::message::{Link, ServerType};
 use common_structs::types::Session;
@@ -12,7 +13,6 @@ use network::PacketMessage;
 use std::collections::HashMap;
 use tokio_util::sync::CancellationToken;
 use wg_2024::network::NodeId;
-use crate::client::backend::requests::RequestToNet;
 
 pub struct ClientBackend {
     new_session: Session,

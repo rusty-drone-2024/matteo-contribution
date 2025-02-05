@@ -77,11 +77,8 @@ impl ClientUI {
             GuiResponse::GotFile(file_link, file) => {
                 let media = self.handle_got_file(file_link, &file);
 
-                return self.create_batch_task(
-                    media.into_iter().map(|link| {
-                        GuiRequest::GetMedia(link)
-                    })
-                );
+                return self
+                    .create_batch_task(media.into_iter().map(|link| GuiRequest::GetMedia(link)));
             }
             GuiResponse::GotMedia(link, media) => {
                 self.handle_got_media(&link, media);
@@ -126,7 +123,9 @@ impl ClientUI {
 
         // TODO remove hardcode (+ mkdir)
         let _ = write(
-            Path::new(&format!("/home/matteo/.cache/matteo_contribution_img/{link}")),
+            Path::new(&format!(
+                "/home/matteo/.cache/matteo_contribution_img/{link}"
+            )),
             media,
         );
         *to_load -= 1;

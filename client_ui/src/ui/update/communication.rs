@@ -1,3 +1,4 @@
+use crate::ui::Message::NetResponse;
 use crate::ui::{ClientUI, Message};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::Task;
@@ -7,7 +8,6 @@ use std::io::Error;
 use std::mem;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
-use crate::ui::Message::NetResponse;
 
 impl ClientUI {
     pub(super) fn create_task(&mut self, req: GuiRequest) -> Task<Message> {
@@ -16,8 +16,11 @@ impl ClientUI {
         self.make_abortable(task)
     }
 
-    pub(super) fn create_batch_task(&mut self, requests: impl IntoIterator<Item = GuiRequest>) -> Task<Message> {
-        let tasks = requests.into_iter().map(|req|{
+    pub(super) fn create_batch_task(
+        &mut self,
+        requests: impl IntoIterator<Item = GuiRequest>,
+    ) -> Task<Message> {
+        let tasks = requests.into_iter().map(|req| {
             let addr = self.addr.clone();
             Task::perform(communicate(addr, req), NetResponse)
         });
@@ -25,7 +28,7 @@ impl ClientUI {
         self.make_abortable(Task::batch(tasks))
     }
 
-    fn make_abortable(&mut self, task: Task<Message>) -> Task<Message>{
+    fn make_abortable(&mut self, task: Task<Message>) -> Task<Message> {
         let (task, handle) = task.abortable();
 
         let old = mem::replace(&mut self.older_task, Some(handle));

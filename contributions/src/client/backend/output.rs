@@ -1,12 +1,14 @@
+use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 use crate::client::backend::ClientBackend;
-use client_bridge::{GuiResponse, RequestWrapper};
 use client_bridge::GuiResponse::{Err404, GotFile, GotMedia, ListOfAll};
-use common_structs::message::{Link};
-use common_structs::message::Message::{RespFile, RespFilesList, RespMedia, RespServerType, ErrNotFound};
+use client_bridge::{GuiResponse, RequestWrapper};
+use common_structs::message::Link;
+use common_structs::message::Message::{
+    ErrNotFound, RespFile, RespFilesList, RespMedia, RespServerType,
+};
 use common_structs::types::Session;
 use network::PacketMessage;
 use wg_2024::network::NodeId;
-use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 
 impl ClientBackend {
     pub(super) fn handle_network_response(&mut self, packet_message: PacketMessage) -> Option<()> {
@@ -25,21 +27,21 @@ impl ClientBackend {
                 server.1 = Some(server_type);
                 return None;
             }
-            (RespFile(file), Some(Get{rq, link})) => {
+            (RespFile(file), Some(Get { rq, link })) => {
                 for (media, node) in &file.related_data {
                     self.save_to_dns(*node, media.clone());
                 }
 
                 rq.post_response(GotFile(link, file));
             }
-            (RespMedia(media), Some(Get{rq, link})) => {
+            (RespMedia(media), Some(Get { rq, link })) => {
                 rq.post_response(GotMedia(link, media));
-            },
-            (ErrNotFound, Some(Get{rq, ..})) => {
+            }
+            (ErrNotFound, Some(Get { rq, .. })) => {
                 // TODO Use better errors
                 rq.post_response(Err404);
-            },
-            (RespFilesList(list), Some(ListPartial (main_session))) => {
+            }
+            (RespFilesList(list), Some(ListPartial(main_session))) => {
                 let (rq, resp) = self.handle_resp_files_list(main_session, server_id, list)?;
                 rq.post_response(resp);
             }
@@ -57,7 +59,7 @@ impl ClientBackend {
         list: Vec<Link>,
     ) -> Option<(RequestWrapper, GuiResponse)> {
         let net_req = self.open_requests.get_mut(&main_session)?;
-        let List{ to_wait, acc, .. } = net_req else {
+        let List { to_wait, acc, .. } = net_req else {
             return None;
         };
 
@@ -71,7 +73,7 @@ impl ClientBackend {
 
         if is_finished {
             let net_req = self.open_requests.remove(&main_session)?;
-            let List{ rq, acc, .. } = net_req else {
+            let List { rq, acc, .. } = net_req else {
                 return None;
             };
             Some((rq, ListOfAll(acc)))

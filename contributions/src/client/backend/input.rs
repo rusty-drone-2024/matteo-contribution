@@ -1,3 +1,5 @@
+use crate::client::backend::requests::RequestToNet;
+use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 use crate::client::backend::ClientBackend;
 use client_bridge::{GuiRequest, RequestWrapper};
 use common_structs::message::Message::{ReqFile, ReqFilesList, ReqMedia};
@@ -6,8 +8,6 @@ use common_structs::types::Session;
 use network::PacketMessage;
 use wg_2024::network::NodeId;
 use wg_2024::packet::NodeType;
-use crate::client::backend::requests::RequestToNet;
-use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 
 impl ClientBackend {
     pub(super) fn handle_frontend_request(&mut self, rq: RequestWrapper) {
@@ -24,12 +24,16 @@ impl ClientBackend {
         };
     }
 
-    fn handle_frontend_rq_types(&mut self, session: Session, mut rq: RequestWrapper) -> Result<RequestToNet, RequestWrapper> {
+    fn handle_frontend_rq_types(
+        &mut self,
+        session: Session,
+        mut rq: RequestWrapper,
+    ) -> Result<RequestToNet, RequestWrapper> {
         let Some(request) = rq.take_request() else {
             return Err(rq);
         };
 
-        match request  {
+        match request {
             GuiRequest::ListAll => {
                 let mut to_wait = 0;
 
@@ -37,7 +41,8 @@ impl ClientBackend {
                     if let Some(ServerType::Text) = server_type {
                         let part_session_id = self.fresh_session();
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
-                        self.open_requests.insert(part_session_id, ListPartial(session));
+                        self.open_requests
+                            .insert(part_session_id, ListPartial(session));
                         let _ = self.network_send.send(packet_msg);
 
                         to_wait += 1;
@@ -52,7 +57,7 @@ impl ClientBackend {
                 Ok(List {
                     rq,
                     to_wait,
-                    acc: vec!(),
+                    acc: vec![],
                 })
             }
             GuiRequest::Get(link) => {

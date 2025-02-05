@@ -8,7 +8,7 @@ use common_structs::message::{FileWithData, Link, Message, ServerType};
 impl TextServer {
     pub(super) fn handle_message(&self, msg: Message) -> Option<Message> {
         Some(match msg {
-            ReqServerType => RespServerType(ServerType::Text),
+            ReqServerType => RespServerType(ServerType::Text(6)),
             ReqFilesList => RespFilesList(self.get_files_list()),
             ReqFile(link) => RespFile(self.get_file(&link)?),
             _ => ErrUnsupportedRequestType,

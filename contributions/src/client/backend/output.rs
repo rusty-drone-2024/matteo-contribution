@@ -2,10 +2,10 @@ use crate::client::backend::requests::RequestToNet::{Get, List, ListPartial};
 use crate::client::backend::ClientBackend;
 use client_bridge::GuiResponse::{Err404, GotFile, GotMedia, ListOfAll};
 use client_bridge::{GuiResponse, RequestWrapper};
-use common_structs::message::Link;
 use common_structs::message::Message::{
     ErrNotFound, RespFile, RespFilesList, RespMedia, RespServerType,
 };
+use common_structs::message::{Link, ServerType};
 use common_structs::types::Session;
 use network::PacketMessage;
 use wg_2024::network::NodeId;
@@ -22,14 +22,18 @@ impl ClientBackend {
 
         match (message, net_req) {
             (RespServerType(server_type), _) => {
-                let pos = self.servers.iter().position(|&(id, _)| id == server_id)?;
-                let server = self.servers.get_mut(pos)?;
-                server.1 = Some(server_type);
+                #[allow(clippy::match_same_arms)]
+                match &server_type {
+                    ServerType::Text(uuid) => self.dns.add_server(*uuid, server_id),
+                    ServerType::Media(uuid) => self.dns.add_server(*uuid, server_id),
+                    ServerType::Chat => {}
+                }
+                self.servers.insert(server_id, server_type)?;
                 return None;
             }
             (RespFile(file), Some(Get { rq, link })) => {
-                for (media, node) in &file.related_data {
-                    self.save_to_dns(*node, media.clone());
+                for (media_link, uuid) in &file.related_data {
+                    self.dns.save(media_link.clone(), *uuid);
                 }
 
                 rq.post_response(GotFile(link, file));
@@ -67,8 +71,10 @@ impl ClientBackend {
         *to_wait -= 1;
         let is_finished = *to_wait == 0;
 
+        // TODO remove unwrap
+        let uuid = self.dns.get_server_uuid(server_id).unwrap();
         for link in list {
-            self.save_to_dns(server_id, link);
+            self.dns.save(link, uuid);
         }
 
         if is_finished {

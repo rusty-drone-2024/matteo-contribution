@@ -11,8 +11,21 @@ pub struct ClientUI {
     pub addr: String,
     pub list: Vec<String>,
     pub older_task: Option<Handle>,
-    pub selected: Option<usize>,
-    pub markdown: Vec<markdown::Item>,
+    pub content_state: ContentState,
+}
+
+pub enum ContentState {
+    Empty,
+    Valid {
+        index: usize,
+        content: Vec<markdown::Item>,
+    },
+    Invalid,
+    Loading {
+        index: usize,
+        content: Option<Vec<markdown::Item>>,
+        to_load: usize,
+    },
 }
 
 impl ClientUI {
@@ -21,8 +34,7 @@ impl ClientUI {
             addr,
             list,
             older_task: None,
-            selected: None,
-            markdown: vec![],
+            content_state: ContentState::Empty,
         }
     }
 }

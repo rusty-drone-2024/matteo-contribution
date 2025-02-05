@@ -3,7 +3,12 @@ use crate::{GuiRequest, GuiResponse, RequestWrapper};
 
 impl RequestWrapper {
     pub fn take_request(&mut self) -> Option<GuiRequest> {
-        recv_over(&mut self.stream)
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .ok()?;
+
+        rt.block_on(recv_over(&mut self.stream))
     }
 
     pub fn post_err_not_found(self) -> Option<()> {
@@ -11,6 +16,11 @@ impl RequestWrapper {
     }
 
     pub fn post_response(mut self, response: GuiResponse) -> Option<()> {
-        send_over(&mut self.stream, response)
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .ok()?;
+
+        rt.block_on(send_over(&mut self.stream, response))
     }
 }

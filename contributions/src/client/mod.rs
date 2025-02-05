@@ -8,6 +8,7 @@ use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkBackend;
 use std::collections::HashMap;
 use std::thread;
+use tokio_util::sync::CancellationToken;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
@@ -36,6 +37,8 @@ impl Leaf for TextMediaClient {
         let (network_out_send, network_out_rcv) = unbounded();
         let (frontend_send, frontend_rcv) = unbounded();
 
+        let cancel_token = CancellationToken::new();
+
         Self {
             threads_data: Some(ThreadsData {
                 network_backend: NetworkBackend::new(
@@ -48,8 +51,13 @@ impl Leaf for TextMediaClient {
                     controller_send,
                     controller_recv,
                 ),
-                backend: ClientBackend::new(frontend_rcv, network_out_rcv, network_in_send),
-                frontend: ClientFrontend::new(id, frontend_send),
+                backend: ClientBackend::new(
+                    frontend_rcv,
+                    network_out_rcv,
+                    network_in_send,
+                    cancel_token.clone(),
+                ),
+                frontend: ClientFrontend::new(id, frontend_send, cancel_token),
             }),
         }
     }

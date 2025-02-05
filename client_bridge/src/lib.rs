@@ -2,7 +2,7 @@
 #![allow(clippy::must_use_candidate)]
 use common_structs::message::{FileWithData, Link, Media};
 use serde::{Deserialize, Serialize};
-use std::net::TcpStream;
+use tokio::net::TcpStream;
 use wg_2024::network::NodeId;
 
 mod io;
@@ -22,13 +22,13 @@ impl From<TcpStream> for RequestWrapper {
 pub enum GuiRequest {
     ListAll,
     Get(Link),
+    GetMedia(Link),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum GuiResponse {
     Err404,
     ListOfAll(Vec<(NodeId, Vec<Link>)>),
-    GotFile(FileWithData),
-    #[allow(dead_code)]
-    GotMedia(Media),
+    GotFile(Link, FileWithData),
+    GotMedia(Link, Media),
 }

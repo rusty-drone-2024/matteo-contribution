@@ -1,6 +1,7 @@
-use crate::ui::{ClientUI, Message};
+use crate::ui::{ClientUI, ContentState, Message};
 use iced::advanced::widget::text::Text;
-use iced::widget::{button, column, container, markdown, row, scrollable, text, Column, Container};
+use iced::widget::markdown;
+use iced::widget::{button, column, container, row, scrollable, text, Column, Container};
 use iced::{Center, Color, Element, Fill, FillPortion, Theme};
 use style::btn_style;
 
@@ -8,7 +9,29 @@ pub mod style;
 
 impl ClientUI {
     pub fn view(&self) -> Element<Message> {
-        row![self.sidebar(), self.markdown(),].height(Fill).into()
+        let content: Element<Message> = match &self.content_state {
+            ContentState::Valid { content, .. } => Self::markdown(content).into(),
+            ContentState::Empty => text("No selection")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
+            ContentState::Invalid => text("Invalid link")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
+            ContentState::Loading { .. } => text("Loading...")
+                .height(Fill)
+                .width(Fill)
+                .align_y(Center)
+                .align_x(Center)
+                .into(),
+        };
+
+        row![self.sidebar(), content].height(Fill).into()
     }
 
     fn sidebar(&self) -> Container<Message> {
@@ -40,12 +63,19 @@ impl ClientUI {
     }
 
     fn col_of_btn(&self) -> Column<Message> {
+        #[allow(clippy::match_same_arms)]
+        let selected = match self.content_state {
+            ContentState::Valid { index, .. } => Some(index),
+            ContentState::Loading { index, .. } => Some(index),
+            _ => None,
+        };
+
         let btns = self
             .list
             .iter()
             .enumerate()
             .map(|(i, name)| {
-                let selected = Some(i) == self.selected;
+                let selected = Some(i) == selected;
 
                 button(text(name))
                     .padding(9)
@@ -59,9 +89,9 @@ impl ClientUI {
         Column::from_vec(btns).spacing(6).padding(6).width(Fill)
     }
 
-    fn markdown(&self) -> Container<Message> {
+    fn markdown(content: &Vec<markdown::Item>) -> Container<Message> {
         let md = markdown::view(
-            &self.markdown,
+            content,
             markdown::Settings::default(),
             markdown::Style::from_palette(Theme::Light.palette()),
         )

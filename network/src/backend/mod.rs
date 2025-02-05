@@ -13,6 +13,7 @@ use crate::PacketMessage;
 use common_structs::leaf::{LeafCommand, LeafEvent};
 use crossbeam_channel::{select, Receiver, Sender};
 use std::collections::HashMap;
+use std::time::Duration;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
@@ -92,14 +93,17 @@ impl NetworkBackend {
                 recv(self.thread_in) -> msg => {
                     let Ok(msg) = msg else { continue; };
                     self.send_message(msg);
-                    self.flood_if_needed();
+                    self.flood_if_needed(false);
+                }
+                default(Duration::from_secs(1)) => {
+                    self.flood_if_needed(true);
                 }
             }
         }
     }
 
-    fn flood_if_needed(&mut self) {
-        if self.disassembler.require_flood() {
+    fn flood_if_needed(&mut self, aggressive: bool) {
+        if self.disassembler.require_flood(aggressive) {
             self.flood();
         }
     }

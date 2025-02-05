@@ -1,17 +1,21 @@
 use crate::TextServer;
 use common_structs::message::{FileWithData, Link};
 use std::collections::HashMap;
+use wg_2024::network::NodeId;
 
 impl TextServer {
     pub(super) fn init_files() -> HashMap<Link, FileWithData> {
         TEST_FILES
             .iter()
-            .map(|(title, file)| {
+            .map(|(title, vec_media, file)| {
                 (
                     (*title).to_string(),
                     FileWithData {
                         file: (*file).to_string(),
-                        related_data: HashMap::default(),
+                        related_data: vec_media
+                            .iter()
+                            .map(|(str, id)| ((*str).to_string(), *id))
+                            .collect(),
                     },
                 )
             })
@@ -19,19 +23,35 @@ impl TextServer {
     }
 }
 
-pub const TEST_FILES: &[(&str, &str)] = &[
-    ("File1", "Content in file1"),
-    ("File2", "Content in file2"),
-    ("File3", "# Title"),
-    ("File4", "## Subtitle"),
-    ("File5", "Text"),
-    ("File6", "Random"),
-    ("File7", "adsdaasd"),
-    ("Lorem random text", "dsads"),
-    ("File9asd", "[File3](File3)"),
-    ("File.md", "# Content in file2\n## LOl\n### No\ntext\n"),
+#[allow(clippy::type_complexity)]
+pub const TEST_FILES: &[(&str, &[(&str, NodeId)], &str)] = &[
+    ("File1", &[], "Content in file1"),
+    ("File2", &[], "Content in file2"),
+    ("File3", &[], "# Title"),
+    ("File4", &[], "## Subtitle"),
+    ("File5", &[], "Text"),
+    (
+        "Chicken",
+        &[("chicken.jpeg", 12)],
+        "![Random](chicken.jpeg) very random i guess",
+    ),
+    (
+        "Chicken 2",
+        &[("chicken.jpeg", 14)],
+        "![Random](chicken.jpeg) not my chicken",
+    ),
+    ("File Link", &[], "[LINK TO ONLINE](https://www.google.com)"),
+    ("File Link Offline", &[], "[LINK TO OFFLINE](File3)"),
+    (
+        "Lorem random img",
+        &[("sunset.jpg", 12)],
+        "![Hello World!](sunset.jpg)",
+    ),
+    ("File9asd", &[], "[File3](File3)"),
+    ("File.md", &[], "# Content in file2\n## LOl\n### No\ntext\n"),
     (
         "Full Example online",
+        &[("sunset.jpg", 12), ("ferris.png", 12)],
         r#"
 # h1 Heading 8-)
 ## h2 Heading
@@ -39,7 +59,6 @@ pub const TEST_FILES: &[(&str, &str)] = &[
 #### h4 Heading
 ##### h5 Heading
 ###### h6 Heading
-
 
 ## Horizontal Rules
 
@@ -168,16 +187,8 @@ Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
 
 ## Images
 
-![Minion](https://octodex.github.com/images/minion.png)
-![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
-
-Like links, Images also have a footnote style syntax
-
-![Alt text][id]
-
-With a reference later in the document defining the URL location:
-
-[id]: https://octodex.github.com/images/dojocat.jpg  "The Dojocat"
+![Mine Image](ferris.png)
+![Mine Image2](sunset.jpg)
 
 
 ## Plugins

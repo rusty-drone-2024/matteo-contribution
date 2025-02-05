@@ -7,7 +7,13 @@ edition = "2021"
 crossbeam-channel = "0.5.14"
 wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git", features = ["serialize"] }
 common_structs = { git = "https://github.com/rusty-drone-2024/common-structs.git" }
-attohttpc = "0.28.2"
 
 network = { path = "../network" }
 client_bridge = { path = "../client_bridge" }
+tokio-util = "0.7.13"
+
+
+[dependencies.tokio]
+version = "1.43.0"
+default-features = false
+features = ["net", "io-util", "sync", "macros"]

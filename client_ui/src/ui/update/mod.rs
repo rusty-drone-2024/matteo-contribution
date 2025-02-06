@@ -8,6 +8,7 @@ use std::path::Path;
 use std::process::exit;
 
 mod communication;
+mod command;
 
 impl ClientUI {
     pub fn update(&mut self, message: Message) -> Task<Message> {
@@ -59,6 +60,8 @@ impl ClientUI {
             content: None,
             to_load: 1,
         };
+
+        let _ = Self::delete_cache();
 
         Some(link.to_string())
     }

@@ -68,14 +68,19 @@ impl ClientFrontend {
     }
 
     fn run_gui(addr: &str) -> Child {
-        // TODO fix its use (+ is temp fix)
-
-        Command::new("cargo")
+        #[cfg(debug_assertions)]
+        return Command::new("cargo")
             .arg("run")
             .arg("--bin")
             .arg("client_ui")
             .arg(addr)
             .spawn()
-            .unwrap()
+            .expect("Coudn't open the required binary");
+
+        #[cfg(not(debug_assertions))]
+        return Command::new(".resources/client_ui")
+            .arg(addr)
+            .spawn()
+            .expect("Coudn't open the required binary");
     }
 }

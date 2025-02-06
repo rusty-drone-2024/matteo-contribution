@@ -21,7 +21,6 @@ fn test_for_routing_err_fine() {
 #[test]
 fn test_for_routing_err_unexpected() {
     let packet = new_test_fragment_packet(&[10, 30], 11);
-    // TODO check id to return
     assert_eq!(
         Some(UnexpectedRecipient(20)),
         Net::find_routing_error(20, &packet)

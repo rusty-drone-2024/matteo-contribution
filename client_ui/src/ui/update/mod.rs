@@ -30,7 +30,6 @@ impl ClientUI {
                 if url.starts_with("http") {
                     let _ = open::that(url.as_str());
                 } else {
-                    // TODO maybe invert order check
                     let pos = self.list.iter().position(|x| url.eq(x));
                     if let Some(pos) = pos {
                         return Task::done(Message::Selected(pos));
@@ -88,6 +87,7 @@ impl ClientUI {
     }
 
     fn handle_got_file(&mut self, _link: Link, file: &FileWithData) -> Vec<Link> {
+        // TODO check is the same
         let ContentState::Loading { index, .. } = self.content_state else {
             eprintln!("Received file when non waiting");
             return vec![];
@@ -111,6 +111,7 @@ impl ClientUI {
     }
 
     fn handle_got_media(&mut self, link: &Link, media: Media) {
+        // TODO check is the same
         let ContentState::Loading {
             index,
             content,
@@ -120,7 +121,6 @@ impl ClientUI {
             return eprintln!("Received media when non waiting");
         };
 
-        // TODO remove hardcode (+ mkdir)
         let _ = write(Path::new(&format!("{BASE_PATH}/{link}")), media);
         *to_load -= 1;
         if *to_load > 0 {

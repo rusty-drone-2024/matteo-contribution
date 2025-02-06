@@ -47,7 +47,6 @@ impl Connections {
 }
 
 fn new_net_handler(id: NodeId, next_id: NodeId) -> (Net, Connections) {
-    //TODO name
     let net_in = unbounded();
     let net_out = unbounded();
     let pck_in = unbounded();

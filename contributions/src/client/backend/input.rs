@@ -49,7 +49,7 @@ impl ClientBackend {
                     }
                 }
 
-                // TODO Stop assuming that is already done topology
+                // TODO Maybe send another message
                 if to_wait == 0 {
                     return Err(rq);
                 }

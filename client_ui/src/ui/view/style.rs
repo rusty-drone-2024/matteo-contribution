@@ -2,7 +2,7 @@ use iced::border::Radius;
 use iced::theme::palette::{Background, Extended, Pair, Primary, Secondary};
 use iced::theme::Palette;
 use iced::widget::button::{Status, Style};
-use iced::{Border, Color, Shadow, Theme};
+use iced::{Border, Color, Padding, Shadow, Theme};
 
 pub fn btn_style(theme: &Theme, status: Status, selected: bool) -> Style {
     let base: Style = Style {
@@ -39,6 +39,15 @@ pub fn btn_style(theme: &Theme, status: Status, selected: bool) -> Style {
             ..base
         },
         _ => Style::default(),
+    }
+}
+
+pub fn pad_xy(x: f32, y: f32) -> Padding {
+    Padding {
+        top: y,
+        right: x,
+        bottom: y,
+        left: x,
     }
 }
 

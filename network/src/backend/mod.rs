@@ -77,7 +77,7 @@ impl NetworkBackend {
             select! {
                 recv(self.controller_command) -> msg => {
                     let Ok(comm) = msg else { continue; };
-                    exit = Self::handle_command(&mut self.packets_out, comm);
+                    exit = Self::handle_command(&mut self.packets_out, &mut self.topology, comm);
                 },
                 recv(self.packet_in) -> msg => {
                     let Ok(packet) = msg else { continue; };

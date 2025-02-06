@@ -44,6 +44,7 @@ pub struct NetworkBackend {
 
 impl NetworkBackend {
     #[allow(clippy::too_many_arguments)]
+    #[must_use]
     pub fn new(
         node_id: NodeId,
         node_type: NodeType,
@@ -77,7 +78,7 @@ impl NetworkBackend {
             select! {
                 recv(self.controller_command) -> msg => {
                     let Ok(comm) = msg else { continue; };
-                    exit = Self::handle_command(&mut self.packets_out, comm);
+                    exit = Self::handle_command(&mut self.packets_out, &mut self.topology, comm);
                 },
                 recv(self.packet_in) -> msg => {
                     let Ok(packet) = msg else { continue; };

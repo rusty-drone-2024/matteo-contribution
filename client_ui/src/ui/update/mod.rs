@@ -7,6 +7,7 @@ use std::fs::write;
 use std::path::Path;
 use std::process::exit;
 
+mod command;
 mod communication;
 
 impl ClientUI {
@@ -59,6 +60,8 @@ impl ClientUI {
             content: None,
             to_load: 1,
         };
+
+        let _ = Self::delete_cache();
 
         Some(link.to_string())
     }

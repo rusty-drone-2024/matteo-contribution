@@ -1,9 +1,21 @@
-use super::{Assembler, MessageToAssemble};
-use common_structs::types::Session;
+use super::{Assembler, FragmentMalformed, MessageToAssemble};
+use common_structs::types::{FragmentIdx, Session};
 use wg_2024::packet::Fragment;
 
 impl Assembler {
-    pub fn add_fragment(&mut self, session: Session, fragment: Fragment) -> bool {
+    /// Add the `fragment` to the pile that need to be assembled.
+    /// If the group with the given `session_id` doesn't exist than
+    /// it is created.
+    /// # Return
+    /// In case of success it return wheter the fragment was cleanly inserted
+    /// or wheter it is was already received.
+    /// # Errors
+    /// If the message was not correctly fragmented on the other side.
+    pub fn merge_fragment(
+        &mut self,
+        session: Session,
+        fragment: Fragment,
+    ) -> Result<bool, FragmentMalformed> {
         let total = fragment.total_n_fragments;
 
         let to_assemble = self
@@ -11,20 +23,28 @@ impl Assembler {
             .entry(session)
             .or_insert_with(|| MessageToAssemble::new(total));
 
-        if Assembler::is_valid_fragment_index(
-            fragment.fragment_index,
-            total,
-            to_assemble.pieces_number,
-        ) {
-            return to_assemble
-                .pieces
-                .insert(fragment.fragment_index, fragment)
-                .is_none();
+        let is_valid =
+            Assembler::is_valid_index(fragment.fragment_index, total, to_assemble.pieces_number);
+        if !is_valid {
+            return Err(FragmentMalformed {});
         }
-        false
+
+        Ok(to_assemble
+            .pieces
+            .insert(fragment.fragment_index, fragment)
+            .is_none())
     }
 
-    pub fn is_valid_fragment_index(index: u64, total: u64, pieces_number: u64) -> bool {
-        index < total && total == pieces_number
+    /// Check wheter the index are valid of not. To be valid the `expected_total`
+    /// should be the same as the `total` in the new packet, and the `index` should be
+    /// between 0 <= `index` < `total`.
+    /// # Return
+    /// True if valid and false else.
+    pub(super) fn is_valid_index(
+        index: FragmentIdx,
+        total: FragmentIdx,
+        expected_total: FragmentIdx,
+    ) -> bool {
+        index < total && total == expected_total
     }
 }

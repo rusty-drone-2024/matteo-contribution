@@ -1,5 +1,5 @@
 use client_bridge::RequestWrapper;
-use common_structs::message::Link;
+use common_structs::message::{Link, ServerUUID};
 use common_structs::types::Session;
 use wg_2024::network::NodeId;
 
@@ -13,5 +13,8 @@ pub enum RequestToNet {
         rq: RequestWrapper,
         link: Link,
     },
-    ListPartial(Session),
+    ListPartial {
+        session: Session,
+        uuid: ServerUUID,
+    },
 }

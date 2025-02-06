@@ -9,11 +9,7 @@ impl MediaServer {
     pub(crate) fn get_test_media(link: &Link) -> Option<Media> {
         let link = &format!("{IMAGE_PATH}/{link}");
 
-        if let Ok(image) = read(Path::new(link)) {
-            return Some(image);
-        }
-
-        eprintln!("Coudn't load mistic image of {link}");
-        None
+        // TODO println in case of no folder (or empty) -> just do hard check
+        read(Path::new(link)).ok()
     }
 }

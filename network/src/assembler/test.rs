@@ -5,7 +5,7 @@ use common_structs::message::Message;
 #[test]
 fn missing_session() {
     let mut assembler = Assembler::default();
-    assert!(assembler.get_full_message(11).is_none());
+    assert!(assembler.take_full_message(11).is_none());
 }
 
 #[test]
@@ -21,10 +21,10 @@ fn assemble_msg() {
 
     for f in fragments {
         assert!(
-            assembler.get_full_message(11).is_none(),
+            assembler.take_full_message(11).is_none(),
             "Message shouldn't be ready yet"
         );
-        assembler.add_fragment(11, f);
+        assert_eq!(Ok(true), assembler.merge_fragment(11, f));
     }
-    assert_eq!(Some(msg), assembler.get_full_message(11));
+    assert_eq!(Some(msg), assembler.take_full_message(11));
 }

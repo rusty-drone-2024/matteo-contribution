@@ -75,12 +75,12 @@ impl ClientFrontend {
             .arg("client_ui")
             .arg(addr)
             .spawn()
-            .expect("Coudn't open the required binary");
+            .expect("Couldn't open the required binary");
 
         #[cfg(not(debug_assertions))]
         return Command::new(".resources/client_ui")
             .arg(addr)
             .spawn()
-            .expect("Coudn't open the required binary");
+            .expect("Couldn't open the required binary");
     }
 }

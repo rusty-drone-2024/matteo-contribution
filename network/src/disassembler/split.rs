@@ -82,7 +82,7 @@ impl Split {
             .map_err(|_| "Exiting range of Vec (problem of protocol)".to_string())?;
         self.pieces
             .get(index)
-            .ok_or("Coundn't find fragment of message".to_string())
+            .ok_or("Couldn't find fragment of message".to_string())
     }
 
     fn get_mut_piece(&mut self, fragment_idx: FragmentIdx) -> Result<&mut FragmentInfo, String> {
@@ -90,6 +90,6 @@ impl Split {
             .map_err(|_| "Exiting range of Vec (problem of protocol)")?;
         self.pieces
             .get_mut(index)
-            .ok_or("Coundn't find fragment of message".to_string())
+            .ok_or("Couldn't find fragment of message".to_string())
     }
 }

@@ -12,7 +12,9 @@ impl NetworkBackend {
         source: NodeId,
         fragment: Fragment,
     ) {
-        let Some(message) = self.assembler.merge_fragment(session, fragment) else {
+        let _ = self.assembler.merge_fragment(session, fragment);
+
+        let Some(message) = self.assembler.take_full_message(session) else {
             return; // Packet not ready yet
         };
 

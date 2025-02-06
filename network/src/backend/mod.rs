@@ -44,6 +44,7 @@ pub struct NetworkBackend {
 
 impl NetworkBackend {
     #[allow(clippy::too_many_arguments)]
+    #[must_use]
     pub fn new(
         node_id: NodeId,
         node_type: NodeType,

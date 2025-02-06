@@ -14,7 +14,7 @@ pub fn main() {
     let title = "Matteo Text & Media Client";
     let theme = custom_theme();
     let initial_task = Task::done(Message::Refresh);
-    let initialization = || (ClientUI::new(addr, vec![]), initial_task);
+    let initialization = || (ClientUI::new(addr), initial_task);
 
     let _ = iced::application(title, ClientUI::update, ClientUI::view)
         .theme(move |_| theme.clone())

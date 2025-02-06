@@ -36,7 +36,7 @@ fn main() {
     net.create_and_run_leaf::<SamText>(13).unwrap();
     net.create_and_run_leaf::<SamMedia>(14).unwrap();
     net.create_and_run_leaf::<SamChat>(15).unwrap();
-    // TODO fix need to do after for temp problem
+    // Need to be after
     net.create_and_run_leaf::<TextMediaClient>(0).unwrap();
 
     loop {

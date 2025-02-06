@@ -5,7 +5,7 @@ use client_bridge::{GuiResponse, RequestWrapper};
 use common_structs::message::Message::{
     ErrNotFound, RespFile, RespFilesList, RespMedia, RespServerType,
 };
-use common_structs::message::{Link, ServerType};
+use common_structs::message::{Link, ServerType, ServerUUID};
 use common_structs::types::Session;
 use network::PacketMessage;
 use wg_2024::network::NodeId;
@@ -44,8 +44,8 @@ impl ClientBackend {
             (ErrNotFound, Some(Get { rq, .. })) => {
                 rq.post_response(Err404);
             }
-            (RespFilesList(list), Some(ListPartial(main_session))) => {
-                let (rq, resp) = self.handle_resp_files_list(main_session, server_id, list)?;
+            (RespFilesList(list), Some(ListPartial{session, uuid})) => {
+                let (rq, resp) = self.handle_resp_files_list(session, server_id, uuid, list)?;
                 rq.post_response(resp);
             }
             (_, _) => {
@@ -59,6 +59,7 @@ impl ClientBackend {
         &mut self,
         main_session: Session,
         server_id: NodeId,
+        uuid: ServerUUID,
         list: Vec<Link>,
     ) -> Option<(RequestWrapper, GuiResponse)> {
         let net_req = self.open_requests.get_mut(&main_session)?;
@@ -70,8 +71,6 @@ impl ClientBackend {
         *to_wait -= 1;
         let is_finished = *to_wait == 0;
 
-        // TODO remove unwrap
-        let uuid = self.dns.get_server_uuid(server_id).unwrap_or_default();
         for link in list {
             self.dns.save(link, uuid);
         }

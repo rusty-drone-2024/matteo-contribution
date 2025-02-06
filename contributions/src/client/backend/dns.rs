@@ -21,14 +21,4 @@ impl Dns {
         let uuid = self.file_to_uuid.get(link)?;
         self.servers.get(uuid).copied()
     }
-
-    pub(crate) fn get_server_uuid(&self, node_id: NodeId) -> Option<ServerUUID> {
-        // TODO in favor of safer ways (so no unwap)
-        self.servers.iter().find_map(|(uuid, id)| {
-            if *id == node_id {
-                return Some(*uuid);
-            }
-            None
-        })
-    }
 }

@@ -38,11 +38,11 @@ impl ClientBackend {
                 let mut to_wait = 0;
 
                 for (id, server_type) in self.servers.clone() {
-                    if let ServerType::Text(_) = server_type {
+                    if let ServerType::Text(uuid) = server_type {
                         let part_session_id = self.fresh_session();
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
                         self.open_requests
-                            .insert(part_session_id, ListPartial(session));
+                            .insert(part_session_id, ListPartial{session, uuid});
                         let _ = self.network_send.send(packet_msg);
 
                         to_wait += 1;

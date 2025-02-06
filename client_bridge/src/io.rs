@@ -2,10 +2,10 @@ use crate::send::{recv_over, send_over, BridgeRecvError, BridgeSendError};
 use crate::{GuiRequest, GuiResponse, RequestWrapper};
 
 impl RequestWrapper {
-    /// Get the request from the underlaying implementation
+    /// Get the request from the underlying implementation
     /// It is a blocking call.
     /// # Return
-    /// Return Ok(GuiRequest) if succeded to obtain the request.
+    /// Return Ok(GuiRequest) if succeeded to obtain the request.
     /// # Errors
     /// Return a `BridgeRecvError` based on the problem that occurred.
     /// # Panics
@@ -21,7 +21,7 @@ impl RequestWrapper {
 
     /// Use `post_response` to respond to the frontend with an `GuiResponse::Err404`
     /// # Return
-    /// Return Ok(()) if succeded to obtain the request.
+    /// Return Ok(()) if succeeded to obtain the request.
     /// # Errors
     /// Return a `BridgeSendError` based on the problem that occurred.
     /// # Panics
@@ -33,7 +33,7 @@ impl RequestWrapper {
     /// Send to the frontend the passed response.
     /// It is a blocking call.
     /// # Return
-    /// Return Ok(()) if succeded to obtain the request.
+    /// Return Ok(()) if succeeded to obtain the request.
     /// # Errors
     /// Return a `BridgeSendError` based on the problem that occurred.
     /// # Panics

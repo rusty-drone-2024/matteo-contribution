@@ -62,6 +62,6 @@ pub enum BridgeRecvError {
 pub enum BridgeSendError {
     /// IO error while trying to write.
     IoError,
-    /// The data coudn't be parsed. Possible an internal bug.
+    /// The data couldn't be parsed. Possible an internal bug.
     ParseFailure,
 }

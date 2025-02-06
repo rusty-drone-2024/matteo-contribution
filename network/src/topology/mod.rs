@@ -12,7 +12,7 @@ use wg_2024::network::NodeId;
 pub type Weight = u8;
 
 /// Represent the topology using a directed graph
-/// to avoid passing throught the client and use
+/// to avoid passing thought the client and use
 /// weight to estimate the drop rate.
 /// Also keep track of `flood_id`.
 pub struct Topology {

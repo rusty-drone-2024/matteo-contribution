@@ -36,7 +36,7 @@ fn inverse_path_fail() {
 }
 
 #[test]
-fn last_hop_undirectional() {
+fn last_hop_not_directional() {
     let mut topology = Topology::new(11);
     let path1 = vec![11, 1, 2, 3, 4, 5, 7, 9];
     let path2 = vec![11, 8];
@@ -79,7 +79,7 @@ fn remove_node() {
 }
 
 #[test]
-fn readd_node() {
+fn re_add_node() {
     let mut topology = Topology::new(11);
     let path = vec![11, 1, 2, 3];
 

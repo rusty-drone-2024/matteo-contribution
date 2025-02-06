@@ -3,7 +3,7 @@ use wg_2024::network::NodeId;
 use wg_2024::packet::{FloodResponse, NodeType};
 
 impl Topology {
-    /// Add the information containted in a `FloodResponse` to the topology,
+    /// Add the information contained in a `FloodResponse` to the topology,
     /// only if it has the current `flood_id` else it ignores it,
     /// adjusting the understanding by adding the nodes and edges required.
     /// The path must be a valid path starting with this node id.
@@ -29,7 +29,7 @@ impl Topology {
         Some((id, node_type))
     }
 
-    /// Add the information containted in the `path` to the topology,
+    /// Add the information contained in the `path` to the topology,
     /// adjusting the understanding by adding the nodes and edges required.
     /// The path must be a valid path starting with this node id.
     /// # Return
@@ -67,7 +67,7 @@ impl Topology {
         self.update_weight(to_mark, false);
     }
 
-    /// Update a `Weight` of a node by increasing or decrising based on the
+    /// Update a `Weight` of a node by increasing or decreasing based on the
     /// `positive` flag. If this flag is set the `weight` is decreased in order
     /// to make it more likely to be picked in the future.
     pub(super) fn update_weight(&mut self, node: NodeId, positive: bool) {

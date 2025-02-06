@@ -1,8 +1,8 @@
 use crate::backend::test::Net;
+use crate::topology::Topology;
 use common_structs::leaf::LeafCommand::{AddSender, Kill, RemoveSender};
 use crossbeam_channel::unbounded;
 use std::collections::HashMap;
-use crate::topology::Topology;
 
 #[test]
 fn test_command_kill() {

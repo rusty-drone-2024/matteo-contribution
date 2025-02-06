@@ -9,14 +9,20 @@ use tokio::net::TcpStream;
 /// The `Ok(())` if it successfully written the data to the stream.
 /// # Errors
 /// Return a `BridgeSendError` based on the problem that occurred.
-pub async fn send_over<T: Serialize>(stream: &mut TcpStream, data: T) -> Result<(), BridgeSendError> {
-    let serialized = serde_json::to_vec(&data)
-        .map_err(|_| BridgeSendError::ParseFailure)?;
+pub async fn send_over<T: Serialize>(
+    stream: &mut TcpStream,
+    data: T,
+) -> Result<(), BridgeSendError> {
+    let serialized = serde_json::to_vec(&data).map_err(|_| BridgeSendError::ParseFailure)?;
     let len = serialized.len();
 
-    stream.write_all(&len.to_le_bytes()).await
+    stream
+        .write_all(&len.to_le_bytes())
+        .await
         .map_err(|_| BridgeSendError::IoError)?;
-    stream.write_all(&serialized).await
+    stream
+        .write_all(&serialized)
+        .await
         .map_err(|_| BridgeSendError::IoError)
 }
 
@@ -28,31 +34,34 @@ pub async fn send_over<T: Serialize>(stream: &mut TcpStream, data: T) -> Result<
 /// Return a `BridgeRecvError` based on the problem that occurred.
 pub async fn recv_over<T: DeserializeOwned>(stream: &mut TcpStream) -> Result<T, BridgeRecvError> {
     let mut len = [0u8; size_of::<usize>()];
-    stream.read_exact(&mut len).await
+    stream
+        .read_exact(&mut len)
+        .await
         .map_err(|_| BridgeRecvError::NotEnoughBytes)?;
 
     let len = usize::from_le_bytes(len);
     let mut vec = vec![0u8; len];
-    stream.read_exact(&mut vec).await
+    stream
+        .read_exact(&mut vec)
+        .await
         .map_err(|_| BridgeRecvError::NotEnoughBytes)?;
 
-    serde_json::from_slice(&vec)
-        .map_err(|_| BridgeRecvError::Unparsable)
+    serde_json::from_slice(&vec).map_err(|_| BridgeRecvError::Unparsable)
 }
 
 /// Error that the bridge can encounter during reading
-pub enum BridgeRecvError{
+pub enum BridgeRecvError {
     /// Stream was closed (EOF found) before full message written
     NotEnoughBytes,
     /// The data found has right size but it is not in json
     /// or does not represent the right object.
-    Unparsable
+    Unparsable,
 }
 
 /// Error that the bridge can encounter during writing
-pub enum BridgeSendError{
+pub enum BridgeSendError {
     /// IO error while trying to write.
     IoError,
     /// The data coudn't be parsed. Possible an internal bug.
-    ParseFailure
+    ParseFailure,
 }

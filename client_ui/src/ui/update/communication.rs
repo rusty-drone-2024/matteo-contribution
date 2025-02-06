@@ -1,10 +1,10 @@
 use crate::ui::Message::NetResponse;
 use crate::ui::{ClientUI, Message};
+use client_bridge::send::{recv_over, send_over};
 use client_bridge::{GuiRequest, GuiResponse};
 use iced::Task;
 use std::mem;
 use tokio::net::TcpStream;
-use client_bridge::send::{recv_over, send_over};
 
 impl ClientUI {
     pub(super) fn create_task(&mut self, req: GuiRequest) -> Task<Message> {

@@ -13,7 +13,7 @@ pub enum RequestToNet {
         rq: RequestWrapper,
         link: Link,
     },
-    ListPartial{
+    ListPartial {
         session: Session,
         uuid: ServerUUID,
     },

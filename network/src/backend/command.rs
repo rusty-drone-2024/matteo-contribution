@@ -1,11 +1,11 @@
 use crate::backend::NetworkBackend;
+use crate::topology::Topology;
 use common_structs::leaf::LeafCommand;
 use common_structs::leaf::LeafCommand::{AddSender, Kill, RemoveSender};
 use crossbeam_channel::Sender;
 use std::collections::HashMap;
 use wg_2024::network::NodeId;
 use wg_2024::packet::Packet;
-use crate::topology::Topology;
 
 impl NetworkBackend {
     pub(super) fn handle_command(

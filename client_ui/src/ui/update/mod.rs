@@ -7,8 +7,8 @@ use std::fs::write;
 use std::path::Path;
 use std::process::exit;
 
-mod communication;
 mod command;
+mod communication;
 
 impl ClientUI {
     pub fn update(&mut self, message: Message) -> Task<Message> {

@@ -44,7 +44,7 @@ impl ClientBackend {
             (ErrNotFound, Some(Get { rq, .. })) => {
                 let _ = rq.post_response(Err404);
             }
-            (RespFilesList(list), Some(ListPartial{session, uuid})) => {
+            (RespFilesList(list), Some(ListPartial { session, uuid })) => {
                 let (rq, resp) = self.handle_resp_files_list(session, server_id, uuid, list)?;
                 let _ = rq.post_response(resp);
             }

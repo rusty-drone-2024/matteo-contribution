@@ -36,17 +36,17 @@ impl ClientBackend {
                     self.dns.save(media_link.clone(), *uuid);
                 }
 
-                rq.post_response(GotFile(link, file));
+                let _ = rq.post_response(GotFile(link, file));
             }
             (RespMedia(media), Some(Get { rq, link })) => {
-                rq.post_response(GotMedia(link, media));
+                let _ = rq.post_response(GotMedia(link, media));
             }
             (ErrNotFound, Some(Get { rq, .. })) => {
-                rq.post_response(Err404);
+                let _ = rq.post_response(Err404);
             }
             (RespFilesList(list), Some(ListPartial{session, uuid})) => {
                 let (rq, resp) = self.handle_resp_files_list(session, server_id, uuid, list)?;
-                rq.post_response(resp);
+                let _ = rq.post_response(resp);
             }
             (_, _) => {
                 return None;

@@ -19,7 +19,7 @@ impl ClientBackend {
                 self.open_requests.insert(session, net_req);
             }
             Err(rq) => {
-                rq.post_err_not_found();
+                let _ = rq.post_err_not_found();
             }
         };
     }
@@ -29,7 +29,7 @@ impl ClientBackend {
         session: Session,
         mut rq: RequestWrapper,
     ) -> Result<RequestToNet, RequestWrapper> {
-        let Some(request) = rq.take_request() else {
+        let Ok(request) = rq.take_request() else {
             return Err(rq);
         };
 

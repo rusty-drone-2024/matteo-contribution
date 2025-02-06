@@ -12,7 +12,10 @@ impl Topology {
     /// Only a single leaf can be return at max as no path can pass through a client.
     #[must_use]
     pub fn add_flood_response(&mut self, flood_res: FloodResponse) -> Option<(NodeId, NodeType)> {
-        let FloodResponse { flood_id, path_trace }= flood_res;
+        let FloodResponse {
+            flood_id,
+            path_trace,
+        } = flood_res;
         if flood_id != self.current_flood_id {
             return None;
         }

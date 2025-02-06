@@ -36,7 +36,7 @@ impl Topology {
     }
 
     /// Get a new fresh `flood_id`. Doing so invalidate the old one making
-    /// it so that all `FloodResponse` received after this call that have 
+    /// it so that all `FloodResponse` received after this call that have
     /// older `flood_id` will be ignored.
     #[must_use]
     pub fn take_fresh_flood_id(&mut self) -> u64 {

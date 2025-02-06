@@ -26,8 +26,9 @@ impl Topology {
             |finish| finish == to,
             edge_cost,
             |_| 0,
-        )?.1;
-        
+        )?
+        .1;
+
         self.age_path(&path);
 
         Some(Routing::new(path, 1))
@@ -35,8 +36,8 @@ impl Topology {
 
     /// Age the path, the pdr estimation is decreased for each of the node
     /// in the chain clamped at 0.
-    //TODO Test
-    pub(super) fn age_path(&mut self, path: &[NodeId]){
+    //TODO Test expecially if it is too strong (or probably too weak)
+    pub(super) fn age_path(&mut self, path: &[NodeId]) {
         for node in path {
             self.update_weight(*node, true);
         }

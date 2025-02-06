@@ -42,7 +42,6 @@ impl ClientBackend {
                 rq.post_response(GotMedia(link, media));
             }
             (ErrNotFound, Some(Get { rq, .. })) => {
-                // TODO Use better errors
                 rq.post_response(Err404);
             }
             (RespFilesList(list), Some(ListPartial(main_session))) => {
@@ -72,7 +71,7 @@ impl ClientBackend {
         let is_finished = *to_wait == 0;
 
         // TODO remove unwrap
-        let uuid = self.dns.get_server_uuid(server_id).unwrap();
+        let uuid = self.dns.get_server_uuid(server_id).unwrap_or_default();
         for link in list {
             self.dns.save(link, uuid);
         }

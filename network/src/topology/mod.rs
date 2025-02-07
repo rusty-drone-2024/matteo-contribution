@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 mod editing;
 mod test;
 mod traversing;
@@ -19,7 +18,7 @@ pub struct Topology {
     start_id: NodeId,
     current_flood_id: u64,
     graph: DiGraphMap<NodeId, ()>,
-    weights: HashMap<NodeId, u8>,
+    weights: HashMap<NodeId, Weight>,
 }
 
 impl Topology {

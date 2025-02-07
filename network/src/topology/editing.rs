@@ -1,4 +1,4 @@
-use crate::topology::Topology;
+use crate::topology::{Topology, Weight};
 use wg_2024::network::NodeId;
 use wg_2024::packet::{FloodResponse, NodeType};
 
@@ -82,6 +82,6 @@ impl Topology {
         let weight = self.weights.entry(node).or_default();
         let new_weight = (u64::from(*weight) * (MEM_LEN - 1) + new_res) / MEM_LEN;
 
-        *weight = u8::try_from(new_weight).unwrap_or(0);
+        *weight = Weight::try_from(new_weight).unwrap_or(0);
     }
 }

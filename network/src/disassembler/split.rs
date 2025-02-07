@@ -101,7 +101,7 @@ impl Split {
         res
     }
 
-    /// Getter of all fragments
+    /// Getter of all fragments (not in order)
     /// # Return
     /// All the fragments (waiting and not, acked and not)
     pub(super) fn fragments(&self) -> Vec<Fragment> {

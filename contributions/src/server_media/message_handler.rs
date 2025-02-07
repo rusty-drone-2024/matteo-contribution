@@ -23,7 +23,7 @@ impl MediaServer {
             }
         }
 
-        let link = &format!("{IMAGE_PATH}/{link}");
+        let link = &format!(".resources/img_matteo/{link}");
         let Ok(media) = read(Path::new(link)) else {
             eprintln!("Images of Matteo Media Server are missing");
             return None;

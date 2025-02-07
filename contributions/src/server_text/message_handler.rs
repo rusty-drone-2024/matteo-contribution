@@ -7,7 +7,7 @@ use common_structs::message::{FileWithData, Link, ServerType};
 use network::PacketMessage;
 
 impl TextServer {
-    pub(super) fn handle_message(&self, packet_msg: PacketMessage) -> Option<PacketMessage> {
+    pub(super) fn handle_message(&self, packet_msg: PacketMessage) -> PacketMessage {
         let PacketMessage {
             session,
             opposite_end,
@@ -21,7 +21,7 @@ impl TextServer {
             _ => ErrUnsupportedRequestType,
         };
 
-        Some(PacketMessage::new(session, opposite_end, response))
+        PacketMessage::new(session, opposite_end, response)
     }
 
     fn get_files_list(&self) -> Vec<Link> {

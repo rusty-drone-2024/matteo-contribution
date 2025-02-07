@@ -5,7 +5,6 @@ use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::{FileWithData, Link};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkOutput::MsgReceived;
-use network::PacketMessage;
 use network::{NetworkBackend, NetworkCommunication};
 use std::collections::HashMap;
 use std::thread;
@@ -63,7 +62,7 @@ impl Leaf for TextServer {
             };
 
             let response = self.handle_message(packet_msg);
-            self.net.sender.send(response)
+            let _ = self.net.sender.send(response);
         }
     }
 }

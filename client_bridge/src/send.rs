@@ -32,7 +32,9 @@ pub async fn send_over<T: Send + Serialize>(
 /// The `Ok(t: T)` if it successfully read the data from the stream.
 /// # Errors
 /// Return a `BridgeRecvError` based on the problem that occurred.
-pub async fn recv_over<T: Send + DeserializeOwned>(stream: &mut TcpStream) -> Result<T, BridgeRecvError> {
+pub async fn recv_over<T: Send + DeserializeOwned>(
+    stream: &mut TcpStream,
+) -> Result<T, BridgeRecvError> {
     let mut len = [0u8; size_of::<usize>()];
     stream
         .read_exact(&mut len)

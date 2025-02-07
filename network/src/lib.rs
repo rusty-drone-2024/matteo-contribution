@@ -1,4 +1,8 @@
 #![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![warn(clippy::cargo)]
+#![allow(clippy::cargo_common_metadata)]
+//! A backend network handler used by my three contributions.
 use common_structs::message::Message;
 use common_structs::types::Session;
 use wg_2024::network::NodeId;
@@ -22,7 +26,7 @@ pub struct PacketMessage {
 
 impl PacketMessage {
     #[must_use]
-    pub fn new(session: Session, opposite_end: NodeId, message: Message) -> Self {
+    pub const fn new(session: Session, opposite_end: NodeId, message: Message) -> Self {
         Self {
             session,
             opposite_end,

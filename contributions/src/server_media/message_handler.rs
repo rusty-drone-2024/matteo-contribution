@@ -9,11 +9,7 @@ impl MediaServer {
         match message {
             ReqServerType => RespServerType(ServerType::Media(7)),
             ReqMedia(link) => {
-                if let Some(media) = Self::get_test_media(&link) {
-                    RespMedia(media)
-                } else {
-                    ErrNotFound
-                }
+                Self::get_test_media(&link).map_or(ErrNotFound, RespMedia)
             }
             _ => ErrUnsupportedRequestType,
         }

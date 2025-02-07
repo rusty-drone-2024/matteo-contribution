@@ -12,7 +12,7 @@ pub struct ClientFrontend {
 }
 
 impl ClientFrontend {
-    pub fn new(
+    pub const fn new(
         node_id: NodeId,
         requests_channel: Sender<RequestWrapper>,
         close_req: CancellationToken,

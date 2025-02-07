@@ -30,7 +30,7 @@ pub enum ContentState {
 }
 
 impl ClientUI {
-    pub fn new(addr: String) -> Self {
+    pub const fn new(addr: String) -> Self {
         Self {
             addr,
             list: vec![],

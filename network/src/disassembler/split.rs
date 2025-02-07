@@ -39,7 +39,7 @@ impl Split {
     /// Getter of destination
     /// # Return
     /// The destination of the message
-    pub fn destination(&self) -> NodeId {
+    pub const fn destination(&self) -> NodeId {
         self.destination
     }
 

@@ -30,7 +30,7 @@ impl FragmentInfo {
     /// Getter method for fragment
     /// # Return
     /// The fragment in question
-    pub(super) fn fragment(&self) -> &Fragment {
+    pub(super) const fn fragment(&self) -> &Fragment {
         &self.fragment
     }
 }

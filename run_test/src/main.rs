@@ -1,4 +1,9 @@
 #![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![warn(clippy::cargo)]
+#![allow(clippy::cargo_common_metadata)]
+#![allow(clippy::multiple_crate_versions)]
+//! A small example topology for internal manual tests.
 use matteo_contribution::{MediaServer, TextMediaClient, TextServer};
 use rusty_drones::RustyDrone;
 use rusty_drones_servers::ChatServer as SamChat;

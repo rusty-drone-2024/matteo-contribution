@@ -1,4 +1,9 @@
 #![warn(clippy::pedantic)]
+#![warn(clippy::nursery)]
+#![warn(clippy::cargo)]
+#![allow(clippy::cargo_common_metadata)]
+//! Crate use to bridge communication between client frontend and backend
+
 use common_structs::message::{FileWithData, Link, Media};
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpStream;

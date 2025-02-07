@@ -24,8 +24,8 @@ pub enum NetworkOutput {
 
 pub struct NetworkCommunication {
     pub backend: Option<NetworkBackend>,
-    pub rcv: Receiver<NetworkOutput>,
-    pub send: Sender<PacketMessage>,
+    pub receiver: Receiver<NetworkOutput>,
+    pub sender: Sender<PacketMessage>,
 }
 
 pub struct NetworkBackend {

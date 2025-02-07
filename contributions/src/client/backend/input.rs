@@ -43,7 +43,7 @@ impl ClientBackend {
                         let packet_msg = PacketMessage::new(part_session_id, id, ReqFilesList);
                         self.open_requests
                             .insert(part_session_id, ListPartial { session, uuid });
-                        let _ = self.network_send.send(packet_msg);
+                        let _ = self.net.sender.send(packet_msg);
 
                         to_wait += 1;
                     }
@@ -66,7 +66,7 @@ impl ClientBackend {
                 };
 
                 let packet_msg = PacketMessage::new(session, server_id, ReqFile(link.clone()));
-                let _ = self.network_send.send(packet_msg);
+                let _ = self.net.sender.send(packet_msg);
                 Ok(Get { rq, link })
             }
             GuiRequest::GetMedia(link) => {
@@ -75,7 +75,7 @@ impl ClientBackend {
                 };
 
                 let packet_msg = PacketMessage::new(session, server_id, ReqMedia(link.clone()));
-                let _ = self.network_send.send(packet_msg);
+                let _ = self.net.sender.send(packet_msg);
                 Ok(Get { rq, link })
             }
         }
@@ -86,7 +86,7 @@ impl ClientBackend {
             let packet_req_type =
                 PacketMessage::new(self.fresh_session(), node_id, Message::ReqServerType);
 
-            let _ = self.network_send.send(packet_req_type);
+            let _ = self.net.sender.send(packet_req_type);
         }
     }
 

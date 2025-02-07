@@ -1,18 +1,27 @@
 use super::TextServer;
 use common_structs::message::Message::{
-    ErrUnsupportedRequestType, ReqFile, ReqFilesList, ReqServerType, RespFile, RespFilesList,
-    RespServerType,
+    ErrNotFound, ErrUnsupportedRequestType, ReqFile, ReqFilesList, ReqServerType, RespFile,
+    RespFilesList, RespServerType,
 };
-use common_structs::message::{FileWithData, Link, Message, ServerType};
+use common_structs::message::{FileWithData, Link, ServerType};
+use network::PacketMessage;
 
 impl TextServer {
-    pub(super) fn handle_message(&self, msg: Message) -> Option<Message> {
-        Some(match msg {
+    pub(super) fn handle_message(&self, packet_msg: PacketMessage) -> Option<PacketMessage> {
+        let PacketMessage {
+            session,
+            opposite_end,
+            message,
+        } = packet_msg;
+
+        let response = match message {
             ReqServerType => RespServerType(ServerType::Text(6)),
             ReqFilesList => RespFilesList(self.get_files_list()),
-            ReqFile(link) => RespFile(self.get_file(&link)?),
+            ReqFile(link) => self.get_file(&link).map_or(ErrNotFound, RespFile),
             _ => ErrUnsupportedRequestType,
-        })
+        };
+
+        Some(PacketMessage::new(session, opposite_end, response))
     }
 
     fn get_files_list(&self) -> Vec<Link> {

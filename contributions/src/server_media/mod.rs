@@ -1,4 +1,3 @@
-mod features;
 mod message_handler;
 
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};

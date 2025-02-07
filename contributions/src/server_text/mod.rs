@@ -62,18 +62,8 @@ impl Leaf for TextServer {
                 continue; // Ignore update of backend
             };
 
-            let PacketMessage {
-                session,
-                opposite_end,
-                message,
-            } = packet_msg;
-
-            let response = self.handle_message(message.clone());
-
-            if let Some(response) = response {
-                let packet_resp = PacketMessage::new(session, opposite_end, response);
-                let _ = self.net.sender.send(packet_resp);
-            }
+            let response = self.handle_message(packet_msg);
+            self.net.sender.send(response)
         }
     }
 }

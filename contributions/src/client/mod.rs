@@ -12,12 +12,16 @@ use tokio_util::sync::CancellationToken;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
+/// A client that handle text and media in the form
+/// of a markdown document.
 pub struct TextMediaClient {
     threads_data: Option<ThreadsData>,
 }
 
+/// The three part in which this client is split.
+/// Each part run on a separate thread for better performance.
 struct ThreadsData {
-    network_backend: NetworkBackend,
+    net_handler: NetworkBackend,
     backend: ClientBackend,
     frontend: ClientFrontend,
 }
@@ -41,7 +45,7 @@ impl Leaf for TextMediaClient {
 
         Self {
             threads_data: Some(ThreadsData {
-                network_backend: NetworkBackend::new(
+                net_handler: NetworkBackend::new(
                     id,
                     NodeType::Client,
                     network_in_rcv,
@@ -68,13 +72,13 @@ impl Leaf for TextMediaClient {
         };
 
         let ThreadsData {
-            mut network_backend,
-            mut backend,
+            net_handler: net,
+            backend,
             frontend,
         } = data;
 
-        thread::spawn(move || network_backend.run());
-        thread::spawn(move || backend.run());
+        thread::spawn(move || net.loop_forever());
+        thread::spawn(move || backend.loop_forever());
         frontend.loop_forever();
     }
 }

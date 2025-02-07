@@ -50,7 +50,7 @@ impl ClientBackend {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn loop_forever(mut self) {
         loop {
             select! {
                 recv(self.frontend_rcv) -> res => {

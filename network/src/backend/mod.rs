@@ -70,7 +70,7 @@ impl NetworkBackend {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn loop_forever(mut self) {
         let mut exit = false;
         self.flood();
 

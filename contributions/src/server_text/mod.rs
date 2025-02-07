@@ -11,6 +11,7 @@ use std::thread;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
+/// A text server with some test data.
 pub struct TextServer {
     files: HashMap<Link, FileWithData>,
     net: NetworkCommunication,
@@ -52,8 +53,8 @@ impl Leaf for TextServer {
     }
 
     fn run(&mut self) {
-        if let Some(mut net_backend) = self.net.backend.take() {
-            thread::spawn(move || net_backend.run());
+        if let Some(net_backend) = self.net.backend.take() {
+            thread::spawn(move || net_backend.loop_forever());
         }
 
         while let Ok(net_msg) = self.net.receiver.recv() {

@@ -90,7 +90,7 @@ impl ClientBackend {
         }
     }
 
-    fn fresh_session(&mut self) -> u64 {
+    fn fresh_session(&mut self) -> Session {
         let res = self.new_session;
         self.new_session += 1;
         res

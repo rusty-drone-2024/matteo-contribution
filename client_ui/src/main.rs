@@ -1,5 +1,4 @@
 #![warn(clippy::pedantic)]
-#![allow(clippy::must_use_candidate)]
 use crate::ui::{custom_theme, ClientUI, Message};
 use iced::Task;
 use std::env;

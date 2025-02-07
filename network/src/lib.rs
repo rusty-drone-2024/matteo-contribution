@@ -13,7 +13,6 @@ mod disassembler;
 mod topology;
 
 pub use backend::NetworkBackend;
-// TODO remove it?
 pub use backend::NetworkCommunication;
 pub use backend::NetworkOutput;
 

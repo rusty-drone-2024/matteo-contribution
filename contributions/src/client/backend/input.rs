@@ -49,8 +49,8 @@ impl ClientBackend {
                     }
                 }
 
-                // TODO Maybe send another message
                 if to_wait == 0 {
+                    // TODO Maybe send another message
                     return Err(rq);
                 }
 

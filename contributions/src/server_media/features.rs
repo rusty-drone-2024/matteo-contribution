@@ -7,9 +7,19 @@ const IMAGE_PATH: &str = ".resources/img_matteo";
 
 impl MediaServer {
     pub(crate) fn get_test_media(link: &Link) -> Option<Media> {
-        let link = &format!("{IMAGE_PATH}/{link}");
+        match link.as_str() {
+            "chicken.jpeg" | "sunset.jpg" | "ferris.png" => {}
+            _ => {
+                return None;
+            }
+        }
 
-        // TODO println in case of no folder (or empty) -> just do hard check
-        read(Path::new(link)).ok()
+        let link = &format!("{IMAGE_PATH}/{link}");
+        let Ok(media) = read(Path::new(link)) else {
+            eprintln!("Images of Matteo Media Server are missing");
+            return None;
+        };
+
+        Some(media)
     }
 }

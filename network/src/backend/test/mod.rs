@@ -1,10 +1,10 @@
 #![cfg(test)]
 
-use std::iter;
 use crate::backend::{NetworkBackend, NetworkOutput};
 use crate::PacketMessage;
 use common_structs::leaf::{LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use std::iter;
 use std::time::Duration;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};

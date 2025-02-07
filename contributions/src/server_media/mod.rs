@@ -3,7 +3,6 @@ mod message_handler;
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkOutput::MsgReceived;
-use network::PacketMessage;
 use network::{NetworkBackend, NetworkCommunication};
 use std::collections::HashMap;
 use std::thread;
@@ -57,16 +56,9 @@ impl Leaf for MediaServer {
             let MsgReceived(packet_msg) = net_msg else {
                 continue; // Ignore update of backend
             };
-            let PacketMessage {
-                session,
-                opposite_end,
-                message,
-            } = packet_msg;
 
-            let response = Self::handle_test_message(message.clone());
-
-            let packet_resp = PacketMessage::new(session, opposite_end, response);
-            let _ = self.net.sender.send(packet_resp);
+            let response = Self::handle_message(packet_msg);
+            let _ = self.net.sender.send(response);
         }
     }
 }

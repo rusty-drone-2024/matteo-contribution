@@ -96,7 +96,7 @@ impl NetworkBackend {
                     self.send_message(msg);
                     self.flood_if_needed(false);
                 }
-                default(Duration::from_secs(1)) => {
+                default(Duration::from_secs(3)) => {
                     self.flood_if_needed(true);
                 }
             }

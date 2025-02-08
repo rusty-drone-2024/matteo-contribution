@@ -3,6 +3,10 @@ use common_structs::message::{FileWithData, Link, ServerUUID};
 use std::collections::HashMap;
 
 impl TextServer {
+    /// Used by the server to initialize some test files
+    /// # Return
+    /// An hashmap containing all test files with their
+    /// given link.
     pub(super) fn init_files() -> HashMap<Link, FileWithData> {
         TEST_FILES
             .iter()
@@ -23,7 +27,7 @@ impl TextServer {
 }
 
 #[allow(clippy::type_complexity)]
-pub const TEST_FILES: &[(&str, &[(&str, ServerUUID)], &str)] = &[
+const TEST_FILES: &[(&str, &[(&str, ServerUUID)], &str)] = &[
     ("File1", &[], "Content in file1"),
     ("File2", &[], "Content in file2"),
     ("File3", &[], "# Title"),

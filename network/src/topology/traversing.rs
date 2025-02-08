@@ -12,7 +12,6 @@ impl Topology {
     /// # Return
     /// The routing if one is find. Else in case of the two node are not connected it
     /// returns `None`.
-    // TODO use probability estimation instead
     #[must_use]
     pub fn get_routing_for(&mut self, to: NodeId) -> Option<Routing> {
         let edge_cost = |(node_start, _, &())| {
@@ -36,7 +35,6 @@ impl Topology {
 
     /// Age the path, the pdr estimation is decreased for each of the node
     /// in the chain clamped at 0.
-    //TODO Test expecially if it is too strong (or probably too weak)
     pub(super) fn age_path(&mut self, path: &[NodeId]) {
         for node in path {
             self.update_weight(*node, true);

@@ -42,7 +42,7 @@ pub fn btn_style(theme: &Theme, status: Status, selected: bool) -> Style {
     }
 }
 
-pub fn pad_xy(x: f32, y: f32) -> Padding {
+pub const fn pad_xy(x: f32, y: f32) -> Padding {
     Padding {
         top: y,
         right: x,

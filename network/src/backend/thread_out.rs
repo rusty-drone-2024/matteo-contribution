@@ -23,7 +23,7 @@ impl NetworkBackend {
         let _ = self.thread_out.send(sendable);
     }
 
-    pub(super) fn send_new_leaf_to_thread(&mut self, node_id: NodeId, node_type: NodeType) {
+    pub(super) fn send_new_leaf_to_thread(&self, node_id: NodeId, node_type: NodeType) {
         let sendable = NewLeafFound(node_id, node_type);
         let _ = self.thread_out.send(sendable);
     }

@@ -24,8 +24,8 @@ pub enum NetworkOutput {
 
 pub struct NetworkCommunication {
     pub backend: Option<NetworkBackend>,
-    pub rcv: Receiver<NetworkOutput>,
-    pub send: Sender<PacketMessage>,
+    pub receiver: Receiver<NetworkOutput>,
+    pub sender: Sender<PacketMessage>,
 }
 
 pub struct NetworkBackend {
@@ -70,7 +70,7 @@ impl NetworkBackend {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn loop_forever(mut self) {
         let mut exit = false;
         self.flood();
 
@@ -96,7 +96,7 @@ impl NetworkBackend {
                     self.send_message(msg);
                     self.flood_if_needed(false);
                 }
-                default(Duration::from_secs(1)) => {
+                default(Duration::from_secs(3)) => {
                     self.flood_if_needed(true);
                 }
             }

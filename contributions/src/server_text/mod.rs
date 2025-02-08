@@ -5,17 +5,16 @@ use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use common_structs::message::{FileWithData, Link};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkOutput::MsgReceived;
-use network::PacketMessage;
 use network::{NetworkBackend, NetworkCommunication};
 use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
+/// A text server with some test data.
 pub struct TextServer {
-    _node_id: NodeId,
     files: HashMap<Link, FileWithData>,
-    network: NetworkCommunication,
+    net: NetworkCommunication,
 }
 
 impl Leaf for TextServer {
@@ -44,38 +43,27 @@ impl Leaf for TextServer {
         ));
 
         Self {
-            _node_id: id,
             files: Self::init_files(),
-            network: NetworkCommunication {
+            net: NetworkCommunication {
                 backend: network_backend,
-                rcv: network_rcv,
-                send: network_send,
+                receiver: network_rcv,
+                sender: network_send,
             },
         }
     }
 
     fn run(&mut self) {
-        if let Some(mut net_backend) = self.network.backend.take() {
-            thread::spawn(move || net_backend.run());
+        if let Some(net_backend) = self.net.backend.take() {
+            thread::spawn(move || net_backend.loop_forever());
         }
 
-        while let Ok(net_msg) = self.network.rcv.recv() {
+        while let Ok(net_msg) = self.net.receiver.recv() {
             let MsgReceived(packet_msg) = net_msg else {
                 continue; // Ignore update of backend
             };
 
-            let PacketMessage {
-                session,
-                opposite_end,
-                message,
-            } = packet_msg;
-
-            let response = self.handle_message(message.clone());
-
-            if let Some(response) = response {
-                let packet_resp = PacketMessage::new(session, opposite_end, response);
-                let _ = self.network.send.send(packet_resp);
-            }
+            let response = self.handle_message(packet_msg);
+            let _ = self.net.sender.send(response);
         }
     }
 }

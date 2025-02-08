@@ -24,7 +24,7 @@ impl Assembler {
             .or_insert_with(|| MessageToAssemble::new(total));
 
         let is_valid =
-            Assembler::is_valid_index(fragment.fragment_index, total, to_assemble.pieces_number);
+            Self::is_valid_index(fragment.fragment_index, total, to_assemble.pieces_number);
         if !is_valid {
             return Err(FragmentMalformed {});
         }
@@ -40,7 +40,7 @@ impl Assembler {
     /// between 0 <= `index` < `total`.
     /// # Return
     /// True if valid and false else.
-    pub(super) fn is_valid_index(
+    pub(super) const fn is_valid_index(
         index: FragmentIdx,
         total: FragmentIdx,
         expected_total: FragmentIdx,

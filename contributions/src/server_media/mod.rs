@@ -1,18 +1,17 @@
-mod features;
 mod message_handler;
 
 use common_structs::leaf::{Leaf, LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use network::NetworkOutput::MsgReceived;
-use network::PacketMessage;
 use network::{NetworkBackend, NetworkCommunication};
 use std::collections::HashMap;
 use std::thread;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
 
+/// A media server with some test data.
 pub struct MediaServer {
-    network: NetworkCommunication,
+    net: NetworkCommunication,
 }
 
 impl Leaf for MediaServer {
@@ -41,33 +40,26 @@ impl Leaf for MediaServer {
         ));
 
         Self {
-            network: NetworkCommunication {
+            net: NetworkCommunication {
                 backend: network_backend,
-                rcv: network_rcv,
-                send: network_send,
+                receiver: network_rcv,
+                sender: network_send,
             },
         }
     }
 
     fn run(&mut self) {
-        if let Some(mut net_backend) = self.network.backend.take() {
-            thread::spawn(move || net_backend.run());
+        if let Some(net_backend) = self.net.backend.take() {
+            thread::spawn(move || net_backend.loop_forever());
         }
 
-        while let Ok(net_msg) = self.network.rcv.recv() {
+        while let Ok(net_msg) = self.net.receiver.recv() {
             let MsgReceived(packet_msg) = net_msg else {
                 continue; // Ignore update of backend
             };
-            let PacketMessage {
-                session,
-                opposite_end,
-                message,
-            } = packet_msg;
 
-            let response = Self::handle_test_message(message.clone());
-
-            let packet_resp = PacketMessage::new(session, opposite_end, response);
-            let _ = self.network.send.send(packet_resp);
+            let response = Self::handle_message(packet_msg);
+            let _ = self.net.sender.send(response);
         }
     }
 }

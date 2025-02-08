@@ -26,8 +26,6 @@ impl ClientUI {
                 return self.create_task(req);
             }
             Message::LinkClicked(url) => {
-                let url = url.to_string();
-
                 if url.starts_with("http") {
                     let _ = open::that(url.as_str());
                 } else {

@@ -4,6 +4,7 @@ use crate::backend::{NetworkBackend, NetworkOutput};
 use crate::PacketMessage;
 use common_structs::leaf::{LeafCommand, LeafEvent};
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use std::iter;
 use std::time::Duration;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{NodeType, Packet};
@@ -27,7 +28,7 @@ struct Connections {
 }
 
 impl Connections {
-    fn new(
+    const fn new(
         net_in: Sender<PacketMessage>,
         net_out: Receiver<NetworkOutput>,
         pck_in: Sender<Packet>,
@@ -60,7 +61,7 @@ fn new_net_handler(id: NodeId, next_id: NodeId) -> (Net, Connections) {
         net_in.1,
         net_out.0,
         pck_in.1,
-        [(next_id, pck_out.0)].into_iter().collect(),
+        iter::once((next_id, pck_out.0)).collect(),
         leaf_event.0,
         leaf_command.1,
     );

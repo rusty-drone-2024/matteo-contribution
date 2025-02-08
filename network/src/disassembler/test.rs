@@ -22,7 +22,9 @@ fn fragment_packets() {
     disassembler.split(11, 20, msg);
     let split = disassembler.get(11).unwrap();
 
-    assert_eq!(expected, split.fragments());
+    let mut frag = split.fragments();
+    frag.sort_by(|a, b| a.fragment_index.cmp(&b.fragment_index));
+    assert_eq!(expected, frag);
 }
 
 #[test]

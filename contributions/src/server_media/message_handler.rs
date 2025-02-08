@@ -33,7 +33,7 @@ impl MediaServer {
     /// The given `Media` if it exist. Else `None` is returned.
     fn get_media(link: &Link) -> Option<Media> {
         match link.as_str() {
-            "chicken.jpeg" | "sunset.jpg" | "ferris.png" => {}
+            "my-chicken.jpeg" | "sunset.jpg" | "ferris.png" => {}
             _ => return None,
         }
 

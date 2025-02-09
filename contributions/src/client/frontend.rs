@@ -1,3 +1,4 @@
+use std::env::current_exe;
 use client_bridge::RequestWrapper;
 use crossbeam_channel::Sender;
 use std::process::{Child, Command};
@@ -91,19 +92,12 @@ impl ClientFrontend {
     /// To do so it uses cargo in debug mode as temp fix.
     /// In release mode it assume that the file is in `.resources/client_ui`
     fn run_gui(addr: &str) -> Child {
-        #[cfg(debug_assertions)]
-        return Command::new("cargo")
-            .arg("run")
-            .arg("--bin")
-            .arg("client_ui")
-            .arg(addr)
-            .spawn()
-            .expect("Couldn't open the required binary");
+        let exe = current_exe();
 
-        #[cfg(not(debug_assertions))]
-        return Command::new(".resources/client_ui")
+        Command::new(exe.expect("FAIL").to_str().unwrap())
+            .arg("media-gui")
             .arg(addr)
             .spawn()
-            .expect("Couldn't open the required binary");
+            .expect("Couldn't open the required binary")
     }
 }

@@ -16,7 +16,7 @@ impl Topology {
     pub fn get_routing_for(&mut self, to: NodeId) -> Option<Routing> {
         let edge_cost = |(node_start, _, &())| {
             let weight = self.weights.get(&node_start).copied().unwrap_or_default();
-            u64::from(weight) + 1
+            weight + 1.0
         };
 
         let path = astar(
@@ -24,7 +24,7 @@ impl Topology {
             self.start_id,
             |finish| finish == to,
             edge_cost,
-            |_| 0,
+            |_| 0.0,
         )?
         .1;
 

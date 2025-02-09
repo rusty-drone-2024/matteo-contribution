@@ -91,7 +91,7 @@ impl ClientFrontend {
     /// To do so it uses cargo in debug mode as temp fix.
     /// In release mode it assume that the file is in `.resources/client_ui`
     fn run_gui(addr: &str) -> Child {
-        #[cfg(debug_assertions)]
+        /*#[cfg(debug_assertions)]
         return Command::new("cargo")
             .arg("run")
             .arg("--bin")
@@ -100,10 +100,10 @@ impl ClientFrontend {
             .spawn()
             .expect("Couldn't open the required binary");
 
-        #[cfg(not(debug_assertions))]
-        return Command::new(".resources/client_ui")
+        #[cfg(not(debug_assertions))]*/
+        Command::new(".resources/client_ui")
             .arg(addr)
             .spawn()
-            .expect("Couldn't open the required binary");
+            .expect("Couldn't open the required binary")
     }
 }

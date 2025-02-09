@@ -1,4 +1,4 @@
-use crate::topology::{Topology, Weight};
+use crate::topology::Topology;
 use wg_2024::network::NodeId;
 use wg_2024::packet::{FloodResponse, NodeType};
 
@@ -50,6 +50,9 @@ impl Topology {
             let a = window[0];
             let b = window[1];
 
+            self.weights.entry(a).or_insert(10000.0);
+            self.weights.entry(a).or_insert(10000.0);
+
             self.graph.add_edge(a, b, ());
             if i != 0 && !(is_last_leaf && i == last_index) {
                 self.graph.add_edge(b, a, ());
@@ -74,14 +77,23 @@ impl Topology {
     /// `positive` flag. If this flag is set the `weight` is decreased in order
     /// to make it more likely to be picked in the future.
     pub(super) fn update_weight(&mut self, node: NodeId, positive: bool) {
-        const MEM_LEN: u64 = 50;
-        const NEG_FACTOR: u64 = 200;
+        const MEM_LEN: f64 = 50.0;
+        const NEG_FACTOR: f64 = 100000.0;
 
-        let new_res = u64::from(!positive) * NEG_FACTOR;
+        let new_res = f64::from(!positive) * NEG_FACTOR;
 
-        let weight = self.weights.entry(node).or_default();
-        let new_weight = (u64::from(*weight) * (MEM_LEN - 1) + new_res) / MEM_LEN;
+        let weight = self.weights.entry(node).or_insert(10000.0);
+        let new_weight = (f64::from(*weight) * (MEM_LEN - 1.0) + new_res) / MEM_LEN;
 
-        *weight = Weight::try_from(new_weight).unwrap_or(0);
+        *weight = new_weight;
+
+        let mut a = self.weights.iter().map(|(id, w)| (id, *w / 1000.0)).collect::<Vec<_>>();
+        a.sort_by(|(id1, _), (id2, _)| id1.cmp(id2));
+
+        let mut str = "".to_string();
+        for i in a {
+            str.push_str(&format!("(id={}, {:.1})", i.0, i.1))
+        }
+        println!("{str}");
     }
 }

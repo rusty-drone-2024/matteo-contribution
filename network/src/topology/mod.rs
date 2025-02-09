@@ -8,7 +8,7 @@ use wg_2024::network::NodeId;
 
 /// The weight of a single node, is an estimation of
 /// the drone pdr. The higher the number the higher the pdr is.
-pub type Weight = u8;
+pub type Weight = f64;
 
 /// Represent the topology using a directed graph
 /// to avoid passing thought the client and use

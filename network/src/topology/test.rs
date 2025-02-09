@@ -135,9 +135,9 @@ fn max_weight_decrease() {
     for _ in 0..100 {
         topology.mark_drop(5);
     }
-    assert!(*topology.weights.get(&5).unwrap() > 0);
+    assert!(*topology.weights.get(&5).unwrap() > 0.0);
     for _ in 0..100 {
         topology.update_weight(5, true);
     }
-    assert_eq!(0u8, *topology.weights.get(&5).unwrap());
+    assert_eq!(0.0, *topology.weights.get(&5).unwrap());
 }

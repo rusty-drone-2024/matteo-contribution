@@ -3,6 +3,3 @@ Cargo.lock
 
 .idea
 *.log
-
-# Test files
-/.resources/

@@ -84,7 +84,7 @@ impl NetworkBackend {
         if fully_acked {
             let _ = self
                 .controller_event
-                .send(LeafEvent::MessageFullySent(session));
+                .send(LeafEvent::MessageFullySent(self.id, session));
         }
 
         self.topology.age_path(&routing.hops);

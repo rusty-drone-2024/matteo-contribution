@@ -17,7 +17,7 @@ impl NetworkBackend {
         self.disassembler.split(session, dest, message.clone());
         let _ = self
             .controller_event
-            .send(LeafEvent::MessageStartSend(session, message));
+            .send(LeafEvent::MessageStartSend(self.id, session, message));
         self.send_split(session);
     }
 

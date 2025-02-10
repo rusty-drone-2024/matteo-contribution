@@ -97,6 +97,7 @@ impl NetworkBackend {
                     self.flood_if_needed(false);
                 }
                 default(Duration::from_secs(3)) => {
+                    //self.topology.print_estimations();
                     self.flood_if_needed(true);
                 }
             }

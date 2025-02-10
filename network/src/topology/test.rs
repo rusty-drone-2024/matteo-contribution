@@ -132,12 +132,16 @@ fn max_weight_decrease() {
     let path1 = vec![11, 1, 5, 8, 9];
     topology.add_path(&path1, true).unwrap();
 
-    for _ in 0..100 {
+    for _ in 0..1000 {
         topology.mark_drop(5);
     }
-    assert!(*topology.weights.get(&5).unwrap() > 0);
-    for _ in 0..100 {
+    let max = *topology.weights.get(&5).unwrap();
+
+    for _ in 0..1000 {
         topology.update_weight(5, true);
     }
-    assert_eq!(0u8, *topology.weights.get(&5).unwrap());
+    let min = *topology.weights.get(&5).unwrap();
+
+    assert!(max > 0);
+    assert!(min * 2 < max);
 }

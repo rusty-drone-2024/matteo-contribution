@@ -74,14 +74,34 @@ impl Topology {
     /// `positive` flag. If this flag is set the `weight` is decreased in order
     /// to make it more likely to be picked in the future.
     pub(super) fn update_weight(&mut self, node: NodeId, positive: bool) {
-        const MEM_LEN: u64 = 50;
-        const NEG_FACTOR: u64 = 200;
+        const MEM_LEN: u32 = 1000;
+        const NEG_FACTOR: u32 = u32::MAX / MEM_LEN;
 
-        let new_res = u64::from(!positive) * NEG_FACTOR;
+        let new_res = u32::from(!positive) * NEG_FACTOR;
 
         let weight = self.weights.entry(node).or_default();
-        let new_weight = (u64::from(*weight) * (MEM_LEN - 1) + new_res) / MEM_LEN;
+        let new_weight = (*weight * (MEM_LEN - 1) + new_res) / MEM_LEN;
 
         *weight = Weight::try_from(new_weight).unwrap_or(0);
+    }
+
+    #[allow(dead_code)]
+    pub fn print_estimations(&self) {
+        let max = Weight::max(1, self.weights.values().copied().max().unwrap_or(1));
+
+        let mut values = self
+            .weights
+            .iter()
+            .map(|(id, w)| (*id, f64::from(*w * 100) / f64::from(max)))
+            .collect::<Vec<_>>();
+
+        values.sort_by(|(id1, _), (id2, _)| id1.cmp(id2));
+
+        let mut str = String::new();
+        for (id, percent) in values {
+            str.push_str(&format!("[{id}]={percent:.1} "));
+        }
+
+        println!("ID {} weights: {}", self.start_id, str);
     }
 }

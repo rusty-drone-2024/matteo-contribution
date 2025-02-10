@@ -51,8 +51,7 @@ impl Disassembler {
 
     /// Mark a fragment decided by the `fragment_idx` of a message decided by the `session`
     /// # Return
-    /// Wheater the ack changed the status of the fragment. Meaning it return false if
-    /// it was already ack, true otherwise.
+    /// Wheater the `Message` is fully acker or not.
     /// # Error
     /// It return error if the `session` is not present in the disassembler.
     pub fn ack(&mut self, session: Session, fragment_idx: FragmentIdx) -> Result<bool, String> {
@@ -63,7 +62,8 @@ impl Disassembler {
 
         if res && is_acked {
             self.splits.remove(&session);
+            return Ok(true);
         }
-        Ok(res)
+        Ok(false)
     }
 }

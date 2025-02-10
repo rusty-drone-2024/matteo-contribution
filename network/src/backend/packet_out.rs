@@ -15,9 +15,12 @@ impl NetworkBackend {
 
         println!("===SENDING===> ({} -> {dest}): {}", self.id, &message);
         self.disassembler.split(session, dest, message.clone());
-        let _ = self
-            .controller_event
-            .send(LeafEvent::MessageStartSend(self.id, session, message));
+        let _ = self.controller_event.send(LeafEvent::MessageStartSend {
+            start: self.id,
+            session,
+            dest,
+            message,
+        });
         self.send_split(session);
     }
 

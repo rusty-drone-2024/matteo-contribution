@@ -13,7 +13,6 @@ impl NetworkBackend {
             message,
         } = msg;
 
-        println!("===SENDING===> ({} -> {dest}): {}", self.id, &message);
         self.disassembler.split(session, dest, message.clone());
         let _ = self.controller_event.send(LeafEvent::MessageStartSend {
             start: self.id,
@@ -71,7 +70,7 @@ impl NetworkBackend {
 
     pub(super) fn flood(&mut self) {
         let flood_id = self.topology.take_fresh_flood_id();
-        println!("==> FLOODING FROM {}", self.id);
+        //println!("==> FLOODING FROM {}", self.id);
 
         let packet = Packet::new_flood_request(
             Routing::empty_route(),

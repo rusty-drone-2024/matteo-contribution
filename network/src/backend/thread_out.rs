@@ -18,7 +18,6 @@ impl NetworkBackend {
             return; // Packet not ready yet
         };
 
-        println!("\t===RECEIVED==> ({} <- {}): {}", self.id, source, message);
         let sendable = MsgReceived(PacketMessage::new(session, source, message));
         let _ = self.thread_out.send(sendable);
     }

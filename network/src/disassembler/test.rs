@@ -41,7 +41,8 @@ fn fragment_acks() {
 
     for i in 0..fragments.len() as u64 {
         assert!(disassembler.splits.contains_key(&11));
-        assert_eq!(Ok(true), disassembler.ack(11, i));
+        let is_last = i == (fragments.len() - 1) as u64;
+        assert_eq!(Ok(is_last), disassembler.ack(11, i));
     }
     assert!(!disassembler.splits.contains_key(&11));
 }

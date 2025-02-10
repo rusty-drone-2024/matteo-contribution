@@ -1,4 +1,5 @@
 use crate::backend::NetworkBackend;
+use common_structs::leaf::LeafEvent;
 use common_structs::types::{Routing, Session};
 use wg_2024::packet::{Ack, FloodResponse, Fragment, Nack, NackType, Packet, PacketType};
 
@@ -79,7 +80,12 @@ impl NetworkBackend {
     }
 
     fn handle_ack(&mut self, session: Session, ack: &Ack, routing: &Routing) -> Result<(), String> {
-        self.disassembler.ack(session, ack.fragment_index)?;
+        let fully_acked = self.disassembler.ack(session, ack.fragment_index)?;
+        if fully_acked {
+            let _ = self
+                .controller_event
+                .send(LeafEvent::MessageFullySent(session));
+        }
 
         self.topology.age_path(&routing.hops);
         Ok(())

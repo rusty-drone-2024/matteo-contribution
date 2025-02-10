@@ -1,4 +1,5 @@
 use crate::backend::{NetworkBackend, PacketMessage};
+use common_structs::leaf::LeafEvent;
 use common_structs::leaf::LeafEvent::{ControllerShortcut, PacketSend};
 use common_structs::types::{Routing, Session};
 use wg_2024::packet::PacketType::MsgFragment;
@@ -13,7 +14,10 @@ impl NetworkBackend {
         } = msg;
 
         println!("===SENDING===> ({} -> {dest}): {}", self.id, &message);
-        self.disassembler.split(session, dest, message);
+        self.disassembler.split(session, dest, message.clone());
+        let _ = self
+            .controller_event
+            .send(LeafEvent::MessageStartSend(session, message));
         self.send_split(session);
     }
 
